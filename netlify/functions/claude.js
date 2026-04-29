@@ -190,7 +190,7 @@ Finally, end the recipe with a section called "WANT TO LEARN MORE?" and suggest 
       if (!text) throw new Error("Empty response");
       setRecipe(text);
     } catch(e) {
-      setError("Error: " + e.message);
+      setError("Error: " + (e.message || JSON.stringify(e)) + " | Status: " + (res ? res.status : "no response"));
     }
     setLoading(false);
   };
@@ -401,7 +401,7 @@ Finally, end the recipe with a section called "WANT TO LEARN MORE?" and suggest 
 
                   {/* Parse and render recipe sections */}
                   {(() => {
-                    const lines = recipe.split("\n").filter(l => l.trim());
+                    const lines = (recipe || "").split("\n").filter(l => l.trim());
                     const sections = { meta:[], why:"", about:"", technique:"", special:"", ingredients:[], tip:"", name:"", learnMore:"" };
                     let inIngredients = false;
 
@@ -477,6 +477,11 @@ Finally, end the recipe with a section called "WANT TO LEARN MORE?" and suggest 
                           <div style={{ padding:"16px", whiteSpace:"pre-wrap", fontSize:13, lineHeight:1.8, color:"#222" }}>
                             {recipe}
                           </div>
+                          {(!recipe || recipe.trim() === "") && (
+                            <div style={{ color:"#c62828", padding:"20px" }}>
+                              Recipe was empty. Please try again.
+                            </div>
+                          )}
                         )}
 
                         {/* Tip */}
