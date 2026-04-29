@@ -177,7 +177,7 @@ Finally, end the recipe with a section called "WANT TO LEARN MORE?" and suggest 
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           model: "claude-sonnet-4-20250514",
-          max_tokens: 1200,
+          max_tokens: 4000,
           system: systemPrompt,
           messages: [{ role: "user", content: userPrompt }]
         })
