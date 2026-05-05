@@ -1,6 +1,6 @@
 
 AI Overview
-— A web application for generating personalized vegan recipes using professional plant-based ingredients and providing training course links.1
+— This file contains the latest version of the recipe application, featuring a TikTok-style video commercial.123
 
 <!DOCTYPE html>
 <html lang="en">
@@ -12,8 +12,13 @@ AI Overview
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow-x:hidden}
 body{font-family:'Inter',sans-serif;background:#FAF8F4;color:#1A1A18;font-size:16px}
-.wrap{max-width:580px;margin:0 auto;padding:1.25rem}
+.screen{position:fixed;top:0;left:0;width:100%;height:100%;overflow-y:auto;background:#FAF8F4;transition:transform 0.5s cubic-bezier(0.4,0,0.2,1);z-index:1}
+.screen.below{transform:translateY(100%)}
+.screen.active{transform:translateY(0)}
+.screen.above{transform:translateY(-100%)}
+.wrap{max-width:580px;margin:0 auto;padding:1.25rem 1.25rem 3rem}
 .hero{background:#FF1493;border-radius:14px;padding:1.75rem 1.5rem;margin-bottom:1.5rem;text-align:center}
 .hero-label{font-size:11px;color:#000;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.6rem;font-weight:500}
 .hero h1{font-family:'Lora',serif;font-size:28px;font-weight:400;color:#fff;line-height:1.2}
@@ -29,21 +34,28 @@ textarea:focus{outline:none;border-color:#FF1493}
 .chip.red{border-color:#F0CBCB}
 .chip.red.on{background:#FAEAEA;border-color:#D85A5A;color:#A32D2D}
 .divider{height:1px;background:rgba(26,26,24,.08);margin:1.1rem 0}
-.fft{background:#fff;border:1.5px solid rgba(26,26,24,.1);border-radius:14px;padding:1.1rem;margin-bottom:1.25rem}
-.fft h3{font-size:.88rem;font-weight:600;margin-bottom:.3rem;color:#1A1A18}
-.fft p{font-size:.8rem;color:#777;margin-bottom:.65rem;line-height:1.55}
-.fft-tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:.65rem}
-.fft-tag{background:#FFE4F0;border:1px solid #FF1493;padding:.22rem .6rem;border-radius:999px;font-size:.73rem;color:#8B0057}
-.fft-check{display:flex;align-items:center;gap:8px;font-size:.82rem;cursor:pointer;color:#1A1A18}
-.fft-check input{width:16px;height:16px;accent-color:#FF1493;flex-shrink:0}
-.spin-wrap{display:none;text-align:center;padding:2.5rem 1rem}
-.spin-wrap.on{display:block}
-.spin{width:44px;height:44px;border:3px solid #FFE4F0;border-top-color:#FF1493;border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 1rem}
-@keyframes spin{to{transform:rotate(360deg)}}
-.spin-wrap h3{font-family:'Lora',serif;font-size:1.1rem;margin-bottom:.35rem}
-.spin-wrap p{font-size:.85rem;color:#888}
-.result{display:none}
-.result.on{display:block}
+.fft{background:#FFE4F0;border:1.5px solid #FF1493;border-radius:14px;padding:1.1rem;margin-bottom:1.25rem;text-align:center}
+.fft h3{font-size:.88rem;font-weight:600;margin-bottom:.3rem;color:#8B0057}
+.fft p{font-size:.8rem;color:#8B0057;line-height:1.55}
+.fft-tags{display:flex;flex-wrap:wrap;gap:5px;justify-content:center;margin-top:.5rem}
+.fft-tag{background:#fff;border:1px solid #FF1493;padding:.22rem .6rem;border-radius:999px;font-size:.73rem;color:#8B0057}
+.btn-pink{width:100%;padding:1rem;background:#FF1493;color:#fff;border:none;border-radius:12px;font-size:1rem;font-weight:600;cursor:pointer;display:block;text-align:center;margin-bottom:.65rem}
+.btn-out{width:100%;padding:.85rem;background:#fff;color:#1A1A18;border:1.5px solid rgba(26,26,24,.15);border-radius:12px;font-size:.9rem;font-weight:500;cursor:pointer;display:block;text-align:center;margin-bottom:.65rem}
+.note{font-size:.72rem;color:#aaa;text-align:center;margin-bottom:1.5rem}
+.err{background:#FAEAEA;border:1px solid #D85A5A;border-radius:10px;padding:1rem;margin-bottom:1rem;font-size:.88rem;color:#A32D2D;display:none}
+.err.on{display:block}
+.capture-box{background:#fff;border:1.5px solid rgba(26,26,24,.1);border-radius:14px;padding:1.5rem;margin-bottom:1.25rem}
+.capture-box h2{font-family:'Lora',serif;font-size:1.2rem;margin-bottom:.4rem;color:#1A1A18}
+.capture-box p{font-size:.85rem;color:#777;margin-bottom:1.2rem;line-height:1.6}
+.country-detect{font-size:.8rem;color:#888;margin-bottom:.8rem;padding:.6rem;background:#FAF8F4;border-radius:8px;text-align:center}
+#screen3{background:#000}
+.video-wrap{position:relative;width:100%;height:100vh;overflow:hidden}
+.video-wrap iframe{width:100%;height:100%;position:absolute;top:0;left:0;border:none}
+.video-overlay{position:absolute;bottom:0;left:0;right:0;padding:1.5rem;background:linear-gradient(transparent,rgba(0,0,0,0.8));z-index:10;color:#fff;text-align:center}
+.video-overlay p{font-size:.85rem;opacity:.8;margin-bottom:.5rem}
+.video-progress{width:100%;height:4px;background:rgba(255,255,255,.3);border-radius:2px;overflow:hidden;margin-bottom:1rem}
+.video-progress-bar{height:100%;background:#FF1493;border-radius:2px;width:0%;transition:width 1s linear}
+.swipe-hint{font-size:.75rem;opacity:.6;margin-top:.5rem}
 .r-hdr{background:#1A1A18;color:#fff;border-radius:14px;padding:1.4rem;margin-bottom:1rem}
 .r-sub{font-size:.68rem;opacity:.5;text-transform:uppercase;letter-spacing:.09em;margin-bottom:.4rem}
 .r-title{font-family:'Lora',serif;font-size:1.5rem;line-height:1.2;margin-bottom:.3rem}
@@ -71,42 +83,35 @@ textarea:focus{outline:none;border-color:#FF1493}
 .pdf-box{background:#FDF5EA;border:1px solid rgba(196,133,42,.2);border-radius:14px;padding:1.25rem;text-align:center;margin-bottom:1rem}
 .pdf-box h3{font-family:'Lora',serif;font-size:1rem;margin-bottom:.3rem}
 .pdf-box p{font-size:.82rem;color:#888;margin-bottom:1rem;line-height:1.5}
-.btn-pink{width:100%;padding:1rem;background:#FF1493;color:#fff;border:none;border-radius:12px;font-size:1rem;font-weight:600;cursor:pointer;display:block;text-align:center;margin-bottom:.65rem}
-.btn-out{width:100%;padding:.85rem;background:#fff;color:#1A1A18;border:1.5px solid rgba(26,26,24,.15);border-radius:12px;font-size:.9rem;font-weight:500;cursor:pointer;display:block;text-align:center;margin-bottom:.65rem}
-.note{font-size:.72rem;color:#aaa;text-align:center;margin-bottom:1.5rem}
-.err{background:#FAEAEA;border:1px solid #D85A5A;border-radius:10px;padding:1rem;margin-bottom:1rem;font-size:.88rem;color:#A32D2D;display:none}
-.err.on{display:block}
-.capture-box{background:#fff;border:1.5px solid rgba(26,26,24,.1);border-radius:14px;padding:1.5rem;margin-bottom:1.25rem}
-.capture-box h2{font-family:'Lora',serif;font-size:1.2rem;margin-bottom:.4rem;color:#1A1A18}
-.capture-box p{font-size:.85rem;color:#777;margin-bottom:1.2rem;line-height:1.6}
-.country-detect{font-size:.8rem;color:#888;margin-bottom:.8rem;padding:.6rem;background:#FAF8F4;border-radius:8px;text-align:center}
+.swipe-up-bar{text-align:center;padding:.75rem;font-size:.78rem;color:#aaa;cursor:pointer;border-top:1px solid rgba(26,26,24,.06);margin-top:.5rem}
+.swipe-up-bar span{display:block;font-size:1.2rem;margin-bottom:.2rem}
 </style>
 </head>
 <body>
-<div class="wrap">
 
-  <!-- SCREEN 1: CAPTURE FORM -->
-  <div id="captureScreen">
+<div id="screen1" class="screen active">
+  <div class="wrap">
     <div class="hero">
       <div class="hero-label">Chef Jessica's Kitchen</div>
       <h1>Your <em>perfect</em> recipe</h1>
     </div>
     <div class="capture-box">
       <h2>Let's get started! 👋</h2>
-      <p>Enter your details below and Chef Jessica will create a personalised recipe just for you.</p>
+      <p>Enter your details and Chef Jessica will create a personalised recipe just for you.</p>
       <div class="country-detect" id="countryDetect">🌍 Detecting your location...</div>
       <span class="slbl">Email address</span>
       <input type="email" id="captureEmail" placeholder="your@email.com">
       <span class="slbl">Phone number</span>
       <input type="tel" id="capturePhone" placeholder="+1 234 567 8900">
-      <div class="err" id="captureErr">Please enter your email address to continue.</div>
+      <div class="err" id="captureErr">Please enter a valid email address.</div>
       <button onclick="submitCapture()" class="btn-pink" style="margin-top:.75rem">✨ Make My Recipe</button>
       <p class="note">Your details are kept private and never shared.</p>
     </div>
   </div>
+</div>
 
-  <!-- SCREEN 2: RECIPE FORM -->
-  <div id="recipeScreen" style="display:none">
+<div id="screen2" class="screen below">
+  <div class="wrap">
     <div class="hero">
       <div class="hero-label">Chef Jessica's Kitchen</div>
       <h1>Your <em>perfect</em> recipe</h1>
@@ -157,56 +162,67 @@ textarea:focus{outline:none;border-color:#FF1493}
     </div>
     <div class="divider"></div>
     <div class="fft">
-      <h3>Free From That Products</h3>
-      <p>Professional plant-based ingredients used by chefs worldwide — free from allergens, dairy and eggs.</p>
+      <h3>✨ Made with Free From That Products</h3>
+      <p>Every recipe uses Chef Jessica's professional plant-based ingredients</p>
       <div class="fft-tags">
         <span class="fft-tag">Potato Protein 300</span>
         <span class="fft-tag">PANACEGG</span>
         <span class="fft-tag">GERBET</span>
       </div>
-      <label class="fft-check"><input type="checkbox" id="useFFT"> Include Free From That products where helpful</label>
     </div>
     <div class="err" id="errBox">Something went wrong — please try again.</div>
-    <button onclick="generate()" class="btn-pink">&#10024; Make My Recipe &amp; Download PDF</button>
+    <button onclick="generate()" class="btn-pink">✨ Make My Recipe</button>
     <p class="note">Your personalised recipe will be created by Chef Jessica</p>
-    <div class="spin-wrap" id="spinWrap">
-      <div class="spin"></div>
-      <h3>Chef Jessica is cooking...</h3>
-      <p id="spinMsg">Analysing your preferences...</p>
+  </div>
+</div>
+
+<div id="screen3" class="screen below">
+  <div class="video-wrap">
+    <iframe id="ytFrame" src="" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+    <div class="video-overlay">
+      <p>Chef Jessica is creating your recipe...</p>
+      <div class="video-progress"><div class="video-progress-bar" id="progressBar"></div></div>
+      <div class="swipe-hint">↑ Swipe up for your recipe</div>
     </div>
-    <div class="result" id="resultDiv">
-      <div class="r-hdr">
-        <div class="r-sub">Chef Jessica's recipe for you</div>
-        <div class="r-title" id="rTitle"></div>
-        <div class="r-tagline" id="rTagline"></div>
-        <div class="r-meta">
-          <div class="r-mi"><div class="r-ml">Prep</div><div class="r-mv" id="rPrep">-</div></div>
-          <div class="r-mi"><div class="r-ml">Cook</div><div class="r-mv" id="rCook">-</div></div>
-          <div class="r-mi"><div class="r-ml">Serves</div><div class="r-mv" id="rServes">-</div></div>
-          <div class="r-mi"><div class="r-ml">Level</div><div class="r-mv" id="rDiff">-</div></div>
-        </div>
+  </div>
+</div>
+
+<div id="screen4" class="screen below">
+  <div class="wrap">
+    <div class="r-hdr">
+      <div class="r-sub">Chef Jessica's recipe for you</div>
+      <div class="r-title" id="rTitle"></div>
+      <div class="r-tagline" id="rTagline"></div>
+      <div class="r-meta">
+        <div class="r-mi"><div class="r-ml">Prep</div><div class="r-mv" id="rPrep">-</div></div>
+        <div class="r-mi"><div class="r-ml">Cook</div><div class="r-mv" id="rCook">-</div></div>
+        <div class="r-mi"><div class="r-ml">Serves</div><div class="r-mv" id="rServes">-</div></div>
+        <div class="r-mi"><div class="r-ml">Level</div><div class="r-mv" id="rDiff">-</div></div>
       </div>
-      <div class="r-body">
-        <div class="r-sec">Ingredients</div>
-        <ul class="ing-list" id="ingList"></ul>
-        <div class="r-sec">Method</div>
-        <ol class="steps-list" id="stepsList"></ol>
-        <div class="chef-note" id="chefNote">
-          <div class="chef-note-lbl">Chef Jessica's Tip</div>
-          <p id="chefNoteText"></p>
-        </div>
+    </div>
+    <div class="r-body">
+      <div class="r-sec">Ingredients</div>
+      <ul class="ing-list" id="ingList"></ul>
+      <div class="r-sec">Method</div>
+      <ol class="steps-list" id="stepsList"></ol>
+      <div class="chef-note" id="chefNote">
+        <div class="chef-note-lbl">Chef Jessica's Tip</div>
+        <p id="chefNoteText"></p>
       </div>
-      <div style="margin-bottom:1rem">
-        <div style="font-family:Lora,serif;font-size:1rem;margin-bottom:.6rem">Want to learn more?</div>
-        <div class="train-grid" id="trainGrid"></div>
-      </div>
-      <div class="pdf-box">
-        <h3>Download Your Recipe</h3>
-        <p>Beautifully formatted in Chef Jessica's signature style.</p>
-        <button onclick="downloadPDF()" class="btn-pink" id="pdfBtn">&#8659; Download PDF</button>
-        <button onclick="window.print()" class="btn-out">&#128424; Print</button>
-      </div>
-      <button onclick="startOver()" class="btn-out">&#8592; Make Another Recipe</button>
+    </div>
+    <div style="margin-bottom:1rem">
+      <div style="font-family:Lora,serif;font-size:1rem;margin-bottom:.6rem">Want to learn more?</div>
+      <div class="train-grid" id="trainGrid"></div>
+    </div>
+    <div class="pdf-box">
+      <h3>Download Your Recipe</h3>
+      <p>Beautifully formatted in Chef Jessica's signature style.</p>
+      <button onclick="downloadPDF()" class="btn-pink" id="pdfBtn">⬇ Download PDF</button>
+      <button onclick="window.print()" class="btn-out">🖨 Print</button>
+    </div>
+    <div class="swipe-up-bar" onclick="goToScreen(2)">
+      <span>↑</span>
+      Change my recipe request
     </div>
   </div>
 </div>
@@ -216,6 +232,9 @@ var WORKER="https://fft-recipe.man-4bb.workers.dev";
 var SHEETS_URL="https://script.google.com/macros/s/AKfycbxHSfo3ewpxYAZpR41NwdxVm7S91rjLBkwYr3NUD4QRn7_6bifXxxE6SAtS8xg3IsDILg/exec";
 var recipe=null;
 var customerData={email:'',phone:'',country:'',city:'',recipeId:''};
+var progressTimer=null;
+var elapsed=0;
+
 var courses=[
   {name:"Vegan Cheesecakes",url:"https://freefromthat.com/TRAINING-CHEESECAKES",tags:["dessert","cheese"]},
   {name:"Mousse Cakes",url:"https://freefromthat.com/TRAINING-MOUSSE/",tags:["dessert","cake"]},
@@ -231,25 +250,44 @@ var courses=[
   {name:"Tiramisu",url:"https://freefromthat.com/TRAINING-TIRAMISU",tags:["italian"]}
 ];
 
-function generateId(){var now=new Date();return 'RCP-'+now.getFullYear().toString().slice(-2)+String(now.getMonth()+1).padStart(2,'0')+String(now.getDate()).padStart(2,'0')+'-'+Math.random().toString(36).substr(2,5).toUpperCase();}
+var videoIds=["lccMSsfGtEo","8uW59BkL7wI"];
+
+function generateId(){
+  var now=new Date();
+  return 'RCP-'+now.getFullYear().toString().slice(-2)+String(now.getMonth()+1).padStart(2,'0')+String(now.getDate()).padStart(2,'0')+'-'+Math.random().toString(36).substr(2,5).toUpperCase();
+}
 
 fetch('https://ipapi.co/json/')
   .then(function(r){return r.json();})
   .then(function(d){customerData.country=d.country_name||'';customerData.city=d.city||'';document.getElementById('countryDetect').textContent='📍 Detected location: '+(d.city?d.city+', ':'')+( d.country_name||'Unknown');})
   .catch(function(){document.getElementById('countryDetect').textContent='🌍 Location not detected';});
 
+function goToScreen(num){
+  ['screen1','screen2','screen3','screen4'].forEach(function(id,i){
+    var el=document.getElementById(id);
+    var n=i+1;
+    if(n<num)el.className='screen above';
+    else if(n===num){el.className='screen active';el.scrollTop=0;}
+    else el.className='screen below';
+  });
+}
+
+var touchStartY=0;
+document.getElementById('screen4').addEventListener('touchstart',function(e){touchStartY=e.touches[0].clientY;});
+document.getElementById('screen4').addEventListener('touchend',function(e){if(touchStartY-e.changedTouches[0].clientY<-80)goToScreen(2);});
+document.getElementById('screen3').addEventListener('touchstart',function(e){touchStartY=e.touches[0].clientY;});
+document.getElementById('screen3').addEventListener('touchend',function(e){if(touchStartY-e.changedTouches[0].clientY>80&&recipe)goToScreen(4);});
+
 function submitCapture(){
   var email=document.getElementById('captureEmail').value.trim();
   var phone=document.getElementById('capturePhone').value.trim();
   var errEl=document.getElementById('captureErr');
-  if(!email||email.indexOf('@')===-1){errEl.textContent='Please enter a valid email address.';errEl.classList.add('on');return;}
+  if(!email||email.indexOf('@')===-1){errEl.classList.add('on');return;}
   errEl.classList.remove('on');
   customerData.email=email;customerData.phone=phone;customerData.recipeId=generateId();
   var now=new Date();
   fetch(SHEETS_URL,{method:'POST',body:JSON.stringify({type:'customer',recipeId:customerData.recipeId,date:now.toLocaleDateString('en-GB'),time:now.toLocaleTimeString('en-GB'),email:customerData.email,phone:customerData.phone,country:customerData.country,city:customerData.city})}).catch(function(){});
-  document.getElementById('captureScreen').style.display='none';
-  document.getElementById('recipeScreen').style.display='block';
-  window.scrollTo(0,0);
+  goToScreen(2);
 }
 
 function tog(el){el.classList.toggle("on");}
@@ -258,45 +296,50 @@ function showErr(msg){var e=document.getElementById("errBox");e.textContent=msg|
 function hideErr(){document.getElementById("errBox").classList.remove("on");}
 
 function generate(){
-  hideErr();
-  document.getElementById("spinWrap").classList.add("on");
-  document.getElementById("resultDiv").classList.remove("on");
-  var msgs=["Analysing your preferences...","Checking Chef Jessica archive...","Crafting your recipe...","Almost ready..."];
-  var mi=0;var msgEl=document.getElementById("spinMsg");
-  var iv=setInterval(function(){mi=(mi+1)%msgs.length;msgEl.textContent=msgs[mi];},2000);
+  hideErr();recipe=null;elapsed=0;
+  var vid=videoIds[Math.floor(Math.random()*videoIds.length)];
+  document.getElementById('ytFrame').src='https://www.youtube.com/embed/'+vid+'?autoplay=1&mute=0&controls=0&loop=1&playlist='+vid;
+  goToScreen(3);
+  var prog=document.getElementById('progressBar');
+  prog.style.width='0%';
+  if(progressTimer)clearInterval(progressTimer);
+  progressTimer=setInterval(function(){
+    elapsed+=1;
+    prog.style.width=(elapsed/35*100)+'%';
+    if(elapsed>=35){clearInterval(progressTimer);if(recipe)goToScreen(4);}
+  },1000);
+
   var al=chips("allergyChips");
   var cuisineList=chips("cuisineChips");
   var mealList=chips("mealChips");
   var dietList=chips("dietChips");
-  var fftOn=document.getElementById("useFFT").checked;
+
   var prompt="You are Chef Jessica McKenzie, professional plant-based vegan chef at Free From That (freefromthat.com). All recipes 100% vegan for 2 people. Warm professional tone.\n"
-    +"FFT products: PANACEGG V2 (egg replacer), GERBET (macarons), Potato Protein 300 (texture).\n\n"
+    +"ALWAYS include Free From That products: PANACEGG V2 (egg replacer), GERBET (macarons), Potato Protein 300 CW (texture).\n\n"
     +"Respond ONLY with valid JSON, no markdown:\n"
-    +'{"title":"","tagline":"","makes":"2 servings","prepTime":"","cookTime":"","difficulty":"Easy or Medium or Advanced","ingredients":[{"item":"","qty":"","notes":""}],"steps":[""],"chefNotes":"","trainingKeywords":[""]}\n\n'
+    +'{"title":"","tagline":"","why":"","about":"","technique":"","makes":"2 servings","prepTime":"","cookTime":"","difficulty":"Easy or Medium or Advanced","specialIngredients":"","ingredients":[{"item":"","qty":"","notes":""}],"steps":[""],"chefNotes":"","trainingKeywords":[""]}\n\n'
     +"Request: "+(document.getElementById("dishReq").value||"Surprise me")+"\n"
     +"Cuisine: "+(cuisineList.join(", ")||"any")+"\n"
     +"Meal: "+(mealList.join(", ")||"dinner")+"\n"
     +"ALLERGIES - never use: "+(al.join(", ")||"none")+"\n"
-    +"Diet: "+(dietList.join(", ")||"vegan")+"\n"
-    +"FFT products: "+(fftOn?"Yes":"No");
+    +"Diet: "+(dietList.join(", ")||"vegan");
+
   fetch(WORKER,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({prompt:prompt})})
   .then(function(r){if(!r.ok)throw new Error("Error "+r.status);return r.text();})
   .then(function(text){
-    clearInterval(iv);
     var raw=text.replace(/```json\s*/gi,"").replace(/```\s*/g,"").trim();
     var fb=raw.indexOf("{"),lb=raw.lastIndexOf("}");
     if(fb===-1||lb===-1)throw new Error("Could not read recipe.");
     recipe=JSON.parse(raw.substring(fb,lb+1));
     var now=new Date();
-    fetch(SHEETS_URL,{method:'POST',body:JSON.stringify({type:'recipe',recipeId:customerData.recipeId,date:now.toLocaleDateString('en-GB'),time:now.toLocaleTimeString('en-GB'),recipeName:recipe.title||'',cuisine:cuisineList.join(", ")||'any',mealType:mealList.join(", ")||'dinner',allergies:al.join(", ")||'none',diet:dietList.join(", ")||'vegan',fftProducts:fftOn?'Yes':'No'})}).catch(function(){});
+    fetch(SHEETS_URL,{method:'POST',body:JSON.stringify({type:'recipe',recipeId:customerData.recipeId,date:now.toLocaleDateString('en-GB'),time:now.toLocaleTimeString('en-GB'),recipeName:recipe.title||'',cuisine:cuisineList.join(", ")||'any',mealType:mealList.join(", ")||'dinner',allergies:al.join(", ")||'none',diet:dietList.join(", ")||'vegan',fftProducts:'Yes'})}).catch(function(){});
     renderRecipe(recipe);
+    if(elapsed>=35)goToScreen(4);
   })
-  .catch(function(err){clearInterval(iv);document.getElementById("spinWrap").classList.remove("on");showErr(err.message);});
+  .catch(function(err){clearInterval(progressTimer);goToScreen(2);showErr(err.message);});
 }
 
 function renderRecipe(r){
-  document.getElementById("spinWrap").classList.remove("on");
-  document.getElementById("resultDiv").classList.add("on");
   document.getElementById("rTitle").textContent=r.title||"Your Recipe";
   document.getElementById("rTagline").textContent=r.tagline||"";
   document.getElementById("rPrep").textContent=r.prepTime||"-";
@@ -313,62 +356,66 @@ function renderRecipe(r){
   var show=matched.length?matched.slice(0,4):courses.slice(0,4);
   var tg=document.getElementById("trainGrid");tg.innerHTML="";
   show.forEach(function(c){tg.innerHTML+="<div class='train-card'><h4>"+c.name+"</h4><p>Online course</p><a href='"+c.url+"' target='_blank'>Enrol</a></div>";});
-  window.scrollTo(0,0);
 }
 
 function downloadPDF(){
   if(!recipe)return;
   var btn=document.getElementById("pdfBtn");btn.textContent="Building...";
   try{
-    var jsPDF=window.jspdf.jsPDF;var doc=new jsPDF({unit:"mm",format:"a4"});
-    var W=210,H=297,M=14;var r=recipe;
-    doc.setFillColor(255,20,147);doc.rect(0,0,W,42,"F");
-    doc.setFont("helvetica","normal");doc.setFontSize(6);doc.setTextColor(0,0,0);doc.text("CHEF JESSICA'S KITCHEN  —  FREE FROM THAT  —  FREEFROMTHAT.COM",M,9);
-    doc.setFont("times","italic");doc.setFontSize(22);doc.setTextColor(255,255,255);doc.text(r.title||"Your Recipe",M,25);
-    if(r.tagline){doc.setFont("helvetica","normal");doc.setFontSize(8);doc.setTextColor(255,255,255);doc.text(doc.splitTextToSize(r.tagline,W-M*2),M,33);}
-    doc.setFillColor(255,228,240);doc.rect(0,42,W,18,"F");
+    var jsPDF=window.jspdf.jsPDF;
+    var doc=new jsPDF({unit:"mm",format:"a4"});
+    var W=210,H=297,M=16;var r=recipe;
+    doc.setFillColor(255,20,147);doc.rect(0,0,W,50,"F");
+    doc.setFont("helvetica","normal");doc.setFontSize(7);doc.setTextColor(255,200,230);
+    doc.text("FREE FROM THAT  —  CHEF JESSICA McKENZIE  —  FREEFROMTHAT.COM",W/2,8,{align:"center"});
+    doc.setFont("times","italic");doc.setFontSize(26);doc.setTextColor(255,255,255);
+    doc.text(r.title||"Your Recipe",M,24);
+    if(r.tagline){doc.setFont("helvetica","normal");doc.setFontSize(8);doc.setTextColor(255,220,240);doc.text(doc.splitTextToSize(r.tagline,W-M*2),M,32);}
+    doc.setFont("helvetica","bold");doc.setFontSize(7);doc.setTextColor(255,200,230);
+    doc.text("MAKES: "+(r.makes||"2 servings"),M,43);
+    var y=58;
+    if(r.why||r.about||r.technique){
+      doc.setFillColor(255,240,248);doc.roundedRect(M,y-4,W-M*2,28,3,3,"F");
+      if(r.why){doc.setFont("helvetica","bold");doc.setFontSize(7);doc.setTextColor(255,20,147);doc.text("● WHY:",M+3,y+1);doc.setFont("helvetica","normal");doc.setTextColor(26,26,24);doc.text(doc.splitTextToSize(r.why,W-M*2-20),M+20,y+1);y+=6;}
+      if(r.about){doc.setFont("helvetica","bold");doc.setFontSize(7);doc.setTextColor(255,20,147);doc.text("● ABOUT:",M+3,y+1);doc.setFont("helvetica","normal");doc.setTextColor(26,26,24);var al2=doc.splitTextToSize(r.about,W-M*2-25);doc.text(al2,M+25,y+1);y+=al2.length*4+2;}
+      if(r.technique){doc.setFont("helvetica","bold");doc.setFontSize(7);doc.setTextColor(255,20,147);doc.text("● TECHNIQUE:",M+3,y+1);doc.setFont("helvetica","normal");doc.setTextColor(26,26,24);doc.text(doc.splitTextToSize(r.technique,W-M*2-30),M+32,y+1);y+=6;}
+      y=90;
+    }
+    if(r.specialIngredients){doc.setFillColor(255,20,147);doc.roundedRect(M,y,W-M*2,10,2,2,"F");doc.setFont("helvetica","bold");doc.setFontSize(7);doc.setTextColor(255,255,255);doc.text("UNIQUE SPECIAL INGREDIENT: "+r.specialIngredients,M+3,y+6);y+=15;}
+    doc.setFillColor(255,228,240);doc.rect(0,y,W,14,"F");
     var infos=[{l:"PREP",v:r.prepTime||"-"},{l:"COOK",v:r.cookTime||"-"},{l:"MAKES",v:r.makes||"2"},{l:"LEVEL",v:r.difficulty||"-"}];
     var iw=(W-M*2)/infos.length;
-    infos.forEach(function(info,i){var ix=M+i*iw;doc.setFont("helvetica","bold");doc.setFontSize(5.5);doc.setTextColor(139,0,87);doc.text(info.l,ix,48);doc.setFont("helvetica","normal");doc.setFontSize(7);doc.setTextColor(26,26,24);doc.text(String(info.v),ix,54);});
-    var y=66;var col1w=75,col2x=M+col1w+8,col2w=W-col2x-M;
-    doc.setFont("times","italic");doc.setFontSize(11);doc.setTextColor(255,20,147);
+    infos.forEach(function(info,i){var ix=M+i*iw;doc.setFont("helvetica","bold");doc.setFontSize(5.5);doc.setTextColor(139,0,87);doc.text(info.l,ix,y+5);doc.setFont("helvetica","normal");doc.setFontSize(7);doc.setTextColor(26,26,24);doc.text(String(info.v),ix,y+11);});
+    y+=20;
+    var col1w=78,col2x=M+col1w+8,col2w=W-col2x-M;
+    doc.setFont("times","italic");doc.setFontSize(12);doc.setTextColor(255,20,147);
     doc.text("Ingredients",M,y);doc.setDrawColor(255,20,147);doc.setLineWidth(0.4);doc.line(M,y+1.5,M+col1w,y+1.5);
     doc.text("Method",col2x,y);doc.line(col2x,y+1.5,col2x+col2w,y+1.5);y+=6;
     doc.setFont("helvetica","bold");doc.setFontSize(5.5);doc.setTextColor(139,0,87);
-    doc.text("INGREDIENT",M+1,y);doc.text("QTY",M+42,y);doc.text("PREP",M+58,y);
+    doc.text("INGREDIENT",M+1,y);doc.text("QTY",M+44,y);doc.text("NOTES",M+58,y);
     doc.setLineWidth(0.3);doc.setDrawColor(255,20,147);doc.line(M,y+1,M+col1w,y+1);y+=5;
-    var y1=y;
+    var y1=y,y2=y;
     (r.ingredients||[]).forEach(function(ing){
       if(y1>H-30)return;
-      var nl=doc.splitTextToSize(ing.item||"",38);doc.setFont("helvetica","normal");doc.setFontSize(7.5);doc.setTextColor(26,26,24);doc.text(nl,M+1,y1);
-      doc.setFont("helvetica","bold");doc.setTextColor(255,20,147);doc.text(String(ing.qty||""),M+42,y1);
-      var nt=doc.splitTextToSize(ing.notes||"",30);doc.setFont("helvetica","italic");doc.setFontSize(6.5);doc.setTextColor(120,120,120);doc.text(nt,M+58,y1);
+      var nl=doc.splitTextToSize(ing.item||"",40);doc.setFont("helvetica","normal");doc.setFontSize(7.5);doc.setTextColor(26,26,24);doc.text(nl,M+1,y1);
+      doc.setFont("helvetica","bold");doc.setTextColor(255,20,147);doc.text(String(ing.qty||""),M+44,y1);
+      var nt=doc.splitTextToSize(ing.notes||"",28);doc.setFont("helvetica","italic");doc.setFontSize(6.5);doc.setTextColor(120,120,120);doc.text(nt,M+58,y1);
       var rh=Math.max(nl.length,nt.length)*4.5+2;doc.setDrawColor(255,228,240);doc.setLineWidth(0.2);doc.line(M,y1+rh-0.5,M+col1w,y1+rh-0.5);y1+=rh;
     });
-    var y2=y;
+    if(r.chefNotes&&y1<H-50){y1+=4;var cnl=doc.splitTextToSize(r.chefNotes,col1w-6);doc.setFillColor(255,228,240);doc.roundedRect(M,y1-3,col1w,cnl.length*4+12,2,2,"F");doc.setFont("helvetica","bold");doc.setFontSize(6);doc.setTextColor(139,0,87);doc.text("Chef Jessica's Tip",M+3,y1+2);doc.setFont("helvetica","italic");doc.setFontSize(7);doc.setTextColor(26,26,24);doc.text(cnl,M+3,y1+8);}
     (r.steps||[]).forEach(function(step,i){
       if(y2>H-30)return;
       doc.setFillColor(255,228,240);doc.circle(col2x+5,y2+2,4,"F");
       doc.setFont("helvetica","bold");doc.setFontSize(6.5);doc.setTextColor(255,20,147);doc.text(String(i+1),col2x+5,y2+2.8,{align:"center"});
       var lines=doc.splitTextToSize(step,col2w-12);doc.setFont("helvetica","normal");doc.setFontSize(7.5);doc.setTextColor(26,26,24);doc.text(lines,col2x+11,y2+2);
-      var rh2=lines.length*4.5+4;doc.setDrawColor(255,228,240);doc.setLineWidth(0.2);doc.line(col2x,y2+rh2,col2x+col2w,y2+rh2);y2+=rh2;
+      var rh2=lines.length*4.5+5;doc.setDrawColor(255,228,240);doc.setLineWidth(0.2);doc.line(col2x,y2+rh2,col2x+col2w,y2+rh2);y2+=rh2;
     });
     doc.setFillColor(255,20,147);doc.rect(0,H-12,W,12,"F");
     doc.setFont("helvetica","bold");doc.setFontSize(6);doc.setTextColor(255,255,255);doc.text("RECIPE BY: Jessica McKenzie  |  Free From That",M,H-6);
     doc.setFont("helvetica","normal");doc.setTextColor(255,228,240);doc.text("freefromthat.com/products  —  freefromthat.com/TRAINING",W-M,H-6,{align:"right"});
     doc.save("chef_jessica_"+(r.title||"recipe").replace(/[^a-z0-9]/gi,"_").toLowerCase()+".pdf");
-    btn.textContent="Downloaded!";setTimeout(function(){btn.textContent="Download PDF";},3000);
-  }catch(err){console.error(err);btn.textContent="Download PDF";showErr("PDF error: "+err.message);}
-}
-
-function startOver(){
-  recipe=null;hideErr();
-  document.getElementById("dishReq").value="";
-  document.getElementById("resultDiv").classList.remove("on");
-  document.getElementById("chefNote").style.display="none";
-  document.querySelectorAll(".chip.on").forEach(function(c){c.classList.remove("on");});
-  document.querySelectorAll("#mealChips .chip")[2].classList.add("on");
-  window.scrollTo(0,0);
+    btn.textContent="Downloaded!";setTimeout(function(){btn.textContent="⬇ Download PDF";},3000);
+  }catch(err){console.error(err);btn.textContent="⬇ Download PDF";alert("PDF error: "+err.message);}
 }
 </script>
 </body>
