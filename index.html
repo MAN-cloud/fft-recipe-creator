@@ -199,4 +199,292 @@ textarea:focus{outline:none;border-color:#FF1493}
       <iframe id="ytFrame" src="" allow="autoplay; encrypted-media; gyroscope; accelerometer" allowfullscreen playsinline></iframe>
     </div>
     <div class="video-overlay">
-      <p>Chef Jessica is creating your
+      <p>Chef Jessica is creating your recipe...</p>
+      <div class="video-progress"><div class="video-progress-bar" id="progressBar"></div></div>
+      <div class="video-controls">
+        <button class="mute-btn" id="muteBtn" onclick="forceNext()">🔇 Unmute (Go to Recipe)</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="screen4" class="screen below">
+  <div class="wrap">
+    <div class="fft-logo-bar">
+      <div class="fft-logo-text">FREE<span>FROM</span>THAT 🥄</div>
+      <div style="font-size:.72rem;color:#888;margin-top:.25rem">Chef Jessica McKenzie</div>
+    </div>
+    <div class="r-hdr">
+      <div class="r-sub">Chef Jessica's recipe for you</div>
+      <div class="r-title" id="rTitle"></div>
+      <div class="r-tagline" id="rTagline"></div>
+      <div class="r-meta">
+        <div class="r-mi"><div class="r-ml">Prep</div><div class="r-mv" id="rPrep">-</div></div>
+        <div class="r-mi"><div class="r-ml">Cook</div><div class="r-mv" id="rCook">-</div></div>
+        <div class="r-mi"><div class="r-ml">Serves</div><div class="r-mv" id="rServes">-</div></div>
+        <div class="r-mi"><div class="r-ml">Level</div><div class="r-mv" id="rDiff">-</div></div>
+      </div>
+    </div>
+
+    <div class="why-box" id="whyBox">
+      <strong>🔬 Why It Works — Chef Jessica's Food Science</strong>
+      <span id="whyText"></span>
+    </div>
+
+    <div class="r-body">
+      <div class="r-sec">Ingredients</div>
+      <ul class="ing-list" id="ingList"></ul>
+      <div class="r-sec">Method</div>
+      <ol class="steps-list" id="stepsList"></ol>
+      <div class="chef-note" id="chefNote">
+        <div class="chef-note-lbl">Chef Jessica's Tip</div>
+        <p id="chefNoteText"></p>
+      </div>
+    </div>
+
+    <div class="buy-box" id="buyBox">
+      <h3>🛒 Where to Buy Your Ingredients</h3>
+      <div id="buyLinks"></div>
+    </div>
+
+    <div class="photos-box" id="photosBox" style="display:none">
+      <h3>📸 Share Your Creation!</h3>
+      <p>Made this recipe? We would love to see it! Share your photo with the Free From That community.</p>
+      <div class="photos-links" id="photoLinks"></div>
+      <p style="font-size:.72rem;color:#888">Tap an album to add your photo</p>
+    </div>
+
+    <div style="margin-bottom:1rem">
+      <div style="font-family:Lora,serif;font-size:1rem;margin-bottom:.6rem">Want to learn more?</div>
+      <div class="train-grid" id="trainGrid"></div>
+    </div>
+
+    <div class="rating-box">
+      <h3>⭐ Rate This Recipe</h3>
+      <div class="stars">
+        <span class="star" onclick="setRating(1)">★</span>
+        <span class="star" onclick="setRating(2)">★</span>
+        <span class="star" onclick="setRating(3)">★</span>
+        <span class="star" onclick="setRating(4)">★</span>
+        <span class="star" onclick="setRating(5)">★</span>
+      </div>
+      <textarea class="rating-comment" id="ratingComment" placeholder="Leave a comment for Chef Jessica..."></textarea>
+      <button onclick="submitRating()" class="btn-pink">Send to Chef Jessica 💌</button>
+      <div class="rating-thanks" id="ratingThanks">Thank you! Chef Jessica loves hearing from you 🌸</div>
+    </div>
+
+    <div class="pdf-box">
+      <h3>Download Your Recipe</h3>
+      <p>Beautifully formatted in Chef Jessica's signature style.</p>
+      <button onclick="downloadPDF()" class="btn-pink" id="pdfBtn">⬇ Download PDF</button>
+      <button onclick="window.print()" class="btn-out">🖨 Print</button>
+    </div>
+
+    <div class="swipe-up-bar" onclick="goToScreen(2)">
+      <span>↑</span>Change my recipe request
+    </div>
+  </div>
+</div>
+
+<script>
+var WORKER="https://fft-recipe.man-4bb.workers.dev";
+var SHEETS_URL="https://script.google.com/macros/s/AKfycbxHSfo3ewpxYAZpR41NwdxVm7S91rjLBkwYr3NUD4QRn7_6bifXxxE6SAtS8xg3IsDILg/exec";
+var recipe=null;
+var customerData={email:'',phone:'',country:'',city:'',recipeId:''};
+var progressTimer=null;
+var elapsed=0;
+var currentRating=0;
+var isMuted=true;
+var videoIds=["8uW59BkL7wI"]; 
+
+var courses=[
+  {name:"Vegan Cheesecakes",url:"https://freefromthat.com/TRAINING-CHEESECAKES",tags:["cheesecake","cheese","cream cheese","no-bake"]},
+  {name:"Mousse Cakes",url:"https://freefromthat.com/TRAINING-MOUSSE/",tags:["mousse","cake","chocolate mousse","layer cake","entremet"]},
+  {name:"Brioche",url:"https://freefromthat.com/TRAINING-BRIOCHE/",tags:["brioche","bread","bun","dough","baking"]},
+  {name:"Vegan Cuisine",url:"https://freefromthat.com/TRAINING-CUISINE",tags:["cuisine","main","dinner","lunch","savoury","savory"]},
+  {name:"Savory Pastry",url:"https://freefromthat.com/TRAINING-SAVORY",tags:["pastry","tart","quiche","puff","shortcrust","pie"]},
+  {name:"Vegan Burgers",url:"https://freefromthat.com/TRAINING-BURGERS",tags:["burger","patty","sandwich"]},
+  {name:"Vegan Chicken",url:"https://freefromthat.com/TRAINING-CHICKEN",tags:["chicken","nugget","tender","fried","poultry"]},
+  {name:"Dessert Bar",url:"https://freefromthat.com/TRAINING-DESSERTBAR",tags:["brownie","bar","blondie","fudge","slice"]},
+  {name:"Eclairs",url:"https://freefromthat.com/TRAINING-ECLAIRS",tags:["eclair","choux","cream puff","profiterole","chouquette"]},
+  {name:"Macarons",url:"https://freefromthat.com/online-fancymacarons",tags:["macaron","meringue","french macaron"]},
+  {name:"GF Desserts",url:"https://freefromthat.com/GF-ELEGANT",tags:["gluten-free","gluten free","gf","celiac","coeliac"]},
+  {name:"Tiramisu",url:"https://freefromthat.com/TRAINING-TIRAMISU",tags:["tiramisu","italian","coffee","mascarpone","ladyfinger"]}
+];
+
+function loadPastRecipes(){try{return JSON.parse(localStorage.getItem('fft_past_recipes')||'[]');}catch(e){return[];}}
+function savePastRecipe(r){
+  var past=loadPastRecipes();
+  past.unshift({id:customerData.recipeId,title:r.title,date:new Date().toLocaleDateString('en-GB'),data:r});
+  if(past.length>20)past=past.slice(0,20);
+  localStorage.setItem('fft_past_recipes',JSON.stringify(past));
+}
+function renderPastRecipes(){
+  var past=loadPastRecipes();
+  var box=document.getElementById('pastBox');
+  var list=document.getElementById('pastList');
+  if(!past.length){box.style.display='none';return;}
+  box.style.display='block';list.innerHTML='';
+  past.forEach(function(p,i){
+    list.innerHTML+='<div class="past-item"><div><div class="past-item-name">'+p.title+'</div><div class="past-item-date">'+p.date+'</div></div><button class="btn-sm" onclick="loadPastRecipe('+i+')">View Again</button></div>';
+  });
+}
+function loadPastRecipe(i){
+  var past=loadPastRecipes();
+  if(!past[i])return;
+  recipe=past[i].data;renderRecipe(recipe);goToScreen(4);
+}
+
+function generateId(){
+  var now=new Date();
+  return 'RCP-'+now.getFullYear().toString().slice(-2)+String(now.getMonth()+1).padStart(2,'0')+String(now.getDate()).padStart(2,'0')+'-'+Math.random().toString(36).substr(2,5).toUpperCase();
+}
+
+function isDesktop(){return window.innerWidth>768;}
+
+fetch('https://ipapi.co/json/')
+  .then(function(r){return r.json();})
+  .then(function(d){
+    customerData.country=d.country_name||'Unknown';
+    customerData.city=d.city||'Unknown';
+    document.getElementById('countryDetect').textContent='📍 Detected location: '+(d.city?d.city+', ':'')+( d.country_name||'Unknown');
+  })
+  .catch(function(){
+    customerData.country='Unknown';
+    document.getElementById('countryDetect').textContent='🌍 Location detection skipped';
+  });
+
+function goToScreen(num){
+  ['screen1','screen2','screen3','screen4'].forEach(function(id,i){
+    var el=document.getElementById(id);var n=i+1;
+    if(n<num)el.className='screen above';
+    else if(n===num){el.className='screen active';el.scrollTop=0;}
+    else el.className='screen below';
+  });
+  if(num===2)renderPastRecipes();
+}
+
+var touchStartY=0;
+document.getElementById('screen4').addEventListener('touchstart',function(e){touchStartY=e.touches[0].clientY;},{passive:true});
+document.getElementById('screen4').addEventListener('touchend',function(e){if(touchStartY-e.changedTouches[0].clientY<-80)goToScreen(2);});
+
+function submitCapture(){
+  var email=document.getElementById('captureEmail').value.trim();
+  var phone=document.getElementById('capturePhone').value.trim();
+  var errEl=document.getElementById('captureErr');
+  if(!email||email.indexOf('@')===-1){errEl.classList.add('on');return;}
+  errEl.classList.remove('on');
+  customerData.email=email;
+  customerData.phone=phone;
+  customerData.recipeId=generateId();
+  var now=new Date();
+  fetch(SHEETS_URL,{method:'POST',body:JSON.stringify({type:'customer',recipeId:customerData.recipeId,date:now.toLocaleDateString('en-GB'),time:now.toLocaleTimeString('en-GB'),email:customerData.email,phone:customerData.phone,country:customerData.country,city:customerData.city})}).catch(function(e){console.log("Sheet save failed, continuing anyway.");});
+  goToScreen(2);
+}
+
+function tog(el){el.classList.toggle("on");}
+function chips(id){return Array.from(document.querySelectorAll("#"+id+" .chip.on")).map(function(c){return c.textContent.trim();});}
+function showErr(msg){var e=document.getElementById("errBox");e.textContent=msg||"Something went wrong.";e.classList.add("on");}
+function hideErr(){document.getElementById("errBox").classList.remove("on");}
+
+function setRating(n){currentRating=n;document.querySelectorAll('.star').forEach(function(s,i){s.classList.toggle('on',i<n);});}
+function submitRating(){
+  if(!recipe)return;
+  var comment=document.getElementById('ratingComment').value.trim();
+  var now=new Date();
+  fetch(SHEETS_URL,{method:'POST',body:JSON.stringify({type:'rating',recipeId:customerData.recipeId,recipeName:recipe.title||'',email:customerData.email,rating:currentRating,comment:comment,date:now.toLocaleDateString('en-GB'),time:now.toLocaleTimeString('en-GB')})}).catch(function(){});
+  document.getElementById('ratingThanks').style.display='block';
+  document.getElementById('ratingComment').style.display='none';
+  document.querySelector('.stars').style.display='none';
+  document.querySelector('.rating-box .btn-pink').style.display='none';
+}
+
+function startVideo(){
+  isMuted=true;
+  var vid=videoIds[0];
+  document.getElementById('ytFrame').src='https://www.youtube.com/embed/'+vid+'?autoplay=1&mute=1&controls=0&loop=0&playsinline=1&rel=0';
+}
+
+function forceNext() {
+  if (recipe) {
+    document.getElementById('ytFrame').src=''; 
+    goToScreen(4);
+  } else {
+    goToScreen(2);
+    showErr("Chef Jessica couldn't finish the recipe. Please try again.");
+  }
+}
+
+function generate(){
+  hideErr();recipe=null;elapsed=0;currentRating=0;
+  startVideo();goToScreen(3);
+  var prog=document.getElementById('progressBar');
+  prog.style.width='0%';
+  if(progressTimer)clearInterval(progressTimer);
+
+  progressTimer=setInterval(function(){
+    elapsed+=1;
+    prog.style.width=(elapsed/15*100)+'%';
+    if(elapsed>=15){
+      clearInterval(progressTimer);
+      forceNext();
+    }
+  },1000);
+
+  var al=chips("allergyChips");
+  var cuisineList=chips("cuisineChips");
+  var mealList=chips("mealChips");
+  var dietList=chips("dietChips");
+  var dishRequest=document.getElementById("dishReq").value||"Surprise me with something delicious";
+
+  var prompt="JSON ONLY. Structure: {\"title\":\"\",\"tagline\":\"\",\"whyItWorks\":\"\",\"makes\":\"\",\"prepTime\":\"\",\"cookTime\":\"\",\"difficulty\":\"\",\"ingredients\":[{\"item\":\"\",\"qty\":\"\",\"notes\":\"\"}],\"steps\":[\"\"],\"chefNotes\":\"\",\"trainingKeywords\":[\"\"]}. Request: " + dishRequest;
+
+  fetch(WORKER,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({prompt:prompt})})
+  .then(function(r){return r.text();})
+  .then(function(text){
+    var jsonMatch = text.match(/\{[\s\S]*\}/);
+    if(jsonMatch){
+      recipe=JSON.parse(jsonMatch[0]);
+      savePastRecipe(recipe);
+      renderRecipe(recipe);
+    }
+  })
+  .catch(function(err){console.log(err);});
+}
+
+function renderRecipe(r){
+  document.getElementById("rTitle").textContent=r.title||"Your Special Recipe";
+  document.getElementById("rTagline").textContent=r.tagline||"";
+  document.getElementById("rPrep").textContent=r.prepTime||"-";
+  document.getElementById("rCook").textContent=r.cookTime||"-";
+  document.getElementById("rServes").textContent=r.makes||"2";
+  document.getElementById("rDiff").textContent=r.difficulty||"-";
+  if(r.whyItWorks){document.getElementById('whyBox').style.display='block';document.getElementById('whyText').textContent=r.whyItWorks;}
+  var il=document.getElementById("ingList");il.innerHTML="";
+  (r.ingredients||[]).forEach(function(i){il.innerHTML+="<li><span class='ing-dot'></span>"+(i.qty?i.qty+"g "+i.item+(i.notes?" — "+i.notes:""):i.item)+"</li>";});
+  var sl=document.getElementById("stepsList");sl.innerHTML="";
+  (r.steps||[]).forEach(function(s){var li=document.createElement("li");li.textContent=s;sl.appendChild(li);});
+  if(r.chefNotes){document.getElementById("chefNote").style.display="block";document.getElementById("chefNoteText").textContent=r.chefNotes;}
+  var buyLinksEl=document.getElementById('buyLinks');
+  buyLinksEl.innerHTML='<a href="https://freefromthat.com/products" target="_blank" class="buy-link"><div class="buy-icon">🛍</div><div><div class="buy-txt">Free From That Store</div><div class="buy-sub">All FFT professional ingredients</div></div></a>';
+  var tg=document.getElementById("trainGrid");tg.innerHTML="";
+  courses.slice(0,4).forEach(function(c){tg.innerHTML+="<div class='train-card'><h4>"+c.name+"</h4><p>Online course</p><a href='"+c.url+"' target='_blank'>Enrol</a></div>";});
+}
+
+function downloadPDF(){
+  var btn=document.getElementById("pdfBtn");btn.textContent="Building...";
+  try{
+    var jsPDF=window.jspdf.jsPDF;
+    var doc=new jsPDF({unit:"mm",format:"a4"});
+    doc.text(recipe.title || "Recipe", 10, 10);
+    doc.save("chef_jessica_recipe.pdf");
+    btn.textContent="Downloaded!";setTimeout(function(){btn.textContent="⬇ Download PDF";},3000);
+  }catch(err){btn.textContent="⬇ Download PDF";alert("PDF error: "+err.message);}
+}
+
+// PAYWALL REMOVED
+function checkPaywall() { return false; }
+function incrementUsage() { console.log("Usage tracked locally"); }
+</script>
+</body>
+</html>
