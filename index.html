@@ -203,8 +203,7 @@ textarea:focus{outline:none;border-color:#FF1493}
       <p>Chef Jessica is creating your recipe...</p>
       <div class="video-progress"><div class="video-progress-bar" id="progressBar"></div></div>
       <div class="video-controls">
-        <button class="mute-btn" id="muteBtn" onclick="toggleMute()">🔇 Unmute</button>
-        <button class="continue-btn" id="continueBtn" onclick="goToScreen(4)">Continue to Recipe →</button>
+        <button class="mute-btn" id="muteBtn" onclick="forceNext()">🔇 Unmute (Go to Recipe)</button>
       </div>
     </div>
   </div>
@@ -297,7 +296,7 @@ var progressTimer=null;
 var elapsed=0;
 var currentRating=0;
 var isMuted=true;
-var videoIds=["lccMSsfGtEo","8uW59BkL7wI"];
+var videoIds=["8uW59BkL7wI"]; // Add your specific Shorts ID here
 
 var photoAlbums=[
   {name:"Vegan Chicken",url:"https://photos.app.goo.gl/gTUwVQYApusMDP9w5",tags:["chicken","nugget","poultry","tender"]},
@@ -326,12 +325,6 @@ var courses=[
   {name:"GF Desserts",url:"https://freefromthat.com/GF-ELEGANT",tags:["gluten-free","gluten free","gf","celiac","coeliac"]},
   {name:"Tiramisu",url:"https://freefromthat.com/TRAINING-TIRAMISU",tags:["tiramisu","italian","coffee","mascarpone","ladyfinger"]}
 ];
-
-var fftProducts={
-  "PANACEGG":{name:"PANACEGG V2",desc:"Whole-egg replacer — for moisture, structure & binding",url:"https://freefromthat.com/products"},
-  "POTATO PROTEIN":{name:"Potato Protein 300CW",desc:"Egg-white replacer — for foaming, meringues & mousses",url:"https://freefromthat.com/products"},
-  "GERBET":{name:"GERBET",desc:"Specialist egg-white replacer for macarons",url:"https://freefromthat.com/products"}
-};
 
 function loadPastRecipes(){try{return JSON.parse(localStorage.getItem('fft_past_recipes')||'[]');}catch(e){return[];}}
 function savePastRecipe(r){
@@ -363,7 +356,6 @@ function generateId(){
 
 function isDesktop(){return window.innerWidth>768;}
 
-// FIXED LOCATION DETECTION - If it fails, it just says Unknown instead of hanging.
 fetch('https://ipapi.co/json/')
   .then(function(r){return r.json();})
   .then(function(d){
@@ -389,26 +381,18 @@ function goToScreen(num){
 var touchStartY=0;
 document.getElementById('screen4').addEventListener('touchstart',function(e){touchStartY=e.touches[0].clientY;},{passive:true});
 document.getElementById('screen4').addEventListener('touchend',function(e){if(touchStartY-e.changedTouches[0].clientY<-80)goToScreen(2);});
-document.getElementById('screen3').addEventListener('touchstart',function(e){touchStartY=e.touches[0].clientY;},{passive:true});
-document.getElementById('screen3').addEventListener('touchend',function(e){if(touchStartY-e.changedTouches[0].clientY>80&&recipe)goToScreen(4);});
 
-// FIXED SUBMIT - Will now force move to screen 2 even if the Google Sheet link fails.
 function submitCapture(){
   var email=document.getElementById('captureEmail').value.trim();
   var phone=document.getElementById('capturePhone').value.trim();
   var errEl=document.getElementById('captureErr');
   if(!email||email.indexOf('@')===-1){errEl.classList.add('on');return;}
   errEl.classList.remove('on');
-  
   customerData.email=email;
   customerData.phone=phone;
   customerData.recipeId=generateId();
-  
   var now=new Date();
-  
-  // Try to save, but go to next screen regardless of success
   fetch(SHEETS_URL,{method:'POST',body:JSON.stringify({type:'customer',recipeId:customerData.recipeId,date:now.toLocaleDateString('en-GB'),time:now.toLocaleTimeString('en-GB'),email:customerData.email,phone:customerData.phone,country:customerData.country,city:customerData.city})}).catch(function(e){console.log("Sheet save failed, continuing anyway.");});
-  
   goToScreen(2);
 }
 
@@ -429,31 +413,22 @@ function submitRating(){
   document.querySelector('.rating-box .btn-pink').style.display='none';
 }
 
-function toggleMute(){
-  isMuted=!isMuted;
-  var vid=document.getElementById('ytFrame');
-  vid.src=vid.src.replace(isMuted?'mute=0':'mute=1',isMuted?'mute=1':'mute=0');
-  document.getElementById('muteBtn').textContent=isMuted?'🔇 Unmute':'🔊 Mute';
-}
-
 function startVideo(){
   isMuted=true;
-  document.getElementById('muteBtn').textContent='🔇 Unmute';
-  document.getElementById('continueBtn').style.display='none';
-  var vid=videoIds[Math.floor(Math.random()*videoIds.length)];
-  document.getElementById('ytFrame').src='https://www.youtube.com/embed/'+vid+'?autoplay=1&mute=1&controls=0&loop=1&playlist='+vid+'&playsinline=1&rel=0';
+  var vid=videoIds[0];
+  document.getElementById('ytFrame').src='https://www.youtube.com/embed/'+vid+'?autoplay=1&mute=1&controls=0&loop=0&playsinline=1&rel=0';
+}
+
+function forceNext() {
+  if (recipe) {
+    document.getElementById('ytFrame').src=''; // Kill the video sound
+    goToScreen(4);
+  }
 }
 
 function generate(){
   hideErr();recipe=null;elapsed=0;currentRating=0;
-  document.querySelectorAll('.star').forEach(function(s){s.classList.remove('on');});
-  document.getElementById('ratingThanks').style.display='none';
-  document.getElementById('ratingComment').style.display='block';
-  document.querySelector('.stars').style.display='flex';
-  document.querySelector('.rating-box .btn-pink').style.display='block';
-
   startVideo();goToScreen(3);
-
   var prog=document.getElementById('progressBar');
   prog.style.width='0%';
   if(progressTimer)clearInterval(progressTimer);
@@ -463,7 +438,7 @@ function generate(){
     prog.style.width=(elapsed/15*100)+'%';
     if(elapsed>=15){
       clearInterval(progressTimer);
-      if(recipe){goToScreen(4);}
+      if(recipe){forceNext();}
     }
   },1000);
 
@@ -472,35 +447,18 @@ function generate(){
   var mealList=chips("mealChips");
   var dietList=chips("dietChips");
   var dishRequest=document.getElementById("dishReq").value||"Surprise me with something delicious";
-  
+
   var prompt="You are Chef Jessica McKenzie... Respond ONLY with valid JSON.";
 
   fetch(WORKER,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({prompt:prompt})})
   .then(function(r){return r.text();})
   .then(function(text){
     var jsonMatch = text.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) throw new Error("Could not read recipe.");
     recipe=JSON.parse(jsonMatch[0]);
     savePastRecipe(recipe);
     renderRecipe(recipe);
-    if(elapsed>=15)goToScreen(4);
   })
   .catch(function(err){clearInterval(progressTimer);goToScreen(2);showErr(err.message);});
-}
-
-function matchCourses(r){
-  var kw=(r.trainingKeywords||[]).map(function(k){return k.toLowerCase();});
-  var title=(r.title||'').toLowerCase();
-  var allText=kw.join(' ')+' '+title;
-  var matched=courses.filter(function(c){return c.tags.some(function(tag){return allText.indexOf(tag.toLowerCase())!==-1;});});
-  return matched.length?matched.slice(0,4):courses.slice(0,4);
-}
-
-function matchPhotoAlbums(r){
-  var kw=(r.trainingKeywords||[]).map(function(k){return k.toLowerCase();});
-  var title=(r.title||'').toLowerCase();
-  var allText=kw.join(' ')+' '+title;
-  return photoAlbums.filter(function(a){return a.tags.some(function(tag){return allText.indexOf(tag.toLowerCase())!==-1;});});
 }
 
 function renderRecipe(r){
@@ -510,44 +468,8 @@ function renderRecipe(r){
   document.getElementById("rCook").textContent=r.cookTime||"-";
   document.getElementById("rServes").textContent=r.makes||"2";
   document.getElementById("rDiff").textContent=r.difficulty||"-";
-  if(r.whyItWorks){
-    document.getElementById('whyBox').style.display='block';
-    document.getElementById('whyText').textContent=r.whyItWorks;
-  } else {document.getElementById('whyBox').style.display='none';}
+  if(r.whyItWorks){document.getElementById('whyBox').style.display='block';document.getElementById('whyText').textContent=r.whyItWorks;}
   var il=document.getElementById("ingList");il.innerHTML="";
   (r.ingredients||[]).forEach(function(i){il.innerHTML+="<li><span class='ing-dot'></span>"+(i.qty?i.qty+"g "+i.item+(i.notes?" — "+i.notes:""):i.item)+"</li>";});
   var sl=document.getElementById("stepsList");sl.innerHTML="";
-  (r.steps||[]).forEach(function(s){var li=document.createElement("li");li.textContent=s;sl.appendChild(li);});
-  if(r.chefNotes){document.getElementById("chefNote").style.display="block";document.getElementById("chefNoteText").textContent=r.chefNotes;}
-  else{document.getElementById("chefNote").style.display="none";}
-  var buyLinksEl=document.getElementById('buyLinks');
-  buyLinksEl.innerHTML='<a href="https://freefromthat.com/products" target="_blank" class="buy-link"><div class="buy-icon">🛍</div><div><div class="buy-txt">Free From That Store</div><div class="buy-sub">All FFT professional ingredients</div></div></a>';
-  var matchedAlbums=matchPhotoAlbums(r);
-  var photosBox=document.getElementById('photosBox');
-  if(matchedAlbums.length){
-    photosBox.style.display='block';
-    var photoLinks=document.getElementById('photoLinks');photoLinks.innerHTML='';
-    matchedAlbums.forEach(function(a){photoLinks.innerHTML+='<a href="'+a.url+'" target="_blank" class="photos-link">📷 '+a.name+'</a>';});
-  } else {photosBox.style.display='none';}
-  var show=matchCourses(r);
-  var tg=document.getElementById("trainGrid");tg.innerHTML="";
-  show.forEach(function(c){tg.innerHTML+="<div class='train-card'><h4>"+c.name+"</h4><p>Online course</p><a href='"+c.url+"' target='_blank'>Enrol</a></div>";});
-}
-
-function downloadPDF(){
-  var btn=document.getElementById("pdfBtn");btn.textContent="Building...";
-  try{
-    var jsPDF=window.jspdf.jsPDF;
-    var doc=new jsPDF({unit:"mm",format:"a4"});
-    doc.text(recipe.title || "Recipe", 10, 10);
-    doc.save("chef_jessica_recipe.pdf");
-    btn.textContent="Downloaded!";setTimeout(function(){btn.textContent="⬇ Download PDF";},3000);
-  }catch(err){btn.textContent="⬇ Download PDF";alert("PDF error: "+err.message);}
-}
-
-// PAYWALL REMOVED
-function checkPaywall() { return false; }
-function incrementUsage() { console.log("Usage tracked locally"); }
-</script>
-</body>
-</html>
+  (r
