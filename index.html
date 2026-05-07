@@ -21,8 +21,8 @@
         .tag-group { display: flex; flex-wrap: wrap; gap: 8px; }
         .tag { padding: 9px 18px; border: 1px solid rgba(26,26,24,0.12); border-radius: 20px; background: white; font-size: 14px; cursor: pointer; }
         .tag.active { background: var(--primary-pink); color: white; border-color: var(--primary-pink); }
-        button#main-btn { background: var(--primary-pink); color: white; border: none; width: 100%; padding: 1.2rem; border-radius: 50px; font-size: 18px; font-weight: 600; cursor: pointer; margin-top: 1.2rem; box-shadow: 0 4px 15px rgba(255,20,147,0.2); }
-        #ip-display { font-size: 11px; color: #aaa; margin-top: 15px; text-align: center; font-family: monospace; min-height: 14px; }
+        button#main-btn { background: var(--primary-pink); color: white; border: none; width: 100%; padding: 1.2rem; border-radius: 50px; font-size: 18px; font-weight: 600; cursor: pointer; margin-top: 1.2rem; }
+        #ip-display { font-size: 11px; color: #aaa; margin-top: 15px; text-align: center; font-family: monospace; }
         #response { margin-top: 20px; padding: 20px; background: white; border-radius: 12px; display: none; border: 1px solid #eee; line-height: 1.6; }
     </style>
 </head>
@@ -34,7 +34,7 @@
             <input type="text" id="user-name" placeholder="Full Name">
             <input type="tel" id="user-phone" placeholder="Phone Number">
             <button id="main-btn" onclick="toScene2()">Continue to Recipe →</button>
-            <div id="ip-display">Connecting to Secure Server...</div>
+            <div id="ip-display">Connecting...</div>
         </div>
     </div>
 
@@ -58,31 +58,18 @@
         const API_URL = 'https://fft-recipe.man-4bb.workers.dev/chat';
         let lead = { name: '', phone: '', ip: '' };
 
-        // RELIABLE IP & LOCATION CAPTURE
-        async function fetchLocation() {
-            try {
-                const response = await fetch('https://ipapi.co/json/');
-                if (response.ok) {
-                    const data = await response.json();
-                    lead.ip = `${data.ip} - ${data.city}, ${data.country_name}`;
-                    document.getElementById('ip-display').innerText = `ACCESS ID: ${lead.ip}`;
-                }
-            } catch (error) {
-                // Fallback to simpler IP fetch if ipapi is blocked
-                const res = await fetch('https://api.ipify.org?format=json');
-                const data = await res.json();
-                lead.ip = data.ip;
-                document.getElementById('ip-display').innerText = `IP: ${lead.ip} (Location hidden)`;
-            }
-        }
-        fetchLocation();
+        // Restore IP Capture
+        fetch('https://ipapi.co/json/').then(r => r.json()).then(d => {
+            lead.ip = `${d.ip} - ${d.city}, ${d.country_name}`;
+            document.getElementById('ip-display').innerText = `ACCESS ID: ${lead.ip}`;
+        }).catch(() => { document.getElementById('ip-display').innerText = ""; });
 
         document.querySelectorAll('.tag').forEach(t => t.onclick = () => t.classList.toggle('active'));
 
         function toScene2() {
             lead.name = document.getElementById('user-name').value;
             lead.phone = document.getElementById('user-phone').value;
-            if(!lead.name || !lead.phone) return alert("Please provide Name and Phone.");
+            if(!lead.name || !lead.phone) return alert("Required: Name & Phone");
             document.getElementById('scene-1').classList.remove('active');
             document.getElementById('scene-2').classList.add('active');
         }
@@ -102,9 +89,7 @@
                 });
                 const d = await r.json();
                 box.innerHTML = d.response;
-            } catch (e) { 
-                box.innerText = "Connection error. Please check your internet."; 
-            }
+            } catch (e) { box.innerText = "Connection error."; }
         }
     </script>
 </body>
