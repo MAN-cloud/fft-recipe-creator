@@ -21,10 +21,10 @@
         .tag { padding: 9px 18px; border: 1px solid #ddd; border-radius: 20px; background: white; font-size: 14px; cursor: pointer; transition: 0.2s; }
         .tag.active { background: var(--primary-pink); color: white; border-color: var(--primary-pink); }
         .btn-main { background: var(--primary-pink); color: white; border: none; width: 100%; padding: 1.2rem; border-radius: 50px; font-size: 18px; font-weight: 600; cursor: pointer; margin-top: 1.2rem; }
-        #response-box { margin-top: 20px; padding: 25px; background: white; border-radius: 16px; border: 1px solid #eee; line-height: 1.8; font-size: 16px; min-height: 150px; }
+        #response-box { margin-top: 20px; padding: 25px; background: white; border-radius: 16px; border: 1px solid #eee; line-height: 1.8; font-size: 16px; min-height: 150px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
         .video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 14px; margin-bottom: 20px; background: #000; }
         .video-container iframe { position: absolute; top:0; left: 0; width: 100%; height: 100%; }
-        .status-tag { font-size: 10px; color: #999; text-align: center; margin-top: 10px; font-family: monospace; text-transform: uppercase; }
+        .status-bar { font-size: 10px; color: #bbb; text-align: center; margin-top: 15px; font-family: monospace; letter-spacing: 1px; }
     </style>
 </head>
 <body>
@@ -35,13 +35,13 @@
             <input type="email" id="email" placeholder="Email Address">
             <input type="tel" id="phone" placeholder="Phone Number">
             <button class="btn-main" onclick="toScene2()">Continue to Recipe →</button>
-            <div class="status-tag" id="ip-display">Connecting...</div>
+            <div class="status-bar" id="ip-log">CONNECTING...</div>
         </div>
     </div>
 
     <div id="scene-2" class="screen">
         <div class="wrap">
-            <textarea id="prompt" rows="4" placeholder="What would you like to bake today?"></textarea>
+            <textarea id="prompt" rows="4" placeholder="What are we baking today?"></textarea>
             <h3>Allergies & Intolerances</h3>
             <div class="tag-group">
                 <div class="tag">Gluten</div><div class="tag">Nuts</div><div class="tag">Dairy</div><div class="tag">Eggs</div><div class="tag">Soy</div><div class="tag">Shellfish</div><div class="tag">Corn</div>
@@ -64,16 +64,16 @@
             <div class="video-container">
                 <iframe id="vid" src="https://www.youtube.com/embed/videoseries?list=PL7K6PlzZmS-YzdkFZP74h1va8EkYpvl77&autoplay=1&mute=1" frameborder="0"></iframe>
             </div>
-            <div style="text-align:center; font-size:14px; color:#888;" id="timer-label">Chef logic initializing... (15s)</div>
-            <div class="status-tag" id="live-status">Connection: Idle</div>
+            <div style="text-align:center; font-size:14px; color:#888;" id="timer">15s</div>
+            <div class="status-bar" id="s3-status">STATUS: INITIALIZING...</div>
         </div>
     </div>
 
     <div id="scene-4" class="screen">
         <div class="wrap">
             <div class="hero" style="padding: 1.5rem;"><h1>Your Custom<br><em>Recipe Card</em></h1></div>
-            <div id="response-box">Loading master recipe...</div>
-            <div class="status-tag" id="final-status">Status: Waiting for data</div>
+            <div id="response-box">Waiting for master recipe...</div>
+            <div class="status-bar" id="s4-status">STATUS: WAITING...</div>
             <button class="btn-main" onclick="location.reload()" style="background: #333; margin-top: 2rem;">Create Another Recipe</button>
         </div>
     </div>
@@ -81,66 +81,61 @@
     <script>
         const API = 'https://fft-recipe.man-4bb.workers.dev/chat';
         let lead = { email: '', phone: '', ip: '' };
-        let result = "";
-        let timerDone = false;
+        let recipeData = "";
+        let isTimerDone = false;
 
-        // Get Location Info
         fetch('https://ipapi.co/json/').then(r => r.json()).then(d => {
-            lead.ip = `${d.ip} - ${d.city}, ${d.country_name}`;
-            document.getElementById('ip-display').innerText = "ACCESS ID: " + d.ip;
+            lead.ip = d.ip;
+            document.getElementById('ip-log').innerText = "ACCESS ID: " + d.ip;
         });
 
-        // Tag Toggle
         document.querySelectorAll('.tag').forEach(t => t.onclick = () => t.classList.toggle('active'));
 
         function toScene2() {
             lead.email = document.getElementById('email').value;
             lead.phone = document.getElementById('phone').value;
-            if(!lead.email.includes('@') || lead.phone.length < 5) return alert("Please enter valid Email and Phone.");
+            if(!lead.email || !lead.phone) return alert("Details Required");
             document.getElementById('scene-1').classList.remove('active');
             document.getElementById('scene-2').classList.add('active');
         }
 
         async function startFlow() {
-            const userMsg = document.getElementById('prompt').value;
-            const userTags = Array.from(document.querySelectorAll('.tag.active')).map(t => t.innerText);
-            if(!userMsg) return alert("Tell Chef Jessica what you want to bake!");
+            const msg = document.getElementById('prompt').value;
+            const tags = Array.from(document.querySelectorAll('.tag.active')).map(t => t.innerText);
+            if(!msg) return alert("Request Required");
 
-            // Reset Video for Scene 3
-            document.getElementById('vid').src += "&cb=" + Date.now();
             document.getElementById('scene-2').classList.remove('active');
             document.getElementById('scene-3').classList.add('active');
             
-            updateStatus("Sending to Chef...");
-
-            // START API CALL
+            // FETCH RECIPE
             fetch(API, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ message: userMsg, lead: lead, tags: userTags })
+                body: JSON.stringify({ message: msg, lead: lead, tags: tags })
             })
-            .then(async response => {
-                updateStatus("Chef is typing...");
-                if (!response.ok) throw new Error('Server Error: ' + response.status);
-                const data = await response.json();
-                result = data.response.replace(/Panacea Engine Active\..*?\?/, "").replace(/\n/g, "<br>");
-                updateStatus("Recipe Received.");
+            .then(res => res.json())
+            .then(data => {
+                // Better Filter: Only remove the bot text if it's there, don't kill the whole string
+                let clean = data.response.replace("Panacea Engine Active. How can Chef Jessica's logic assist your bake today?", "");
+                recipeData = clean.trim() || data.response; // Fallback to raw data if clean is empty
+                recipeData = recipeData.replace(/\n/g, "<br>");
+                document.getElementById('s3-status').innerText = "STATUS: DATA READY";
+                document.getElementById('s4-status').innerText = "STATUS: DATA READY";
                 render();
             })
             .catch(err => {
-                updateStatus("Error: " + err.message);
-                result = `<b style="color:red;">CONNECTION FAILED:</b><br>${err.message}<br><br>Please check your Cloudflare Worker logs.`;
+                recipeData = "Connection Error. Please check your signal.";
                 render();
             });
 
-            // 15s TIMER
-            let timeLeft = 15;
-            const countdown = setInterval(() => {
-                timeLeft--;
-                document.getElementById('timer-label').innerText = `Refining ingredients... (${timeLeft}s)`;
-                if(timeLeft <= 0) {
-                    clearInterval(countdown);
-                    timerDone = true;
+            // TIMER
+            let countdown = 15;
+            const t = setInterval(() => {
+                countdown--;
+                document.getElementById('timer').innerText = countdown + "s";
+                if(countdown <= 0) {
+                    clearInterval(t);
+                    isTimerDone = true;
                     document.getElementById('scene-3').classList.remove('active');
                     document.getElementById('scene-4').classList.add('active');
                     render();
@@ -148,18 +143,13 @@
             }, 1000);
         }
 
-        function updateStatus(msg) {
-            document.getElementById('live-status').innerText = "Status: " + msg;
-            document.getElementById('final-status').innerText = "Status: " + msg;
-        }
-
         function render() {
-            if(!timerDone) return;
+            if(!isTimerDone) return;
             const box = document.getElementById('response-box');
-            if(result) {
-                box.innerHTML = result;
+            if(recipeData) {
+                box.innerHTML = recipeData;
             } else {
-                box.innerHTML = "<em>Chef Jessica is finalizing your master ratios... <br>Please stand by.</em>";
+                box.innerHTML = "<em>Chef Jessica is finalizing your ratios. One moment...</em>";
             }
         }
     </script>
