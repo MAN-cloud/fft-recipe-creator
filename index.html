@@ -22,8 +22,8 @@
         .tag.active { background: var(--primary-pink); color: white; border-color: var(--primary-pink); }
         .btn-main { background: var(--primary-pink); color: white; border: none; width: 100%; padding: 1.2rem; border-radius: 50px; font-size: 18px; font-weight: 600; cursor: pointer; margin-top: 1.2rem; }
         #ip-display { font-size: 11px; color: #aaa; margin-top: 15px; text-align: center; font-family: monospace; }
-        #response-box { margin-top: 20px; padding: 25px; background: white; border-radius: 16px; border: 1px solid #eee; line-height: 1.7; font-size: 16px; }
-        .video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 14px; margin-bottom: 20px; }
+        #response-box { margin-top: 20px; padding: 25px; background: white; border-radius: 16px; border: 1px solid #eee; line-height: 1.7; font-size: 16px; min-height: 100px; }
+        .video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 14px; margin-bottom: 20px; background: #000; }
         .video-container iframe { position: absolute; top:0; left: 0; width: 100%; height: 100%; }
         .timer-text { text-align: center; font-size: 14px; color: #888; margin-top: 10px; }
     </style>
@@ -67,7 +67,7 @@
         <div class="wrap">
             <div class="hero" style="padding: 1.5rem;"><h1>Chef Jessica is<br><em>Crafting...</em></h1></div>
             <div class="video-container">
-                <iframe src="https://www.youtube.com/embed/videoseries?list=PLpZ5SUpj2S2RM4qS294Fz-XkYf1Z9A1A1&autoplay=1&mute=1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+                <iframe src="https://www.youtube.com/embed/j_nAnN6W8pU?autoplay=1&mute=1&modestbranding=1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
             </div>
             <div class="timer-text" id="countdown">Calculating pro-chef ratios... (15s)</div>
         </div>
@@ -77,7 +77,7 @@
         <div class="wrap">
             <div class="hero" style="padding: 1.5rem;"><h1>Your Custom<br><em>Recipe Card</em></h1></div>
             <div id="response-box"></div>
-            <button class="btn-main" onclick="location.reload()" style="background: #333;">Create Another Recipe</button>
+            <button class="btn-main" onclick="location.reload()" style="background: #333; margin-top: 2rem;">Create Another Recipe</button>
         </div>
     </div>
 
@@ -113,11 +113,9 @@
             const tags = Array.from(document.querySelectorAll('.tag.active')).map(t => t.innerText);
             if(!msg) return alert("What are we baking today?");
 
-            // Move to Video Scene
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById('scene-3').classList.add('active');
             
-            // Start 15s Timer
             let timeLeft = 15;
             const timer = setInterval(() => {
                 timeLeft--;
@@ -129,7 +127,6 @@
                 }
             }, 1000);
 
-            // Start AI Call
             try {
                 const r = await fetch(API_URL, {
                     method: 'POST',
@@ -137,10 +134,17 @@
                     body: JSON.stringify({ message: msg, lead: lead, tags: tags })
                 });
                 const d = await r.json();
-                recipeResult = d.response;
+                
+                // Security check: If the worker sends the "Panacea" text, we ignore it and show a professional placeholder
+                if (d.response.includes("Panacea Engine")) {
+                    recipeResult = "Chef Jessica is reviewing your ingredients. One moment while the master recipe is formatted...";
+                } else {
+                    recipeResult = d.response;
+                }
+                
                 checkFinalTransition();
             } catch (e) { 
-                recipeResult = "Connection error. Please try again.";
+                recipeResult = "Connection error. Chef Jessica's server is busy. Please try again.";
                 checkFinalTransition();
             }
         }
