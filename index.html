@@ -24,7 +24,7 @@
         #response-box { margin-top: 20px; padding: 25px; background: white; border-radius: 16px; border: 1px solid #eee; line-height: 1.8; font-size: 16px; min-height: 150px; }
         .video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 14px; margin-bottom: 20px; background: #000; }
         .video-container iframe { position: absolute; top:0; left: 0; width: 100%; height: 100%; }
-        .timer-text { text-align: center; font-size: 14px; color: #888; margin-top: 10px; }
+        .status-tag { font-size: 10px; color: #999; text-align: center; margin-top: 10px; font-family: monospace; text-transform: uppercase; }
     </style>
 </head>
 <body>
@@ -35,7 +35,7 @@
             <input type="email" id="email" placeholder="Email Address">
             <input type="tel" id="phone" placeholder="Phone Number">
             <button class="btn-main" onclick="toScene2()">Continue to Recipe →</button>
-            <div style="text-align:center; font-size:11px; color:#aaa; margin-top:15px; font-family:monospace;" id="ip-display">Connecting...</div>
+            <div class="status-tag" id="ip-display">Connecting...</div>
         </div>
     </div>
 
@@ -62,16 +62,18 @@
         <div class="wrap">
             <div class="hero" style="padding: 1.5rem;"><h1>Chef Jessica is<br><em>Crafting...</em></h1></div>
             <div class="video-container">
-                <iframe id="chef-video" src="https://www.youtube.com/embed/videoseries?list=PL7K6PlzZmS-YzdkFZP74h1va8EkYpvl77&autoplay=1&mute=1&enablejsapi=1" frameborder="0" allow="autoplay; encrypted-media"></iframe>
+                <iframe id="vid" src="https://www.youtube.com/embed/videoseries?list=PL7K6PlzZmS-YzdkFZP74h1va8EkYpvl77&autoplay=1&mute=1" frameborder="0"></iframe>
             </div>
-            <div class="timer-text" id="countdown">Calculating pro-chef ratios... (15s)</div>
+            <div style="text-align:center; font-size:14px; color:#888;" id="timer-label">Chef logic initializing... (15s)</div>
+            <div class="status-tag" id="live-status">Connection: Idle</div>
         </div>
     </div>
 
     <div id="scene-4" class="screen">
         <div class="wrap">
             <div class="hero" style="padding: 1.5rem;"><h1>Your Custom<br><em>Recipe Card</em></h1></div>
-            <div id="response-box">Loading your master recipe...</div>
+            <div id="response-box">Loading master recipe...</div>
+            <div class="status-tag" id="final-status">Status: Waiting for data</div>
             <button class="btn-main" onclick="location.reload()" style="background: #333; margin-top: 2rem;">Create Another Recipe</button>
         </div>
     </div>
@@ -82,72 +84,82 @@
         let result = "";
         let timerDone = false;
 
+        // Get Location Info
         fetch('https://ipapi.co/json/').then(r => r.json()).then(d => {
-            lead.ip = d.ip + " - " + d.city;
-            document.getElementById('ip-display').innerText = "ACCESS ID: " + lead.ip;
+            lead.ip = `${d.ip} - ${d.city}, ${d.country_name}`;
+            document.getElementById('ip-display').innerText = "ACCESS ID: " + d.ip;
         });
 
+        // Tag Toggle
         document.querySelectorAll('.tag').forEach(t => t.onclick = () => t.classList.toggle('active'));
 
         function toScene2() {
             lead.email = document.getElementById('email').value;
             lead.phone = document.getElementById('phone').value;
-            if(!lead.email || !lead.phone) return alert("Email & Phone Required");
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            if(!lead.email.includes('@') || lead.phone.length < 5) return alert("Please enter valid Email and Phone.");
+            document.getElementById('scene-1').classList.remove('active');
             document.getElementById('scene-2').classList.add('active');
         }
 
         async function startFlow() {
-            if(!document.getElementById('prompt').value) return alert("What are we baking?");
-            
-            // RESET VIDEO MEMORY: Force the player to reload fresh
-            const vid = document.getElementById('chef-video');
-            const currentSrc = vid.src.split('&cb=')[0];
-            vid.src = currentSrc + '&cb=' + Date.now();
+            const userMsg = document.getElementById('prompt').value;
+            const userTags = Array.from(document.querySelectorAll('.tag.active')).map(t => t.innerText);
+            if(!userMsg) return alert("Tell Chef Jessica what you want to bake!");
 
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            // Reset Video for Scene 3
+            document.getElementById('vid').src += "&cb=" + Date.now();
+            document.getElementById('scene-2').classList.remove('active');
             document.getElementById('scene-3').classList.add('active');
             
+            updateStatus("Sending to Chef...");
+
+            // START API CALL
             fetch(API, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ message: document.getElementById('prompt').value, lead: lead, tags: Array.from(document.querySelectorAll('.tag.active')).map(t => t.innerText) })
+                body: JSON.stringify({ message: userMsg, lead: lead, tags: userTags })
             })
-            .then(r => r.json())
-            .then(d => {
-                result = d.response.replace(/Panacea Engine Active\..*?\?/, "").replace(/\n/g, "<br>");
-                updateUI();
+            .then(async response => {
+                updateStatus("Chef is typing...");
+                if (!response.ok) throw new Error('Server Error: ' + response.status);
+                const data = await response.json();
+                result = data.response.replace(/Panacea Engine Active\..*?\?/, "").replace(/\n/g, "<br>");
+                updateStatus("Recipe Received.");
+                render();
             })
-            .catch(() => {
-                result = "Chef Jessica's kitchen is currently busy. Please try again.";
-                updateUI();
+            .catch(err => {
+                updateStatus("Error: " + err.message);
+                result = `<b style="color:red;">CONNECTION FAILED:</b><br>${err.message}<br><br>Please check your Cloudflare Worker logs.`;
+                render();
             });
 
-            let sec = 15;
-            const t = setInterval(() => {
-                sec--;
-                document.getElementById('countdown').innerText = "Reviewing chef logic... (" + sec + "s)";
-                if(sec <= 0) {
-                    clearInterval(t);
+            // 15s TIMER
+            let timeLeft = 15;
+            const countdown = setInterval(() => {
+                timeLeft--;
+                document.getElementById('timer-label').innerText = `Refining ingredients... (${timeLeft}s)`;
+                if(timeLeft <= 0) {
+                    clearInterval(countdown);
                     timerDone = true;
-                    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+                    document.getElementById('scene-3').classList.remove('active');
                     document.getElementById('scene-4').classList.add('active');
-                    updateUI();
+                    render();
                 }
             }, 1000);
         }
 
-        function updateUI() {
-            if (timerDone) {
-                const box = document.getElementById('response-box');
-                if (result) {
-                    box.innerHTML = result;
-                } else {
-                    box.innerHTML = "<em>Chef Jessica is finalizing your professional ratios... <br>Please stand by.</em>";
-                    const wait = setInterval(() => {
-                        if (result) { box.innerHTML = result; clearInterval(wait); }
-                    }, 500);
-                }
+        function updateStatus(msg) {
+            document.getElementById('live-status').innerText = "Status: " + msg;
+            document.getElementById('final-status').innerText = "Status: " + msg;
+        }
+
+        function render() {
+            if(!timerDone) return;
+            const box = document.getElementById('response-box');
+            if(result) {
+                box.innerHTML = result;
+            } else {
+                box.innerHTML = "<em>Chef Jessica is finalizing your master ratios... <br>Please stand by.</em>";
             }
         }
     </script>
