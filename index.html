@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Chef Jessica's Recipe Creator</title>
+    
     <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     
     <style>
@@ -14,13 +15,9 @@
             --input-border: rgba(26,26,24,0.12);
         }
 
-        * { 
-            box-sizing: border-box; 
-            margin: 0; 
-            padding: 0; 
-            -webkit-tap-highlight-color: transparent; 
-        }
-
+        /* Base Reset */
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        
         body, html { 
             height: 100%; 
             width: 100%;
@@ -28,9 +25,10 @@
             color: var(--text-color);
             font-family: 'Inter', sans-serif;
             overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
         }
 
-        /* Screen Transitions */
+        /* Smooth Scene Transitions */
         .screen { 
             position: fixed; 
             top: 0; 
@@ -39,127 +37,135 @@
             height: 100%; 
             overflow-y: auto; 
             background: var(--bg-color); 
-            transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
             z-index: 10;
         }
         .screen.below { transform: translateY(100%); }
         .screen.active { transform: translateY(0); }
 
         .container { 
-            max-width: 600px; 
+            max-width: 580px; 
             margin: 0 auto; 
-            padding: 2.5rem 1.5rem 6rem; 
+            padding: 3rem 1.5rem 6rem; 
         }
 
-        /* Hero Section */
-        .hero-card { 
+        /* Original Branding */
+        .hero-banner { 
             background: var(--primary-pink); 
-            border-radius: 18px; 
-            padding: 2.5rem 1.5rem; 
+            border-radius: 16px; 
+            padding: 2.8rem 1.5rem; 
             margin-bottom: 2rem; 
             text-align: center;
-            box-shadow: 0 10px 30px rgba(255, 20, 147, 0.15);
+            box-shadow: 0 12px 40px rgba(255, 20, 147, 0.12);
         }
-        .hero-card h1 { 
+        .hero-banner h1 { 
             font-family: 'Lora', serif; 
             font-size: 34px; 
             font-weight: 400; 
             color: #ffffff; 
             line-height: 1.1; 
-            letter-spacing: -0.02em;
         }
-        .hero-card h1 em { 
+        .hero-banner h1 em { 
             color: #000000; 
             font-style: italic; 
             display: block;
-            margin-top: 5px;
+            margin-top: 8px;
         }
 
-        /* Form Elements */
+        /* Inputs & Textarea */
         input, textarea { 
             width: 100%; 
-            padding: 1.2rem; 
+            padding: 1.15rem; 
             border: 1px solid var(--input-border); 
-            border-radius: 14px; 
-            margin-bottom: 1.2rem; 
+            border-radius: 12px; 
+            margin-bottom: 1rem; 
             font-size: 16px; 
             font-family: inherit;
             background: #ffffff;
-            transition: border-color 0.3s;
+            transition: all 0.2s ease;
         }
         input:focus, textarea:focus {
             outline: none;
             border-color: var(--primary-pink);
+            box-shadow: 0 0 0 4px rgba(255, 20, 147, 0.05);
         }
 
-        /* Tags */
-        .section-label { 
-            font-size: 12px; 
+        /* Tag System */
+        .section-header { 
+            font-size: 11px; 
             font-weight: 700; 
-            color: #999; 
+            color: #888; 
             text-transform: uppercase; 
-            letter-spacing: 0.12em; 
-            margin: 2rem 0 1rem; 
+            letter-spacing: 0.15em; 
+            margin: 2.2rem 0 1rem; 
         }
-        .tag-cloud { 
+        .tag-wrap { 
             display: flex; 
             flex-wrap: wrap; 
             gap: 10px; 
             margin-bottom: 0.5rem; 
         }
         .tag { 
-            padding: 10px 20px; 
+            padding: 10px 22px; 
             border: 1px solid var(--input-border); 
-            border-radius: 25px; 
+            border-radius: 30px; 
             background: #ffffff; 
             font-size: 14px; 
             font-weight: 500;
             cursor: pointer; 
-            transition: all 0.2s ease;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .tag:hover { border-color: var(--primary-pink); }
         .tag.active { 
             background: var(--primary-pink); 
             color: #ffffff; 
             border-color: var(--primary-pink); 
-            box-shadow: 0 4px 12px rgba(255, 20, 147, 0.2);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(255, 20, 147, 0.25);
         }
 
-        /* Buttons */
-        .btn-primary { 
+        /* Button Logic */
+        .btn-action { 
             background: var(--primary-pink); 
             color: #ffffff; 
             border: none; 
             width: 100%; 
-            padding: 1.3rem; 
+            padding: 1.25rem; 
             border-radius: 50px; 
             font-size: 18px; 
             font-weight: 600; 
             cursor: pointer; 
             margin-top: 1.5rem;
-            transition: transform 0.2s;
+            box-shadow: 0 8px 25px rgba(255, 20, 147, 0.2);
+            transition: all 0.3s ease;
         }
-        .btn-primary:active { transform: scale(0.98); }
-
-        /* Meta Info */
-        #access-id { 
-            font-size: 11px; 
-            color: #bbbbbb; 
-            margin-top: 20px; 
-            text-align: center; 
-            font-family: monospace; 
+        .btn-action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(255, 20, 147, 0.3);
+        }
+        .btn-action:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
         }
 
-        /* Response Box */
-        #recipe-output { 
+        /* Result Area */
+        #recipe-display { 
             margin-top: 25px; 
-            padding: 25px; 
+            padding: 30px; 
             background: #ffffff; 
             border-radius: 16px; 
             display: none; 
             border: 1px solid #eeeeee; 
-            line-height: 1.7;
+            line-height: 1.8;
             font-size: 16px;
+        }
+
+        #access-log { 
+            font-size: 11px; 
+            color: #bbbbbb; 
+            margin-top: 25px; 
+            text-align: center; 
+            font-family: monospace; 
         }
     </style>
 </head>
@@ -167,112 +173,117 @@
 
     <div id="scene-1" class="screen active">
         <div class="container">
-            <div class="hero-card">
+            <div class="hero-banner">
                 <h1>Chef Jessica's <em>Recipe Creator</em></h1>
             </div>
             <input type="email" id="email" placeholder="Email Address">
             <input type="tel" id="phone" placeholder="Phone Number">
-            <button class="btn-primary" onclick="goToScene2()">Continue to Recipe →</button>
-            <div id="access-id">SECURE CONNECTION: INITIALIZING...</div>
+            <button class="btn-action" onclick="toCustomizer()">Continue to Recipe →</button>
+            <div id="access-log">SECURE_ID: INITIALIZING...</div>
         </div>
     </div>
 
     <div id="scene-2" class="screen below">
         <div class="container">
-            <textarea id="prompt" rows="5" placeholder="Tell Chef Jessica what you want to bake... (e.g., 'Fluffy sourdough' or 'Healthy chocolate brownies')"></textarea>
+            <div style="margin-bottom: 2rem;">
+                 <h2 style="font-family: 'Lora', serif; font-size: 24px; margin-bottom: 10px;">What are we baking?</h2>
+                 <textarea id="recipe-prompt" rows="5" placeholder="Tell Chef Jessica about your dream recipe..."></textarea>
+            </div>
             
-            <div class="section-label">Allergies & Intolerances</div>
-            <div class="tag-cloud" id="allergy-tags">
+            <div class="section-header">Allergies & Intolerances</div>
+            <div class="tag-wrap">
                 <div class="tag">Gluten</div><div class="tag">Nuts</div><div class="tag">Dairy</div><div class="tag">Eggs</div><div class="tag">Soy</div><div class="tag">Shellfish</div><div class="tag">Corn</div><div class="tag">Sugar-Free</div><div class="tag">Nightshades</div>
             </div>
 
-            <div class="section-label">Cuisine & Meal Type</div>
-            <div class="tag-cloud" id="cuisine-tags">
+            <div class="section-header">Cuisine & Meal Type</div>
+            <div class="tag-wrap">
                 <div class="tag">Italian</div><div class="tag">French</div><div class="tag">Asian</div><div class="tag">American</div><div class="tag">Mexican</div><div class="tag">Dessert</div><div class="tag">Breakfast</div><div class="tag">Snacks</div><div class="tag">Breads</div>
             </div>
 
-            <div class="section-label">Dietary Preferences</div>
-            <div class="tag-cloud" id="diet-tags">
+            <div class="section-header">Dietary Preferences</div>
+            <div class="tag-wrap">
                 <div class="tag">Vegan</div><div class="tag">Vegetarian</div><div class="tag">Halal</div><div class="tag">Kosher</div><div class="tag">Keto</div><div class="tag">Paleo</div><div class="tag">Gluten-free</div><div class="tag">Low Carb</div><div class="tag">Plant-Based</div>
             </div>
 
-            <div id="recipe-output"></div>
-            <button class="btn-primary" id="submit-btn" onclick="generateRecipe()">✨ Make My Recipe</button>
+            <div id="recipe-display"></div>
+            <button class="btn-action" id="submit-btn" onclick="submitToAI()">✨ Make My Recipe</button>
         </div>
     </div>
 
     <script>
-        const API_ENDPOINT = 'https://fft-recipe.man-4bb.workers.dev/chat';
-        let userData = { email: '', phone: '', ip: '' };
+        const API_PATH = 'https://fft-recipe.man-4bb.workers.dev/chat';
+        let leadSession = { email: '', phone: '', ip: '' };
 
-        // 1. Fetch Location Data
-        async function initAccess() {
+        // Fetch User IP & Location
+        async function getSessionMeta() {
             try {
-                const res = await fetch('https://ipapi.co/json/');
-                const data = await res.json();
-                userData.ip = `${data.ip} (${data.city}, ${data.country_name})`;
-                document.getElementById('access-id').innerText = "ACCESS ID: " + userData.ip;
-            } catch (e) {
-                document.getElementById('access-id').innerText = "ACCESS ID: SECURE_LOCAL_MODE";
+                const response = await fetch('https://ipapi.co/json/');
+                const data = await response.json();
+                leadSession.ip = `${data.ip} - ${data.city}, ${data.country_name}`;
+                document.getElementById('access-log').innerText = "ACCESS ID: " + leadSession.ip;
+            } catch (err) {
+                document.getElementById('access-log').innerText = "ACCESS ID: SECURE_CONNECTION_ACTIVE";
             }
         }
-        initAccess();
+        getSessionMeta();
 
-        // 2. Handle Tag Selection
+        // Tag Toggle Interaction
         document.querySelectorAll('.tag').forEach(tag => {
-            tag.addEventListener('click', () => tag.classList.toggle('active'));
+            tag.addEventListener('click', () => {
+                tag.classList.toggle('active');
+            });
         });
 
-        // 3. Navigation
-        function goToScene2() {
-            userData.email = document.getElementById('email').value;
-            userData.phone = document.getElementById('phone').value;
+        // Scene Switching
+        function toCustomizer() {
+            leadSession.email = document.getElementById('email').value;
+            leadSession.phone = document.getElementById('phone').value;
             
-            if(!userData.email.includes('@') || userData.phone.length < 5) {
-                alert("Please provide a valid email and phone number to continue.");
+            if(!leadSession.email.includes('@') || leadSession.phone.length < 5) {
+                alert("Please provide a valid email and phone number.");
                 return;
             }
             
             document.getElementById('scene-1').classList.remove('active');
             document.getElementById('scene-2').classList.add('active');
-            window.scrollTo(0,0);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // 4. AI Logic
-        async function generateRecipe() {
-            const userPrompt = document.getElementById('prompt').value;
-            const selectedTags = Array.from(document.querySelectorAll('.tag.active')).map(t => t.innerText);
-            const outputBox = document.getElementById('recipe-output');
+        // AI Generation Logic
+        async function submitToAI() {
+            const promptValue = document.getElementById('recipe-prompt').value;
+            const activeTags = Array.from(document.querySelectorAll('.tag.active')).map(t => t.innerText);
+            const box = document.getElementById('recipe-display');
             const btn = document.getElementById('submit-btn');
 
-            if(!userPrompt) {
-                alert("Please tell Chef Jessica what you'd like to bake!");
+            if(!promptValue) {
+                alert("Please enter a recipe request!");
                 return;
             }
 
-            outputBox.style.display = 'block';
-            outputBox.innerHTML = "<em>Consulting Chef Jessica's logic...</em>";
+            box.style.display = 'block';
+            box.innerHTML = "<em>Consulting Chef Jessica's logic...</em>";
             btn.disabled = true;
-            btn.innerText = "Creating...";
+            btn.innerText = "Consulting Chef...";
 
             try {
-                const response = await fetch(API_ENDPOINT, {
+                const res = await fetch(API_PATH, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        message: userPrompt,
-                        lead: userData,
-                        tags: selectedTags
+                        message: promptValue,
+                        lead: leadSession,
+                        tags: activeTags
                     })
                 });
 
-                const result = await response.json();
-                outputBox.innerHTML = result.response;
+                const data = await res.json();
+                box.innerHTML = data.response;
             } catch (error) {
-                outputBox.innerText = "Connection lost. Please try again.";
+                box.innerText = "Connection issue. Please check your signal and try again.";
             } finally {
                 btn.disabled = false;
-                btn.innerText = "✨ Make Another Recipe";
+                btn.innerText = "✨ Make My Recipe";
             }
         }
     </script>
