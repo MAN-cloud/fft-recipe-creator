@@ -42,18 +42,22 @@
     <div id="scene-2" class="screen">
         <div class="wrap">
             <textarea id="prompt" rows="4" placeholder="What are we baking today?"></textarea>
+            
             <h3>Allergies & Intolerances</h3>
             <div class="tag-group">
                 <div class="tag">Gluten</div><div class="tag">Nuts</div><div class="tag">Dairy</div><div class="tag">Eggs</div><div class="tag">Soy</div><div class="tag">Shellfish</div><div class="tag">Corn</div>
             </div>
+
             <h3>Cuisine & Meal Type</h3>
             <div class="tag-group">
                 <div class="tag">Italian</div><div class="tag">French</div><div class="tag">Asian</div><div class="tag">Mediterranean</div><div class="tag">American/USA</div><div class="tag">Indian</div><div class="tag">Breakfast</div><div class="tag">Lunch</div><div class="tag">Dinner</div><div class="tag">Dessert</div>
             </div>
+
             <h3>Dietary Preferences</h3>
             <div class="tag-group">
                 <div class="tag">Vegan</div><div class="tag">Vegetarian</div><div class="tag">Halal</div><div class="tag">Kosher</div><div class="tag">Gluten-free</div><div class="tag">Healthy</div><div class="tag">Whole Foods</div>
             </div>
+
             <button class="btn-main" onclick="startFlow()">✨ Make My Recipe</button>
         </div>
     </div>
@@ -65,15 +69,15 @@
                 <iframe id="vid" src="https://www.youtube.com/embed/videoseries?list=PL7K6PlzZmS-YzdkFZP74h1va8EkYpvl77&autoplay=1&mute=1" frameborder="0"></iframe>
             </div>
             <div style="text-align:center; font-size:14px; color:#888;" id="timer">15s</div>
-            <div class="status-bar" id="s3-status">STATUS: INITIALIZING...</div>
+            <div class="status-bar" id="s3-status">CHEF STATUS: ANALYZING REQUEST...</div>
         </div>
     </div>
 
     <div id="scene-4" class="screen">
         <div class="wrap">
             <div class="hero" style="padding: 1.5rem;"><h1>Your Custom<br><em>Recipe Card</em></h1></div>
-            <div id="response-box">Waiting for master recipe...</div>
-            <div class="status-bar" id="s4-status">STATUS: WAITING...</div>
+            <div id="response-box">Finalizing your professional ratios...</div>
+            <div class="status-bar" id="s4-status">CHEF STATUS: MASTERING INGREDIENTS...</div>
             <button class="btn-main" onclick="location.reload()" style="background: #333; margin-top: 2rem;">Create Another Recipe</button>
         </div>
     </div>
@@ -104,10 +108,10 @@
             const tags = Array.from(document.querySelectorAll('.tag.active')).map(t => t.innerText);
             if(!msg) return alert("Request Required");
 
+            document.getElementById('vid').src += "&cb=" + Date.now();
             document.getElementById('scene-2').classList.remove('active');
             document.getElementById('scene-3').classList.add('active');
             
-            // FETCH RECIPE
             fetch(API, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
@@ -115,20 +119,24 @@
             })
             .then(res => res.json())
             .then(data => {
-                // Better Filter: Only remove the bot text if it's there, don't kill the whole string
-                let clean = data.response.replace("Panacea Engine Active. How can Chef Jessica's logic assist your bake today?", "");
-                recipeData = clean.trim() || data.response; // Fallback to raw data if clean is empty
-                recipeData = recipeData.replace(/\n/g, "<br>");
-                document.getElementById('s3-status').innerText = "STATUS: DATA READY";
-                document.getElementById('s4-status').innerText = "STATUS: DATA READY";
+                // EXTREME FILTER: If it contains Panacea but NO ingredients/instructions, keep waiting
+                if (data.response.includes("Panacea Engine") && !data.response.includes("Ingredients") && !data.response.includes("Step")) {
+                    console.log("Placeholder received. Waiting for real recipe...");
+                    return; 
+                }
+                
+                // Remove the bot-text and format
+                let clean = data.response.replace(/Panacea Engine Active\..*?\?/, "");
+                recipeData = clean.trim().replace(/\n/g, "<br>");
+                document.getElementById('s3-status').innerText = "CHEF STATUS: READY";
+                document.getElementById('s4-status').innerText = "CHEF STATUS: READY";
                 render();
             })
-            .catch(err => {
-                recipeData = "Connection Error. Please check your signal.";
+            .catch(() => {
+                recipeData = "<b>Notice:</b> Chef Jessica is taking extra time to perfect this unique request. Please stay on this page.";
                 render();
             });
 
-            // TIMER
             let countdown = 15;
             const t = setInterval(() => {
                 countdown--;
@@ -149,7 +157,7 @@
             if(recipeData) {
                 box.innerHTML = recipeData;
             } else {
-                box.innerHTML = "<em>Chef Jessica is finalizing your ratios. One moment...</em>";
+                box.innerHTML = "<em>Chef Jessica is meticulously formatting your master recipe ratios.<br><br>Please stay on this screen while the master chef logic completes.</em>";
             }
         }
     </script>
