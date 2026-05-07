@@ -20,12 +20,13 @@
         .tag-group { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 0.5rem; }
         .tag { padding: 9px 18px; border: 1px solid rgba(26,26,24,0.12); border-radius: 20px; background: white; font-size: 14px; cursor: pointer; transition: 0.2s; }
         .tag.active { background: var(--primary-pink); color: white; border-color: var(--primary-pink); }
-        .btn-main { background: var(--primary-pink); color: white; border: none; width: 100%; padding: 1.2rem; border-radius: 50px; font-size: 18px; font-weight: 600; cursor: pointer; margin-top: 1.2rem; }
+        .btn-main { background: var(--primary-pink); color: white; border: none; width: 100%; padding: 1.2rem; border-radius: 50px; font-size: 18px; font-weight: 600; cursor: pointer; margin-top: 1.2rem; transition: transform 0.2s; }
+        .btn-main:active { transform: scale(0.98); }
         #ip-display { font-size: 11px; color: #aaa; margin-top: 15px; text-align: center; font-family: monospace; }
-        #response-box { margin-top: 20px; padding: 25px; background: white; border-radius: 16px; border: 1px solid #eee; line-height: 1.7; font-size: 16px; min-height: 100px; }
-        .video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 14px; margin-bottom: 20px; background: #000; }
+        #response-box { margin-top: 20px; padding: 25px; background: white; border-radius: 16px; border: 1px solid #eee; line-height: 1.7; font-size: 16px; min-height: 150px; }
+        .video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 14px; margin-bottom: 20px; background: #000; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
         .video-container iframe { position: absolute; top:0; left: 0; width: 100%; height: 100%; }
-        .timer-text { text-align: center; font-size: 14px; color: #888; margin-top: 10px; }
+        .timer-text { text-align: center; font-size: 14px; color: #888; margin-top: 10px; font-weight: 500; }
     </style>
 </head>
 <body>
@@ -36,7 +37,7 @@
             <input type="email" id="user-email" placeholder="Email Address">
             <input type="tel" id="user-phone" placeholder="Phone Number">
             <button class="btn-main" onclick="toScene2()">Continue to Recipe →</button>
-            <div id="ip-display">Connecting...</div>
+            <div id="ip-display">Connecting to secure server...</div>
         </div>
     </div>
 
@@ -67,9 +68,9 @@
         <div class="wrap">
             <div class="hero" style="padding: 1.5rem;"><h1>Chef Jessica is<br><em>Crafting...</em></h1></div>
             <div class="video-container">
-                <iframe src="https://www.youtube.com/embed/j_nAnN6W8pU?autoplay=1&mute=1&modestbranding=1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+                <iframe src="https://www.youtube.com/embed/videoseries?list=PL7K6PlzZmS-YzdkFZP74h1va8EkYpvl77&autoplay=1&mute=1&modestbranding=1&loop=1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
             </div>
-            <div class="timer-text" id="countdown">Calculating pro-chef ratios... (15s)</div>
+            <div class="timer-text" id="countdown">Developing the master profile... (15s)</div>
         </div>
     </div>
 
@@ -102,7 +103,7 @@
         function toScene2() {
             lead.email = document.getElementById('user-email').value;
             lead.phone = document.getElementById('user-phone').value;
-            if(!lead.email || !lead.phone) return alert("Please enter Email & Phone.");
+            if(!lead.email || !lead.phone) return alert("Required: Email & Phone Number");
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById('scene-2').classList.add('active');
             window.scrollTo(0,0);
@@ -111,7 +112,7 @@
         async function startAIProcess() {
             const msg = document.getElementById('user-input').value;
             const tags = Array.from(document.querySelectorAll('.tag.active')).map(t => t.innerText);
-            if(!msg) return alert("What are we baking today?");
+            if(!msg) return alert("Please enter your recipe request.");
 
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById('scene-3').classList.add('active');
@@ -119,7 +120,7 @@
             let timeLeft = 15;
             const timer = setInterval(() => {
                 timeLeft--;
-                document.getElementById('countdown').innerText = "Refining ingredients... (" + timeLeft + "s)";
+                document.getElementById('countdown').innerText = "Reviewing chef logic... (" + timeLeft + "s)";
                 if(timeLeft <= 0) {
                     clearInterval(timer);
                     timerDone = true;
@@ -135,16 +136,16 @@
                 });
                 const d = await r.json();
                 
-                // Security check: If the worker sends the "Panacea" text, we ignore it and show a professional placeholder
+                // Bot-Text Security Filter
                 if (d.response.includes("Panacea Engine")) {
-                    recipeResult = "Chef Jessica is reviewing your ingredients. One moment while the master recipe is formatted...";
+                    recipeResult = "### Chef's Note\nOne moment. Chef Jessica's logic is finalizing your custom ratios. Please stand by for the professional formatting...";
                 } else {
                     recipeResult = d.response;
                 }
                 
                 checkFinalTransition();
             } catch (e) { 
-                recipeResult = "Connection error. Chef Jessica's server is busy. Please try again.";
+                recipeResult = "Connection interrupted. Please try again in a moment.";
                 checkFinalTransition();
             }
         }
