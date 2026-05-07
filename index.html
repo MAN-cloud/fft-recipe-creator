@@ -4,286 +4,153 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Chef Jessica's Recipe Creator</title>
-    
     <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    
     <style>
-        :root { 
-            --primary-pink: #FF1493; 
-            --bg-color: #FAF8F4; 
-            --text-color: #1A1A18;
-            --input-border: rgba(26,26,24,0.12);
-        }
-
-        /* Base Reset */
+        :root { --primary-pink: #FF1493; --bg: #FAF8F4; --text: #1A1A18; }
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-        
-        body, html { 
-            height: 100%; 
-            width: 100%;
-            background: var(--bg-color); 
-            color: var(--text-color);
-            font-family: 'Inter', sans-serif;
-            overflow-x: hidden;
-            -webkit-font-smoothing: antialiased;
-        }
-
-        /* Smooth Scene Transitions */
-        .screen { 
-            position: fixed; 
-            top: 0; 
-            left: 0; 
-            width: 100%; 
-            height: 100%; 
-            overflow-y: auto; 
-            background: var(--bg-color); 
-            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-            z-index: 10;
-        }
-        .screen.below { transform: translateY(100%); }
-        .screen.active { transform: translateY(0); }
-
-        .container { 
-            max-width: 580px; 
-            margin: 0 auto; 
-            padding: 3rem 1.5rem 6rem; 
-        }
-
-        /* Original Branding */
-        .hero-banner { 
-            background: var(--primary-pink); 
-            border-radius: 16px; 
-            padding: 2.8rem 1.5rem; 
-            margin-bottom: 2rem; 
-            text-align: center;
-            box-shadow: 0 12px 40px rgba(255, 20, 147, 0.12);
-        }
-        .hero-banner h1 { 
-            font-family: 'Lora', serif; 
-            font-size: 34px; 
-            font-weight: 400; 
-            color: #ffffff; 
-            line-height: 1.1; 
-        }
-        .hero-banner h1 em { 
-            color: #000000; 
-            font-style: italic; 
-            display: block;
-            margin-top: 8px;
-        }
-
-        /* Inputs & Textarea */
-        input, textarea { 
-            width: 100%; 
-            padding: 1.15rem; 
-            border: 1px solid var(--input-border); 
-            border-radius: 12px; 
-            margin-bottom: 1rem; 
-            font-size: 16px; 
-            font-family: inherit;
-            background: #ffffff;
-            transition: all 0.2s ease;
-        }
-        input:focus, textarea:focus {
-            outline: none;
-            border-color: var(--primary-pink);
-            box-shadow: 0 0 0 4px rgba(255, 20, 147, 0.05);
-        }
-
-        /* Tag System */
-        .section-header { 
-            font-size: 11px; 
-            font-weight: 700; 
-            color: #888; 
-            text-transform: uppercase; 
-            letter-spacing: 0.15em; 
-            margin: 2.2rem 0 1rem; 
-        }
-        .tag-wrap { 
-            display: flex; 
-            flex-wrap: wrap; 
-            gap: 10px; 
-            margin-bottom: 0.5rem; 
-        }
-        .tag { 
-            padding: 10px 22px; 
-            border: 1px solid var(--input-border); 
-            border-radius: 30px; 
-            background: #ffffff; 
-            font-size: 14px; 
-            font-weight: 500;
-            cursor: pointer; 
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .tag.active { 
-            background: var(--primary-pink); 
-            color: #ffffff; 
-            border-color: var(--primary-pink); 
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(255, 20, 147, 0.25);
-        }
-
-        /* Button Logic */
-        .btn-action { 
-            background: var(--primary-pink); 
-            color: #ffffff; 
-            border: none; 
-            width: 100%; 
-            padding: 1.25rem; 
-            border-radius: 50px; 
-            font-size: 18px; 
-            font-weight: 600; 
-            cursor: pointer; 
-            margin-top: 1.5rem;
-            box-shadow: 0 8px 25px rgba(255, 20, 147, 0.2);
-            transition: all 0.3s ease;
-        }
-        .btn-action:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 30px rgba(255, 20, 147, 0.3);
-        }
-        .btn-action:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        /* Result Area */
-        #recipe-display { 
-            margin-top: 25px; 
-            padding: 30px; 
-            background: #ffffff; 
-            border-radius: 16px; 
-            display: none; 
-            border: 1px solid #eeeeee; 
-            line-height: 1.8;
-            font-size: 16px;
-        }
-
-        #access-log { 
-            font-size: 11px; 
-            color: #bbbbbb; 
-            margin-top: 25px; 
-            text-align: center; 
-            font-family: monospace; 
-        }
+        body, html { height: 100%; overflow-x: hidden; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); }
+        .screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; overflow-y: auto; background: var(--bg); display: none; }
+        .screen.active { display: block; }
+        .wrap { max-width: 580px; margin: 0 auto; padding: 2rem 1.25rem 5rem; }
+        .hero { background: var(--primary-pink); border-radius: 14px; padding: 2.2rem 1.5rem; margin-bottom: 1.5rem; text-align: center; }
+        .hero h1 { font-family: 'Lora', serif; font-size: 32px; font-weight: 400; color: #fff; line-height: 1.1; }
+        .hero h1 em { color: #000; font-style: italic; }
+        input, textarea { width: 100%; padding: 1.1rem; border: 1px solid rgba(26,26,24,0.12); border-radius: 12px; margin-bottom: 1rem; font-size: 1rem; font-family: inherit; background: #fff; }
+        h3 { font-size: 11px; font-weight: 600; color: #888; text-transform: uppercase; letter-spacing: .1em; margin: 1.8rem 0 0.8rem; }
+        .tag-group { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 0.5rem; }
+        .tag { padding: 9px 18px; border: 1px solid rgba(26,26,24,0.12); border-radius: 20px; background: white; font-size: 14px; cursor: pointer; transition: 0.2s; }
+        .tag.active { background: var(--primary-pink); color: white; border-color: var(--primary-pink); }
+        .btn-main { background: var(--primary-pink); color: white; border: none; width: 100%; padding: 1.2rem; border-radius: 50px; font-size: 18px; font-weight: 600; cursor: pointer; margin-top: 1.2rem; }
+        #ip-display { font-size: 11px; color: #aaa; margin-top: 15px; text-align: center; font-family: monospace; }
+        #response-box { margin-top: 20px; padding: 25px; background: white; border-radius: 16px; border: 1px solid #eee; line-height: 1.7; font-size: 16px; }
+        .video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 14px; margin-bottom: 20px; }
+        .video-container iframe { position: absolute; top:0; left: 0; width: 100%; height: 100%; }
+        .timer-text { text-align: center; font-size: 14px; color: #888; margin-top: 10px; }
     </style>
 </head>
 <body>
 
     <div id="scene-1" class="screen active">
-        <div class="container">
-            <div class="hero-banner">
-                <h1>Chef Jessica's <em>Recipe Creator</em></h1>
-            </div>
-            <input type="email" id="email" placeholder="Email Address">
-            <input type="tel" id="phone" placeholder="Phone Number">
-            <button class="btn-action" onclick="toCustomizer()">Continue to Recipe →</button>
-            <div id="access-log">SECURE_ID: INITIALIZING...</div>
+        <div class="wrap">
+            <div class="hero"><h1>Chef Jessica's <br><em>Recipe Creator</em></h1></div>
+            <input type="email" id="user-email" placeholder="Email Address">
+            <input type="tel" id="user-phone" placeholder="Phone Number">
+            <button class="btn-main" onclick="toScene2()">Continue to Recipe →</button>
+            <div id="ip-display">Connecting...</div>
         </div>
     </div>
 
-    <div id="scene-2" class="screen below">
-        <div class="container">
-            <div style="margin-bottom: 2rem;">
-                 <h2 style="font-family: 'Lora', serif; font-size: 24px; margin-bottom: 10px;">What are we baking?</h2>
-                 <textarea id="recipe-prompt" rows="5" placeholder="Tell Chef Jessica about your dream recipe..."></textarea>
-            </div>
+    <div id="scene-2" class="screen">
+        <div class="wrap">
+            <textarea id="user-input" rows="4" placeholder="What would you like to bake today?"></textarea>
             
-            <div class="section-header">Allergies & Intolerances</div>
-            <div class="tag-wrap">
-                <div class="tag">Gluten</div><div class="tag">Nuts</div><div class="tag">Dairy</div><div class="tag">Eggs</div><div class="tag">Soy</div><div class="tag">Shellfish</div><div class="tag">Corn</div><div class="tag">Sugar-Free</div><div class="tag">Nightshades</div>
+            <h3>Allergies & Intolerances</h3>
+            <div class="tag-group">
+                <div class="tag">Gluten</div><div class="tag">Nuts</div><div class="tag">Dairy</div><div class="tag">Eggs</div><div class="tag">Soy</div><div class="tag">Shellfish</div><div class="tag">Corn</div>
             </div>
 
-            <div class="section-header">Cuisine & Meal Type</div>
-            <div class="tag-wrap">
-                <div class="tag">Italian</div><div class="tag">French</div><div class="tag">Asian</div><div class="tag">American</div><div class="tag">Mexican</div><div class="tag">Dessert</div><div class="tag">Breakfast</div><div class="tag">Snacks</div><div class="tag">Breads</div>
+            <h3>Cuisine & Meal Type</h3>
+            <div class="tag-group">
+                <div class="tag">Italian</div><div class="tag">French</div><div class="tag">Asian</div><div class="tag">Mediterranean</div><div class="tag">American/USA</div><div class="tag">Indian</div><div class="tag">Breakfast</div><div class="tag">Lunch</div><div class="tag">Dinner</div><div class="tag">Dessert</div>
             </div>
 
-            <div class="section-header">Dietary Preferences</div>
-            <div class="tag-wrap">
-                <div class="tag">Vegan</div><div class="tag">Vegetarian</div><div class="tag">Halal</div><div class="tag">Kosher</div><div class="tag">Keto</div><div class="tag">Paleo</div><div class="tag">Gluten-free</div><div class="tag">Low Carb</div><div class="tag">Plant-Based</div>
+            <h3>Dietary Preferences</h3>
+            <div class="tag-group">
+                <div class="tag">Vegan</div><div class="tag">Vegetarian</div><div class="tag">Halal</div><div class="tag">Kosher</div><div class="tag">Gluten-free</div><div class="tag">Healthy</div><div class="tag">Whole Foods</div>
             </div>
 
-            <div id="recipe-display"></div>
-            <button class="btn-action" id="submit-btn" onclick="submitToAI()">✨ Make My Recipe</button>
+            <button class="btn-main" onclick="startAIProcess()">✨ Make My Recipe</button>
+        </div>
+    </div>
+
+    <div id="scene-3" class="screen">
+        <div class="wrap">
+            <div class="hero" style="padding: 1.5rem;"><h1>Chef Jessica is<br><em>Crafting...</em></h1></div>
+            <div class="video-container">
+                <iframe src="https://www.youtube.com/embed/videoseries?list=PLpZ5SUpj2S2RM4qS294Fz-XkYf1Z9A1A1&autoplay=1&mute=1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+            </div>
+            <div class="timer-text" id="countdown">Calculating pro-chef ratios... (15s)</div>
+        </div>
+    </div>
+
+    <div id="scene-4" class="screen">
+        <div class="wrap">
+            <div class="hero" style="padding: 1.5rem;"><h1>Your Custom<br><em>Recipe Card</em></h1></div>
+            <div id="response-box"></div>
+            <button class="btn-main" onclick="location.reload()" style="background: #333;">Create Another Recipe</button>
         </div>
     </div>
 
     <script>
-        const API_PATH = 'https://fft-recipe.man-4bb.workers.dev/chat';
-        let leadSession = { email: '', phone: '', ip: '' };
+        const API_URL = 'https://fft-recipe.man-4bb.workers.dev/chat';
+        let lead = { email: '', phone: '', ip: '' };
+        let recipeResult = '';
+        let timerDone = false;
 
-        // Fetch User IP & Location
-        async function getSessionMeta() {
+        async function fetchIp() {
             try {
-                const response = await fetch('https://ipapi.co/json/');
-                const data = await response.json();
-                leadSession.ip = `${data.ip} - ${data.city}, ${data.country_name}`;
-                document.getElementById('access-log').innerText = "ACCESS ID: " + leadSession.ip;
-            } catch (err) {
-                document.getElementById('access-log').innerText = "ACCESS ID: SECURE_CONNECTION_ACTIVE";
-            }
+                const r = await fetch('https://ipapi.co/json/');
+                const d = await r.json();
+                lead.ip = d.ip + " - " + d.city;
+                document.getElementById('ip-display').innerText = "ACCESS ID: " + lead.ip;
+            } catch (e) { document.getElementById('ip-display').innerText = "SECURE CONNECTION ACTIVE"; }
         }
-        getSessionMeta();
+        fetchIp();
 
-        // Tag Toggle Interaction
-        document.querySelectorAll('.tag').forEach(tag => {
-            tag.addEventListener('click', () => {
-                tag.classList.toggle('active');
-            });
-        });
+        document.querySelectorAll('.tag').forEach(t => t.onclick = () => t.classList.toggle('active'));
 
-        // Scene Switching
-        function toCustomizer() {
-            leadSession.email = document.getElementById('email').value;
-            leadSession.phone = document.getElementById('phone').value;
-            
-            if(!leadSession.email.includes('@') || leadSession.phone.length < 5) {
-                alert("Please provide a valid email and phone number.");
-                return;
-            }
-            
-            document.getElementById('scene-1').classList.remove('active');
+        function toScene2() {
+            lead.email = document.getElementById('user-email').value;
+            lead.phone = document.getElementById('user-phone').value;
+            if(!lead.email || !lead.phone) return alert("Please enter Email & Phone.");
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById('scene-2').classList.add('active');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            window.scrollTo(0,0);
         }
 
-        // AI Generation Logic
-        async function submitToAI() {
-            const promptValue = document.getElementById('recipe-prompt').value;
-            const activeTags = Array.from(document.querySelectorAll('.tag.active')).map(t => t.innerText);
-            const box = document.getElementById('recipe-display');
-            const btn = document.getElementById('submit-btn');
+        async function startAIProcess() {
+            const msg = document.getElementById('user-input').value;
+            const tags = Array.from(document.querySelectorAll('.tag.active')).map(t => t.innerText);
+            if(!msg) return alert("What are we baking today?");
 
-            if(!promptValue) {
-                alert("Please enter a recipe request!");
-                return;
-            }
+            // Move to Video Scene
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById('scene-3').classList.add('active');
+            
+            // Start 15s Timer
+            let timeLeft = 15;
+            const timer = setInterval(() => {
+                timeLeft--;
+                document.getElementById('countdown').innerText = "Refining ingredients... (" + timeLeft + "s)";
+                if(timeLeft <= 0) {
+                    clearInterval(timer);
+                    timerDone = true;
+                    checkFinalTransition();
+                }
+            }, 1000);
 
-            box.style.display = 'block';
-            box.innerHTML = "<em>Consulting Chef Jessica's logic...</em>";
-            btn.disabled = true;
-            btn.innerText = "Consulting Chef...";
-
+            // Start AI Call
             try {
-                const res = await fetch(API_PATH, {
+                const r = await fetch(API_URL, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        message: promptValue,
-                        lead: leadSession,
-                        tags: activeTags
-                    })
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ message: msg, lead: lead, tags: tags })
                 });
+                const d = await r.json();
+                recipeResult = d.response;
+                checkFinalTransition();
+            } catch (e) { 
+                recipeResult = "Connection error. Please try again.";
+                checkFinalTransition();
+            }
+        }
 
-                const data = await res.json();
-                box.innerHTML = data.response;
-            } catch (error) {
-                box.innerText = "Connection issue. Please check your signal and try again.";
-            } finally {
-                btn.disabled = false;
-                btn.innerText = "✨ Make My Recipe";
+        function checkFinalTransition() {
+            if(timerDone && recipeResult) {
+                document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+                document.getElementById('scene-4').classList.add('active');
+                document.getElementById('response-box').innerHTML = recipeResult;
+                window.scrollTo(0,0);
             }
         }
     </script>
