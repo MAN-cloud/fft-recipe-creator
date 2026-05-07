@@ -12,7 +12,7 @@
         .screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; overflow-y: auto; background: var(--bg); transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
         .screen.below { transform: translateY(100%); }
         .screen.active { transform: translateY(0); }
-        .wrap { max-width: 580px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+        .wrap { max-width: 580px; margin: 0 auto; padding: 2.5rem 1.25rem 5rem; }
         .hero { background: var(--primary-pink); border-radius: 14px; padding: 2.2rem 1.5rem; margin-bottom: 1.5rem; text-align: center; }
         .hero h1 { font-family: 'Lora', serif; font-size: 32px; font-weight: 400; color: #fff; line-height: 1.1; }
         .hero h1 em { color: #000; font-style: italic; }
@@ -21,7 +21,7 @@
         .tag-group { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 0.5rem; }
         .tag { padding: 9px 18px; border: 1px solid rgba(26,26,24,0.12); border-radius: 20px; background: white; font-size: 14px; cursor: pointer; transition: all 0.2s; }
         .tag.active { background: var(--primary-pink); color: white; border-color: var(--primary-pink); }
-        button#main-btn { background: var(--primary-pink); color: white; border: none; width: 100%; padding: 1.2rem; border-radius: 50px; font-size: 18px; font-weight: 600; cursor: pointer; margin-top: 1.2rem; }
+        button#main-btn { background: var(--primary-pink); color: white; border: none; width: 100%; padding: 1.2rem; border-radius: 50px; font-size: 18px; font-weight: 600; cursor: pointer; margin-top: 1.2rem; box-shadow: 0 4px 15px rgba(255,20,147,0.2); }
         #ip-display { font-size: 11px; color: #aaa; margin-top: 15px; text-align: center; font-family: monospace; }
         #response { margin-top: 20px; padding: 20px; background: white; border-radius: 12px; display: none; border: 1px solid #eee; line-height: 1.6; }
     </style>
@@ -44,17 +44,17 @@
             
             <h3>Allergies & Intolerances</h3>
             <div class="tag-group">
-                <div class="tag">Gluten</div><div class="tag">Nuts</div><div class="tag">Dairy</div><div class="tag">Eggs</div><div class="tag">Soy</div>
+                <div class="tag">Gluten</div><div class="tag">Nuts</div><div class="tag">Dairy</div><div class="tag">Eggs</div><div class="tag">Soy</div><div class="tag">Shellfish</div><div class="tag">Corn</div>
             </div>
 
             <h3>Cuisine & Meal Type</h3>
             <div class="tag-group">
-                <div class="tag">Italian</div><div class="tag">French</div><div class="tag">Asian</div><div class="tag">Dessert</div>
+                <div class="tag">Italian</div><div class="tag">French</div><div class="tag">Asian</div><div class="tag">American</div><div class="tag">Mexican</div><div class="tag">Dessert</div><div class="tag">Breakfast</div>
             </div>
 
             <h3>Dietary Preferences</h3>
             <div class="tag-group">
-                <div class="tag">Vegan</div><div class="tag">Vegetarian</div><div class="tag">Halal</div><div class="tag">Kosher</div><div class="tag">Gluten-free</div>
+                <div class="tag">Vegan</div><div class="tag">Vegetarian</div><div class="tag">Halal</div><div class="tag">Kosher</div><div class="tag">Keto</div><div class="tag">Paleo</div><div class="tag">Gluten-free</div>
             </div>
 
             <div id="response"></div>
@@ -86,6 +86,7 @@
             if(!lead.email || !lead.phone) return alert("Required: Email & Phone");
             document.getElementById('scene-1').classList.remove('active');
             document.getElementById('scene-2').classList.add('active');
+            window.scrollTo(0,0);
         }
 
         async function runAI() {
