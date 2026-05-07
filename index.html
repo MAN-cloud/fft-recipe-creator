@@ -18,13 +18,16 @@
         input, textarea { width: 100%; padding: 1.1rem; border: 1px solid rgba(26,26,24,0.12); border-radius: 12px; margin-bottom: 1rem; font-size: 1rem; font-family: inherit; background: #fff; }
         h3 { font-size: 11px; font-weight: 600; color: #888; text-transform: uppercase; letter-spacing: .1em; margin: 1.8rem 0 0.8rem; }
         .tag-group { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 0.5rem; }
-        .tag { padding: 9px 18px; border: 1px solid rgba(26,26,24,0.12); border-radius: 20px; background: white; font-size: 14px; cursor: pointer; transition: 0.2s; }
+        .tag { padding: 9px 18px; border: 1px solid rgba(26,26,24,0.12); border-radius: 20px; background: white; font-size: 14px; cursor: pointer; transition: 0.2s; border: 1px solid #ddd; }
         .tag.active { background: var(--primary-pink); color: white; border-color: var(--primary-pink); }
         .btn-main { background: var(--primary-pink); color: white; border: none; width: 100%; padding: 1.2rem; border-radius: 50px; font-size: 18px; font-weight: 600; cursor: pointer; margin-top: 1.2rem; }
-        #response-box { margin-top: 20px; padding: 25px; background: white; border-radius: 16px; border: 1px solid #eee; line-height: 1.8; font-size: 16px; white-space: pre-line; }
+        #response-box { margin-top: 20px; padding: 25px; background: white; border-radius: 16px; border: 1px solid #eee; line-height: 1.8; font-size: 16px; min-height: 150px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
         .video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 14px; margin-bottom: 20px; background: #000; }
         .video-container iframe { position: absolute; top:0; left: 0; width: 100%; height: 100%; }
         .timer-text { text-align: center; font-size: 14px; color: #888; margin-top: 10px; }
+        /* Style for the recipe text inside the box */
+        #response-box h2, #response-box h3 { font-family: 'Lora', serif; margin: 15px 0 10px; color: var(--primary-pink); }
+        #response-box ul, #response-box ol { padding-left: 20px; margin-bottom: 15px; }
     </style>
 </head>
 <body>
@@ -105,21 +108,27 @@
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById('scene-3').classList.add('active');
             
-            // AI Fetch
-            fetch(API_URL, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ message: msg, lead: lead, tags: tags })
-            })
-            .then(r => r.json())
-            .then(d => {
-                recipeResult = d.response.replace(/Panacea Engine Active\..*?\?/, ""); // Clean any bot text
-                checkFinalTransition();
-            })
-            .catch(() => {
-                recipeResult = "Chef Jessica's kitchen is busy. Please refresh and try again!";
-                checkFinalTransition();
-            });
+            // AI Fetch Logic
+            const callAI = () => {
+                fetch(API_URL, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ message: msg, lead: lead, tags: tags })
+                })
+                .then(r => r.json())
+                .then(d => {
+                    // Filter bot text and ensure it's treated as HTML if it has formatting
+                    let cleanRes = d.response.replace(/Panacea Engine Active\..*?\?/, "");
+                    recipeResult = cleanRes.replace(/\n/g, "<br>"); 
+                    checkFinalTransition();
+                })
+                .catch(() => {
+                    recipeResult = "Chef Jessica's kitchen is currently offline. <br><br><button onclick='location.reload()' style='padding:5px 15px; border-radius:10px; border:none; background:#FF1493; color:white;'>Click here to try again</button>";
+                    checkFinalTransition();
+                });
+            };
+
+            callAI();
 
             // 15s Timer
             let sec = 15;
@@ -135,23 +144,22 @@
         }
 
         function checkFinalTransition() {
-            // If the timer is done, move to the scene immediately
             if(timerDone) {
                 document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
                 document.getElementById('scene-4').classList.add('active');
                 
-                // If the recipe is ready, show it. If not, wait for it.
+                const displayBox = document.getElementById('response-box');
                 if(recipeResult) {
-                    document.getElementById('response-box').innerHTML = recipeResult;
+                    displayBox.innerHTML = recipeResult;
                 } else {
-                    document.getElementById('response-box').innerHTML = "<em>Chef Jessica is putting the finishing touches on your recipe. One moment...</em>";
-                    // Poll for the result every second until it arrives
+                    displayBox.innerHTML = "<em>Chef Jessica is putting the finishing touches on your recipe. <br>One moment...</em>";
+                    // Continue checking until it arrives
                     const wait = setInterval(() => {
                         if(recipeResult) {
-                            document.getElementById('response-box').innerHTML = recipeResult;
+                            displayBox.innerHTML = recipeResult;
                             clearInterval(wait);
                         }
-                    }, 1000);
+                    }, 500);
                 }
             }
         }
