@@ -22,7 +22,7 @@
         .tag { padding: 9px 18px; border: 1px solid rgba(26,26,24,0.12); border-radius: 20px; background: white; font-size: 14px; cursor: pointer; }
         .tag.active { background: var(--primary-pink); color: white; border-color: var(--primary-pink); }
         button#main-btn { background: var(--primary-pink); color: white; border: none; width: 100%; padding: 1.2rem; border-radius: 50px; font-size: 18px; font-weight: 600; cursor: pointer; margin-top: 1.2rem; box-shadow: 0 4px 15px rgba(255,20,147,0.2); }
-        #ip-display { font-size: 11px; color: #aaa; margin-top: 15px; text-align: center; font-family: monospace; }
+        #ip-display { font-size: 11px; color: #aaa; margin-top: 15px; text-align: center; font-family: monospace; min-height: 14px; }
         #response { margin-top: 20px; padding: 20px; background: white; border-radius: 12px; display: none; border: 1px solid #eee; line-height: 1.6; }
     </style>
 </head>
@@ -34,7 +34,7 @@
             <input type="text" id="user-name" placeholder="Full Name">
             <input type="tel" id="user-phone" placeholder="Phone Number">
             <button id="main-btn" onclick="toScene2()">Continue to Recipe →</button>
-            <div id="ip-display">Checking Connection...</div>
+            <div id="ip-display">Connecting to Secure Server...</div>
         </div>
     </div>
 
@@ -58,18 +58,24 @@
         const API_URL = 'https://fft-recipe.man-4bb.workers.dev/chat';
         let lead = { name: '', phone: '', ip: '' };
 
-        // IP & Location Tracking Fix
-        async function getIP() {
+        // RELIABLE IP & LOCATION CAPTURE
+        async function fetchLocation() {
             try {
-                const res = await fetch('https://ipapi.co/json/');
+                const response = await fetch('https://ipapi.co/json/');
+                if (response.ok) {
+                    const data = await response.json();
+                    lead.ip = `${data.ip} - ${data.city}, ${data.country_name}`;
+                    document.getElementById('ip-display').innerText = `ACCESS ID: ${lead.ip}`;
+                }
+            } catch (error) {
+                // Fallback to simpler IP fetch if ipapi is blocked
+                const res = await fetch('https://api.ipify.org?format=json');
                 const data = await res.json();
-                lead.ip = `${data.ip} - ${data.city}, ${data.country_name}`;
-                document.getElementById('ip-display').innerText = `ID: ${lead.ip}`;
-            } catch (e) {
-                document.getElementById('ip-display').innerText = "Secure Connection Active";
+                lead.ip = data.ip;
+                document.getElementById('ip-display').innerText = `IP: ${lead.ip} (Location hidden)`;
             }
         }
-        getIP();
+        fetchLocation();
 
         document.querySelectorAll('.tag').forEach(t => t.onclick = () => t.classList.toggle('active'));
 
@@ -96,7 +102,9 @@
                 });
                 const d = await r.json();
                 box.innerHTML = d.response;
-            } catch (e) { box.innerText = "Error. Please check your connection."; }
+            } catch (e) { 
+                box.innerText = "Connection error. Please check your internet."; 
+            }
         }
     </script>
 </body>
