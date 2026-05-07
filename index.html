@@ -18,14 +18,13 @@
         input, textarea { width: 100%; padding: 1.1rem; border: 1px solid rgba(26,26,24,0.12); border-radius: 12px; margin-bottom: 1rem; font-size: 1rem; font-family: inherit; background: #fff; }
         h3 { font-size: 11px; font-weight: 600; color: #888; text-transform: uppercase; letter-spacing: .1em; margin: 1.8rem 0 0.8rem; }
         .tag-group { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 0.5rem; }
-        .tag { padding: 9px 18px; border: 1px solid rgba(26,26,24,0.12); border-radius: 20px; background: white; font-size: 14px; cursor: pointer; border: 1px solid #ddd; }
+        .tag { padding: 9px 18px; border: 1px solid #ddd; border-radius: 20px; background: white; font-size: 14px; cursor: pointer; transition: 0.2s; }
         .tag.active { background: var(--primary-pink); color: white; border-color: var(--primary-pink); }
         .btn-main { background: var(--primary-pink); color: white; border: none; width: 100%; padding: 1.2rem; border-radius: 50px; font-size: 18px; font-weight: 600; cursor: pointer; margin-top: 1.2rem; }
-        #response-box { margin-top: 20px; padding: 25px; background: white; border-radius: 16px; border: 1px solid #eee; line-height: 1.8; font-size: 16px; min-height: 150px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
+        #response-box { margin-top: 20px; padding: 25px; background: white; border-radius: 16px; border: 1px solid #eee; line-height: 1.8; font-size: 16px; min-height: 150px; }
         .video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 14px; margin-bottom: 20px; background: #000; }
         .video-container iframe { position: absolute; top:0; left: 0; width: 100%; height: 100%; }
         .timer-text { text-align: center; font-size: 14px; color: #888; margin-top: 10px; }
-        #response-box b { color: var(--primary-pink); }
     </style>
 </head>
 <body>
@@ -63,7 +62,7 @@
         <div class="wrap">
             <div class="hero" style="padding: 1.5rem;"><h1>Chef Jessica is<br><em>Crafting...</em></h1></div>
             <div class="video-container">
-                <iframe id="player" src="https://www.youtube.com/embed/videoseries?list=PL7K6PlzZmS-YzdkFZP74h1va8EkYpvl77&autoplay=1&mute=1" frameborder="0"></iframe>
+                <iframe id="chef-video" src="https://www.youtube.com/embed/videoseries?list=PL7K6PlzZmS-YzdkFZP74h1va8EkYpvl77&autoplay=1&mute=1&enablejsapi=1" frameborder="0" allow="autoplay; encrypted-media"></iframe>
             </div>
             <div class="timer-text" id="countdown">Calculating pro-chef ratios... (15s)</div>
         </div>
@@ -93,37 +92,36 @@
         function toScene2() {
             lead.email = document.getElementById('email').value;
             lead.phone = document.getElementById('phone').value;
-            if(!lead.email || !lead.phone) return alert("Required: Email & Phone");
+            if(!lead.email || !lead.phone) return alert("Email & Phone Required");
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById('scene-2').classList.add('active');
         }
 
-        async function fetchRecipe() {
-            const msg = document.getElementById('prompt').value;
-            const tags = Array.from(document.querySelectorAll('.tag.active')).map(t => t.innerText);
-            
-            try {
-                const r = await fetch(API, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ message: msg, lead: lead, tags: tags })
-                });
-                const d = await r.json();
-                // Strip bot text and format new lines
-                result = d.response.replace(/Panacea Engine Active\..*?\?/, "").replace(/\n/g, "<br>");
-            } catch (e) {
-                result = "<b>Connection Error:</b> The kitchen is busy. Please try again.";
-            }
-            renderResult();
-        }
-
-        function startFlow() {
+        async function startFlow() {
             if(!document.getElementById('prompt').value) return alert("What are we baking?");
             
+            // RESET VIDEO MEMORY: Force the player to reload fresh
+            const vid = document.getElementById('chef-video');
+            const currentSrc = vid.src.split('&cb=')[0];
+            vid.src = currentSrc + '&cb=' + Date.now();
+
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById('scene-3').classList.add('active');
             
-            fetchRecipe();
+            fetch(API, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ message: document.getElementById('prompt').value, lead: lead, tags: Array.from(document.querySelectorAll('.tag.active')).map(t => t.innerText) })
+            })
+            .then(r => r.json())
+            .then(d => {
+                result = d.response.replace(/Panacea Engine Active\..*?\?/, "").replace(/\n/g, "<br>");
+                updateUI();
+            })
+            .catch(() => {
+                result = "Chef Jessica's kitchen is currently busy. Please try again.";
+                updateUI();
+            });
 
             let sec = 15;
             const t = setInterval(() => {
@@ -132,24 +130,23 @@
                 if(sec <= 0) {
                     clearInterval(t);
                     timerDone = true;
-                    showScene4();
+                    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+                    document.getElementById('scene-4').classList.add('active');
+                    updateUI();
                 }
             }, 1000);
         }
 
-        function showScene4() {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById('scene-4').classList.add('active');
-            renderResult();
-        }
-
-        function renderResult() {
-            const box = document.getElementById('response-box');
+        function updateUI() {
             if (timerDone) {
+                const box = document.getElementById('response-box');
                 if (result) {
                     box.innerHTML = result;
                 } else {
-                    box.innerHTML = "<em>Chef Jessica is finalizing your professional ratios. <br>Please stand by for the master recipe...</em>";
+                    box.innerHTML = "<em>Chef Jessica is finalizing your professional ratios... <br>Please stand by.</em>";
+                    const wait = setInterval(() => {
+                        if (result) { box.innerHTML = result; clearInterval(wait); }
+                    }, 500);
                 }
             }
         }
