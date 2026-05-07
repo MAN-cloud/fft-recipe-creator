@@ -3,82 +3,92 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Chef Jessica's Panacea Engine</title>
+    <title>Chef Jessica's Recipe Creator</title>
     <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
-        :root { --primary-pink: #FF1493; --soft-pink: #FFF0F5; --bg: #FAF8F4; --text: #1A1A18; }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); padding: 15px; }
-        .wrap { max-width: 580px; margin: 0 auto; background: white; padding: 2rem; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
-        .scene { display: none; }
-        .scene.active { display: block; }
-        h1 { font-family: 'Lora', serif; color: var(--primary-pink); margin-bottom: 1rem; text-align: center; }
-        input, textarea { width: 100%; padding: 15px; border: 1px solid #ddd; border-radius: 12px; font-size: 1rem; margin-bottom: 1rem; }
-        h3 { font-size: 0.75rem; text-transform: uppercase; letter-spacing: .05em; color: #888; margin: 1.5rem 0 0.75rem; }
-        .tag-group { display: flex; flex-wrap: wrap; gap: 8px; }
-        .tag { padding: 8px 16px; border: 1px solid #ddd; border-radius: 20px; background: white; font-size: 0.85rem; cursor: pointer; }
-        .tag.active { background: var(--primary-pink); color: white; border-color: var(--primary-pink); }
-        button { background: var(--primary-pink); color: white; border: none; width: 100%; padding: 18px; border-radius: 30px; font-size: 1.1rem; font-weight: 600; cursor: pointer; margin-top: 20px; }
-        #response { margin-top: 20px; padding: 20px; background: var(--soft-pink); border-radius: 12px; display: none; line-height: 1.6; border-left: 5px solid var(--primary-pink); }
+        :root { --primary-pink: #FF1493; --bg: #FAF8F4; --text: #1A1A18; }
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        body, html { height: 100%; overflow-x: hidden; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); font-size: 16px; }
+        .screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; overflow-y: auto; background: var(--bg); transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+        .screen.below { transform: translateY(100%); }
+        .screen.active { transform: translateY(0); }
+        .wrap { max-width: 580px; margin: 0 auto; padding: 1.25rem 1.25rem 3rem; }
+        .hero { background: var(--primary-pink); border-radius: 14px; padding: 1.75rem 1.5rem; margin-bottom: 1.5rem; text-align: center; }
+        .hero h1 { font-family: 'Lora', serif; font-size: 28px; font-weight: 400; color: #fff; line-height: 1.2; }
+        .hero h1 em { color: #000; font-style: italic; }
+        input, textarea { width: 100%; padding: 1rem; border: 1px solid rgba(26,26,24,0.12); border-radius: 10px; font-family: 'Inter', sans-serif; font-size: 1rem; margin-bottom: 1rem; }
+        h3 { font-size: 11px; font-weight: 600; color: #888; text-transform: uppercase; letter-spacing: .07em; margin: 1.5rem 0 0.75rem; }
+        .tag-group { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 0.5rem; }
+        .tag { padding: 7px 14px; border: 1px solid rgba(26,26,24,0.12); border-radius: 20px; background: #fff; font-size: 13px; cursor: pointer; transition: all 0.2s; }
+        .tag.active { background: var(--primary-pink); color: #fff; border-color: var(--primary-pink); }
+        button#main-btn { background: var(--primary-pink); color: #fff; border: none; width: 100%; padding: 1.15rem; border-radius: 100px; font-size: 17px; font-weight: 600; cursor: pointer; margin-top: 1.5rem; box-shadow: 0 4px 15px rgba(255,20,147,0.25); }
+        #response { margin-top: 1.5rem; padding: 1.5rem; background: #fff; border-radius: 12px; display: none; line-height: 1.6; border: 1px solid rgba(26,26,24,0.08); }
     </style>
 </head>
 <body>
-    <div class="wrap">
-        <div id="scene-1" class="scene active">
-            <h1>Welcome to the Panacea</h1>
-            <p style="text-align:center; margin-bottom:20px;">Let's get started with your details.</p>
-            <input type="text" id="user-name" placeholder="Full Name" required>
-            <input type="tel" id="user-phone" placeholder="Phone Number" required>
-            <button onclick="goToScene2()">Next Step →</button>
-        </div>
 
-        <div id="scene-2" class="scene">
-            <h1>Recipe Choices</h1>
-            <textarea id="user-input" rows="3" placeholder="What would you like to bake?"></textarea>
-            
-            <h3>Allergies</h3>
-            <div class="tag-group">
+    <div id="scene-1" class="screen active">
+        <div class="wrap">
+            <div class="hero">
+                <h1>Chef Jessica's <em>Recipe Creator</em></h1>
+            </div>
+            <h3>Your Details</h3>
+            <input type="text" id="user-name" placeholder="Full Name">
+            <input type="tel" id="user-phone" placeholder="Phone Number">
+            <button id="main-btn" onclick="nextScene()">Continue to Recipe →</button>
+        </div>
+    </div>
+
+    <div id="scene-2" class="screen below">
+        <div class="wrap">
+            <textarea id="user-input" rows="4" placeholder="What would you like to bake today?"></textarea>
+
+            <h3>Allergies & Intolerances</h3>
+            <div class="tag-group" id="allergies">
                 <div class="tag">Gluten</div><div class="tag">Nuts</div><div class="tag">Dairy</div><div class="tag">Eggs</div><div class="tag">Soy</div>
             </div>
 
-            <h3>Dietary</h3>
-            <div class="tag-group">
-                <div class="tag">Vegan</div><div class="tag">Halal</div><div class="tag">Kosher</div><div class="tag">Keto</div>
+            <h3>Cuisine & Meal Type</h3>
+            <div class="tag-group" id="cuisine">
+                <div class="tag">Italian</div><div class="tag">French</div><div class="tag">Asian</div><div class="tag">Dessert</div>
+            </div>
+
+            <h3>Dietary Preferences</h3>
+            <div class="tag-group" id="diet">
+                <div class="tag">Vegan</div><div class="tag">Vegetarian</div><div class="tag">Halal</div><div class="tag">Gluten-free</div>
             </div>
 
             <div id="response"></div>
-            <button id="make-recipe">✨ Make My Recipe</button>
+            <button id="main-btn" onclick="generateRecipe()">✨ Make My Recipe</button>
         </div>
     </div>
 
     <script>
         const API_URL = 'https://fft-recipe.man-4bb.workers.dev/chat';
-        let userData = { name: '', phone: '', ip: '' };
+        let leadData = { name: '', phone: '', ip: 'Pending...' };
 
-        // Auto-capture IP Address
-        fetch('https://api.ipify.org?format=json')
-            .then(res => res.json())
-            .then(data => userData.ip = data.ip);
+        // 1. Capture IP Address
+        fetch('https://api.ipify.org?format=json').then(r => r.json()).then(d => leadData.ip = d.ip);
 
-        function goToScene2() {
-            userData.name = document.getElementById('user-name').value;
-            userData.phone = document.getElementById('user-phone').value;
-            if(!userData.name || !userData.phone) return alert("Please fill in your details.");
-            document.getElementById('scene-1').classList.remove('active');
-            document.getElementById('scene-2').classList.add('active');
+        // 2. Handle Tags
+        document.querySelectorAll('.tag').forEach(t => t.onclick = () => t.classList.toggle('active'));
+
+        function nextScene() {
+            leadData.name = document.getElementById('user-name').value;
+            leadData.phone = document.getElementById('user-phone').value;
+            if(!leadData.name || !leadData.phone) return alert("Please enter your name and phone.");
+            document.getElementById('scene-1').className = 'screen';
+            document.getElementById('scene-2').className = 'screen active';
         }
 
-        document.querySelectorAll('.tag').forEach(tag => {
-            tag.addEventListener('click', () => tag.classList.toggle('active'));
-        });
-
-        document.getElementById('make-recipe').addEventListener('click', async () => {
+        async function generateRecipe() {
             const input = document.getElementById('user-input').value;
-            const activeTags = Array.from(document.querySelectorAll('.tag.active')).map(t => t.innerText);
-            const responseDiv = document.getElementById('response');
-            
-            responseDiv.style.display = 'block';
-            responseDiv.innerText = "Chef Jessica is crafting your recipe...";
+            const tags = Array.from(document.querySelectorAll('.tag.active')).map(t => t.innerText);
+            const respDiv = document.getElementById('response');
+
+            respDiv.style.display = 'block';
+            respDiv.innerText = "Chef Jessica is crafting your recipe...";
 
             try {
                 const response = await fetch(API_URL, {
@@ -86,16 +96,16 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
                         message: input,
-                        user: userData,
-                        preferences: activeTags
+                        userData: leadData,
+                        preferences: tags
                     })
                 });
                 const data = await response.json();
-                responseDiv.innerText = data.response;
-            } catch (error) {
-                responseDiv.innerText = "Error connecting to the Panacea Engine.";
+                respDiv.innerHTML = `<strong>Jessica's Logic:</strong><br>${data.response}`;
+            } catch (e) {
+                respDiv.innerText = "Connection error. Please try again.";
             }
-        });
+        }
     </script>
 </body>
 </html>
