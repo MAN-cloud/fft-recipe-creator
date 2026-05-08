@@ -18,12 +18,20 @@
         textarea, input { width: 100%; padding: 1.2rem; border: 1px solid rgba(26,26,24,0.12); border-radius: 14px; margin-bottom: 1.2rem; font-size: 16px; font-family: inherit; background: white; }
         h3 { font-size: 11px; font-weight: 700; color: #999; text-transform: uppercase; letter-spacing: 0.12em; margin: 2rem 0 1rem; }
         .tags { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 0.5rem; }
-        .tag { padding: 10px 20px; border: 1px solid #ddd; border-radius: 25px; background: white; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s ease; }
+        .tag { padding: 10px 20px; border: 1px solid #ddd; border-radius: 25px; background: white; font-size: 14px; font-weight: 500; cursor: pointer; transition: 0.2s; }
         .tag.active { background: var(--pink); color: white; border-color: var(--pink); box-shadow: 0 4px 12px rgba(255,20,147,0.25); }
-        .btn { background: var(--pink); color: white; border: none; width: 100%; padding: 1.3rem; border-radius: 50px; font-size: 18px; font-weight: 600; cursor: pointer; margin-top: 1.5rem; box-shadow: 0 8px 20px rgba(255,20,147,0.2); transition: transform 0.2s; }
-        .btn:active { transform: scale(0.97); }
-        #recipe-box { margin-top: 25px; padding: 30px; background: white; border-radius: 20px; border: 1px solid #eee; line-height: 1.8; font-size: 16px; min-height: 180px; box-shadow: 0 4px 20px rgba(0,0,0,0.03); }
-        .vid-wrap { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 16px; background: #000; box-shadow: 0 10px 40px rgba(0,0,0,0.1); }
+        .btn { background: var(--pink); color: white; border: none; width: 100%; padding: 1.3rem; border-radius: 50px; font-size: 18px; font-weight: 600; cursor: pointer; margin-top: 1.5rem; box-shadow: 0 8px 20px rgba(255,20,147,0.2); }
+        
+        /* GOURMET RECIPE CARD STYLING */
+        #recipe-box { margin-top: 25px; padding: 35px 25px; background: white; border-radius: 20px; border: 1px solid #eee; line-height: 1.8; font-size: 16px; box-shadow: 0 4px 25px rgba(0,0,0,0.04); }
+        .recipe-section-head { font-family: 'Lora', serif; font-weight: 600; font-style: italic; font-size: 20px; margin: 25px 0 10px; color: #333; display: block; border-left: 4px solid var(--pink); padding-left: 12px; }
+        .recipe-content b { color: var(--pink); }
+        .recipe-content p { margin-bottom: 15px; }
+        .recipe-content ul { margin-bottom: 20px; list-style-type: none; }
+        .recipe-content li { margin-bottom: 8px; padding-left: 15px; position: relative; }
+        .recipe-content li::before { content: "•"; color: var(--pink); position: absolute; left: 0; font-weight: bold; }
+
+        .vid-wrap { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 16px; background: #000; }
         .vid-wrap iframe { position: absolute; top:0; left: 0; width: 100%; height: 100%; }
         .status-txt { font-size: 10px; color: #ccc; text-align: center; margin-top: 20px; font-family: monospace; letter-spacing: 1px; text-transform: uppercase; }
     </style>
@@ -43,16 +51,12 @@
     <div id="sc2" class="screen">
         <div class="wrap">
             <textarea id="user-req" rows="4" placeholder="Tell Chef Jessica what you'd like to bake..."></textarea>
-            
             <h3>Allergies & Intolerances</h3>
             <div class="tags"><div class="tag">Gluten</div><div class="tag">Nuts</div><div class="tag">Dairy</div><div class="tag">Eggs</div><div class="tag">Soy</div><div class="tag">Shellfish</div><div class="tag">Corn</div></div>
-            
             <h3>Cuisine & Meal Type</h3>
             <div class="tags"><div class="tag">Italian</div><div class="tag">French</div><div class="tag">Asian</div><div class="tag">Mediterranean</div><div class="tag">American/USA</div><div class="tag">Indian</div><div class="tag">Breakfast</div><div class="tag">Lunch</div><div class="tag">Dinner</div><div class="tag">Dessert</div></div>
-            
             <h3>Dietary Preferences</h3>
             <div class="tags"><div class="tag">Vegan</div><div class="tag">Vegetarian</div><div class="tag">Halal</div><div class="tag">Kosher</div><div class="tag">Gluten-free</div><div class="tag">Healthy</div><div class="tag">Whole Foods</div></div>
-            
             <button class="btn" onclick="startChef()">✨ Make My Recipe</button>
         </div>
     </div>
@@ -69,8 +73,7 @@
     <div id="sc4" class="screen">
         <div class="wrap">
             <div class="hero" style="padding:1.5rem;"><h1>Your Custom<br><em>Recipe Card</em></h1></div>
-            <div id="recipe-box">Finalizing professional ratios...</div>
-            <div class="status-txt" id="final-status">CHEF STATUS: MASTERING INGREDIENTS...</div>
+            <div id="recipe-box" class="recipe-content">Finalizing professional ratios...</div>
             <button class="btn" onclick="location.reload()" style="background:#222; margin-top:2.5rem;">Create Another Recipe</button>
         </div>
     </div>
@@ -82,7 +85,7 @@
         let timeFinished = false;
 
         fetch('https://ipapi.co/json/').then(r => r.json()).then(d => {
-            lead.ip = d.ip + " - " + d.city;
+            lead.ip = d.ip;
             document.getElementById('ip-log').innerText = "ACCESS ID: " + d.ip;
         });
 
@@ -94,7 +97,6 @@
             if(!lead.email || !lead.phone) return alert("Required: Email & Phone Number");
             document.getElementById('sc1').classList.remove('active');
             document.getElementById('sc2').classList.add('active');
-            window.scrollTo(0,0);
         }
 
         async function startChef() {
@@ -102,43 +104,36 @@
             const tags = Array.from(document.querySelectorAll('.tag.active')).map(t => t.innerText);
             if(!val) return alert("Please enter a recipe request.");
 
-            // Reset UI for Scene 3
             document.getElementById('sc2').classList.remove('active');
             document.getElementById('sc3').classList.add('active');
             document.getElementById('chef-vid').src += "&cb=" + Date.now();
 
-            // PERSONA INJECTION: We wrap the user's message in Chef Jessica's rules
-            const chefMessage = `PERSONA: ACT AS CHEF JESSICA. 
-            USER REQUEST: ${val}
-            PREFERENCES: ${tags.join(", ")}
-            INSTRUCTIONS: Provide a professional recipe with Ingredients and Steps. Do not use generic greetings. Use professional culinary terms.`;
-
             fetch(ENDPOINT, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ message: chefMessage, lead: lead, tags: tags })
+                body: JSON.stringify({ message: val, lead: lead, tags: tags })
             })
             .then(res => res.json())
             .then(data => {
                 let raw = data.response;
-                // Filter the "Panacea" greeting but show the rest
-                finalOutput = raw.replace(/Panacea Engine Active\..*?\?/g, "").trim();
                 
-                // If it's STILL only the greeting, we give a professional "One Moment"
-                if(finalOutput.length < 5) {
-                    finalOutput = "<b>Chef Jessica:</b> I am currently refining the ingredient ratios for your request. Please stand by while I finalize the professional formatting...";
-                } else {
-                    finalOutput = finalOutput.replace(/\n/g, "<br>");
-                }
-                document.getElementById('final-status').innerText = "CHEF STATUS: READY";
-                renderCard();
-            })
-            .catch(() => {
-                finalOutput = "<b>Kitchen Alert:</b> The connection was interrupted. Please refresh and try again.";
+                // CLEANUP LOGIC: Convert AI Markdown to Gourmet HTML
+                let formatted = raw.replace(/\n\n/g, "</p><p>"); 
+                formatted = formatted.replace(/\n/g, "<br>"); 
+                
+                // Convert **Title** to a fancy header
+                formatted = formatted.replace(/\*\*(.*?)\*\*/g, (match, p1) => {
+                    return `<span class="recipe-section-head">${p1}</span>`;
+                });
+
+                // Convert bullet points to lists
+                formatted = formatted.replace(/• (.*?)(<br>|$)/g, "<li>$1</li>");
+                formatted = formatted.replace(/- (.*?)(<br>|$)/g, "<li>$1</li>");
+
+                finalOutput = `<div class="recipe-content">${formatted}</div>`;
                 renderCard();
             });
 
-            // Start 15s Countdown
             let s = 15;
             const clock = setInterval(() => {
                 s--;
@@ -148,20 +143,14 @@
                     timeFinished = true;
                     document.getElementById('sc3').classList.remove('active');
                     document.getElementById('sc4').classList.add('active');
-                    window.scrollTo(0,0);
                     renderCard();
                 }
             }, 1000);
         }
 
         function renderCard() {
-            if(!timeFinished) return;
-            const box = document.getElementById('recipe-box');
-            if(finalOutput) {
-                box.innerHTML = finalOutput;
-            } else {
-                box.innerHTML = "<em>Chef Jessica is meticulously formatting your master recipe ratios.<br><br>Please stay on this screen while the master chef logic completes.</em>";
-            }
+            if(!timeFinished || !finalOutput) return;
+            document.getElementById('recipe-box').innerHTML = finalOutput;
         }
     </script>
 </body>
