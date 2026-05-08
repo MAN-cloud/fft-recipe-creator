@@ -4,16 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Chef Jessica's Recipe Creator</title>
-    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root { --pink: #FF1493; --bg: #FAF8F4; --txt: #1A1A18; }
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         body, html { height: 100%; overflow-x: hidden; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--txt); }
         .screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; overflow-y: auto; background: var(--bg); display: none; z-index: 10; }
         .screen.active { display: block; }
-        .wrap { max-width: 580px; margin: 0 auto; padding: 2.5rem 1.25rem 6rem; }
+        .wrap { max-width: 600px; margin: 0 auto; padding: 2.5rem 1.25rem 6rem; }
         .hero { background: var(--pink); border-radius: 16px; padding: 2.5rem 1.5rem; margin-bottom: 2rem; text-align: center; color: white; box-shadow: 0 10px 30px rgba(255,20,147,0.18); }
-        .hero h1 { font-family: 'Lora', serif; font-size: 34px; font-weight: 400; line-height: 1.1; letter-spacing: -0.02em; }
+        .hero h1 { font-family: 'Lora', serif; font-size: 34px; font-weight: 400; line-height: 1.1; }
         .hero h1 em { color: #000; font-style: italic; display: block; margin-top: 4px; }
         textarea, input { width: 100%; padding: 1.2rem; border: 1px solid rgba(26,26,24,0.12); border-radius: 14px; margin-bottom: 1.2rem; font-size: 16px; font-family: inherit; background: white; }
         h3 { font-size: 11px; font-weight: 700; color: #999; text-transform: uppercase; letter-spacing: 0.12em; margin: 2rem 0 1rem; }
@@ -22,18 +23,29 @@
         .tag.active { background: var(--pink); color: white; border-color: var(--pink); box-shadow: 0 4px 12px rgba(255,20,147,0.25); }
         .btn { background: var(--pink); color: white; border: none; width: 100%; padding: 1.3rem; border-radius: 50px; font-size: 18px; font-weight: 600; cursor: pointer; margin-top: 1.5rem; box-shadow: 0 8px 20px rgba(255,20,147,0.2); }
         
-        /* GOURMET RECIPE CARD STYLING */
-        #recipe-box { margin-top: 25px; padding: 35px 25px; background: white; border-radius: 20px; border: 1px solid #eee; line-height: 1.8; font-size: 16px; box-shadow: 0 4px 25px rgba(0,0,0,0.04); }
-        .recipe-section-head { font-family: 'Lora', serif; font-weight: 600; font-style: italic; font-size: 20px; margin: 25px 0 10px; color: #333; display: block; border-left: 4px solid var(--pink); padding-left: 12px; }
-        .recipe-content b { color: var(--pink); }
-        .recipe-content p { margin-bottom: 15px; }
-        .recipe-content ul { margin-bottom: 20px; list-style-type: none; }
-        .recipe-content li { margin-bottom: 8px; padding-left: 15px; position: relative; }
-        .recipe-content li::before { content: "•"; color: var(--pink); position: absolute; left: 0; font-weight: bold; }
+        /* JESSICA MASTER CLASS STYLE */
+        #recipe-output { background: white; padding: 40px 25px; border-radius: 4px; box-shadow: 0 4px 25px rgba(0,0,0,0.05); color: #000; }
+        .master-header { border-bottom: 2px solid var(--pink); margin-bottom: 20px; padding-bottom: 10px; }
+        .master-title { font-family: 'Lora', serif; font-size: 24px; font-weight: 700; text-transform: uppercase; margin-bottom: 5px; }
+        .master-author { font-size: 13px; font-weight: 700; color: #555; margin-bottom: 15px; }
+        .meta-row { font-size: 13px; line-height: 1.6; margin-bottom: 5px; }
+        .meta-bullet { color: var(--pink); margin-right: 8px; font-weight: bold; }
+        .unique-callout { background: #000; color: #fff; padding: 12px; font-size: 11px; font-weight: 800; text-transform: uppercase; margin: 20px 0; text-align: center; letter-spacing: 1px; }
+        .recipe-grid { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .grid-head { border-bottom: 2px solid #eee; font-size: 11px; font-weight: 800; text-transform: uppercase; color: #999; }
+        .grid-head th { text-align: left; padding: 10px 5px; }
+        .grid-row td { padding: 12px 5px; vertical-align: top; font-size: 13px; border-bottom: 1px solid #f2f2f2; }
+        .method-section { margin-top: 30px; }
+        .method-head { background: #f0f0f0; padding: 8px 12px; font-weight: 800; font-size: 12px; text-transform: uppercase; margin-bottom: 15px; }
+        .method-step { margin-bottom: 12px; padding-left: 22px; position: relative; line-height: 1.6; font-size: 14px; }
+        .method-step::before { content: "●"; color: var(--pink); position: absolute; left: 0; font-size: 10px; top: 2px; }
+
+        .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 25px; }
+        .btn-jessica { border: 2.5px solid var(--pink); background: white; color: var(--pink); padding: 14px; border-radius: 6px; font-weight: 800; cursor: pointer; text-transform: uppercase; font-size: 12px; text-align: center; text-decoration: none; }
 
         .vid-wrap { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 16px; background: #000; }
         .vid-wrap iframe { position: absolute; top:0; left: 0; width: 100%; height: 100%; }
-        .status-txt { font-size: 10px; color: #ccc; text-align: center; margin-top: 20px; font-family: monospace; letter-spacing: 1px; text-transform: uppercase; }
+        .status-txt { font-size: 10px; color: #ccc; text-align: center; margin-top: 20px; font-family: monospace; text-transform: uppercase; }
     </style>
 </head>
 <body>
@@ -44,13 +56,13 @@
             <input type="email" id="email" placeholder="Email Address">
             <input type="tel" id="phone" placeholder="Phone Number">
             <button class="btn" onclick="to2()">Continue to Recipe →</button>
-            <div class="status-txt" id="ip-log">CONNECTING TO SECURE NODE...</div>
+            <div class="status-txt" id="ip-log">CONNECTING...</div>
         </div>
     </div>
 
     <div id="sc2" class="screen">
         <div class="wrap">
-            <textarea id="user-req" rows="4" placeholder="Tell Chef Jessica what you'd like to bake..."></textarea>
+            <textarea id="user-req" rows="4" placeholder="What would you like to bake today?"></textarea>
             <h3>Allergies & Intolerances</h3>
             <div class="tags"><div class="tag">Gluten</div><div class="tag">Nuts</div><div class="tag">Dairy</div><div class="tag">Eggs</div><div class="tag">Soy</div><div class="tag">Shellfish</div><div class="tag">Corn</div></div>
             <h3>Cuisine & Meal Type</h3>
@@ -66,23 +78,46 @@
             <div class="hero" style="padding:1.5rem;"><h1>Chef Jessica is<br><em>Crafting...</em></h1></div>
             <div class="vid-wrap"><iframe id="chef-vid" src="https://www.youtube.com/embed/videoseries?list=PL7K6PlzZmS-YzdkFZP74h1va8EkYpvl77&autoplay=1&mute=1" frameborder="0"></iframe></div>
             <div id="timer" style="text-align:center; margin-top:20px; font-weight:700; font-size:18px;">15s</div>
-            <div class="status-txt">CHEF STATUS: INTERPRETING MASTER LOGIC...</div>
+            <div class="status-txt">PREPARING MASTER CLASS RATIOS...</div>
         </div>
     </div>
 
     <div id="sc4" class="screen">
         <div class="wrap">
-            <div class="hero" style="padding:1.5rem;"><h1>Your Custom<br><em>Recipe Card</em></h1></div>
-            <div id="recipe-box" class="recipe-content">Finalizing professional ratios...</div>
-            <button class="btn" onclick="location.reload()" style="background:#222; margin-top:2.5rem;">Create Another Recipe</button>
+            <div id="recipe-output">
+                <div class="master-header">
+                    <div class="master-title" id="r-title">LOADING...</div>
+                    <div class="master-author">RECIPE BY: Jessica McKenzie</div>
+                </div>
+                
+                <div class="meta-row"><span class="meta-bullet">●</span> <b>WHY:</b> <span id="r-why">Professional Analysis</span></div>
+                <div class="meta-row"><span class="meta-bullet">●</span> <b>ABOUT:</b> <span id="r-about">Customized Recipe Logic</span></div>
+                <div class="meta-row"><span class="meta-bullet">●</span> <b>TECHNIQUE:</b> <span id="r-tech">Master Level</span></div>
+                <div class="meta-row"><span class="meta-bullet">●</span> <b>MAKES:</b> <span id="r-makes">Calculated Portions</span></div>
+
+                <div class="unique-callout">Unique Special Ingredient: PANACEGG, Potato Protein CW</div>
+
+                <table class="recipe-grid">
+                    <thead><tr class="grid-head"><th>Ingredient</th><th>Qty</th><th>Method</th></tr></thead>
+                    <tbody id="ingredients-body"></tbody>
+                </table>
+
+                <div class="method-section" id="method-body"></div>
+            </div>
+
+            <div class="btn-row">
+                <button class="btn-jessica" onclick="generatePDF()">Download PDF</button>
+                <a id="shop-btn" class="btn-jessica" href="#" target="_blank">Shop Ingredients</a>
+            </div>
+            <button class="btn" onclick="location.reload()" style="background:#222; margin-top:2rem;">Start New Recipe</button>
         </div>
     </div>
 
     <script>
-        const ENDPOINT = 'https://fft-recipe.man-4bb.workers.dev/chat';
+        const API = 'https://fft-recipe.man-4bb.workers.dev/chat';
         let lead = { email: '', phone: '', ip: '' };
-        let finalOutput = "";
-        let timeFinished = false;
+        let finalData = null;
+        let timerDone = false;
 
         fetch('https://ipapi.co/json/').then(r => r.json()).then(d => {
             lead.ip = d.ip;
@@ -94,44 +129,32 @@
         function to2() {
             lead.email = document.getElementById('email').value;
             lead.phone = document.getElementById('phone').value;
-            if(!lead.email || !lead.phone) return alert("Required: Email & Phone Number");
+            if(!lead.email || !lead.phone) return alert("Required: Email & Phone");
             document.getElementById('sc1').classList.remove('active');
             document.getElementById('sc2').classList.add('active');
         }
 
         async function startChef() {
-            const val = document.getElementById('user-req').value;
+            const req = document.getElementById('user-req').value;
             const tags = Array.from(document.querySelectorAll('.tag.active')).map(t => t.innerText);
-            if(!val) return alert("Please enter a recipe request.");
+            if(!req) return alert("What are we baking?");
 
             document.getElementById('sc2').classList.remove('active');
             document.getElementById('sc3').classList.add('active');
             document.getElementById('chef-vid').src += "&cb=" + Date.now();
 
-            fetch(ENDPOINT, {
+            // Set Shop Link
+            document.getElementById('shop-btn').href = `https://www.amazon.com/s?k=${encodeURIComponent(req)}+ingredients`;
+
+            fetch(API, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ message: val, lead: lead, tags: tags })
+                body: JSON.stringify({ message: req, lead: lead, tags: tags, mode: "MASTER_CLASS" })
             })
             .then(res => res.json())
             .then(data => {
-                let raw = data.response;
-                
-                // CLEANUP LOGIC: Convert AI Markdown to Gourmet HTML
-                let formatted = raw.replace(/\n\n/g, "</p><p>"); 
-                formatted = formatted.replace(/\n/g, "<br>"); 
-                
-                // Convert **Title** to a fancy header
-                formatted = formatted.replace(/\*\*(.*?)\*\*/g, (match, p1) => {
-                    return `<span class="recipe-section-head">${p1}</span>`;
-                });
-
-                // Convert bullet points to lists
-                formatted = formatted.replace(/• (.*?)(<br>|$)/g, "<li>$1</li>");
-                formatted = formatted.replace(/- (.*?)(<br>|$)/g, "<li>$1</li>");
-
-                finalOutput = `<div class="recipe-content">${formatted}</div>`;
-                renderCard();
+                finalData = data; 
+                render();
             });
 
             let s = 15;
@@ -140,18 +163,47 @@
                 document.getElementById('timer').innerText = s + "s";
                 if(s <= 0) {
                     clearInterval(clock);
-                    timeFinished = true;
+                    timerDone = true;
                     document.getElementById('sc3').classList.remove('active');
                     document.getElementById('sc4').classList.add('active');
-                    renderCard();
+                    render();
                 }
             }, 1000);
         }
 
-        function renderCard() {
-            if(!timeFinished || !finalOutput) return;
-            document.getElementById('recipe-box').innerHTML = finalOutput;
+        function render() {
+            if(!timerDone || !finalData) return;
+            
+            // This is a simple fallback parser if the AI returns text instead of JSON
+            const response = finalData.response;
+            document.getElementById('r-title').innerText = (response.match(/TITLE:\s*(.*)/i) || [null, "Custom Recipe"])[1].toUpperCase();
+            document.getElementById('r-why').innerText = (response.match(/WHY:\s*(.*)/i) || [null, "Custom request"])[1];
+            document.getElementById('r-about').innerText = (response.match(/ABOUT:\s*(.*)/i) || [null, "Professional ratios"])[1];
+            document.getElementById('r-tech').innerText = (response.match(/TECHNIQUE:\s*(.*)/i) || [null, "Mastering Texture"])[1];
+            document.getElementById('r-makes').innerText = (response.match(/MAKES:\s*(.*)/i) || [null, "Standard Batch"])[1];
+
+            // Parsing Ingredients (Simple table generator)
+            const ingSection = response.split(/METHOD:/i)[0].split(/INGREDIENTS:/i)[1] || "";
+            const rows = ingSection.split('\n').filter(line => line.includes('|'));
+            let tableHTML = "";
+            rows.forEach(row => {
+                const cols = row.split('|').map(c => c.trim());
+                if(cols.length >= 3) tableHTML += `<tr class="grid-row"><td>${cols[0]}</td><td>${cols[1]}</td><td>${cols[2]}</td></tr>`;
+            });
+            document.getElementById('ingredients-body').innerHTML = tableHTML || "<tr><td colspan='3'>Check PDF for ingredients</td></tr>";
+
+            // Parsing Methods
+            const methodSection = response.split(/METHOD:/i)[1] || "";
+            const steps = methodSection.split('\n').filter(s => s.trim().length > 5);
+            let methodHTML = "<div class='method-head'>PREPARATION STEPS</div>";
+            steps.forEach(step => {
+                methodHTML += `<div class="method-step">${step.replace(/^\d+\.\s*/, '')}</div>`;
+            });
+            document.getElementById('method-body').innerHTML = methodHTML;
         }
-    </script>
-</body>
-</html>
+
+        function generatePDF() {
+            const element = document.getElementById('recipe-output');
+            html2pdf().from(element).set({
+                margin: 15,
+                filename: 'Chef_Jessica_Master
