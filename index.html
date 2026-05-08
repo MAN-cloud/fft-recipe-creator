@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Chef Jessica's Recipe Creator</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root { --pink: #FF1493; --bg: #FAF8F4; --txt: #1A1A18; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -14,18 +14,17 @@
         .screen.active { display: block; }
         .wrap { max-width: 600px; margin: 0 auto; padding: 2.5rem 1.25rem 6rem; }
         
-        /* HERO & BUTTONS */
+        /* GENERAL UI */
         .hero { background: var(--pink); border-radius: 12px; padding: 2.5rem 1.5rem; margin-bottom: 2rem; text-align: center; color: white; box-shadow: 0 10px 30px rgba(255,20,147,0.15); }
         .hero h1 { font-family: 'Lora', serif; font-size: 32px; font-weight: 400; line-height: 1.1; }
-        textarea, input { width: 100%; padding: 1.2rem; border: 1px solid rgba(0,0,0,0.1); border-radius: 12px; margin-bottom: 1rem; font-size: 16px; font-family: inherit; }
-        .btn-main { background: var(--pink); color: white; border: none; width: 100%; padding: 1.2rem; border-radius: 50px; font-size: 18px; font-weight: 700; cursor: pointer; box-shadow: 0 8px 20px rgba(255,20,147,0.2); }
-
-        /* TAGS */
+        textarea, input { width: 100%; padding: 1.2rem; border: 1px solid rgba(0,0,0,0.1); border-radius: 12px; margin-bottom: 1rem; font-size: 16px; font-family: inherit; background: white; }
         .tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 2rem; }
-        .tag { padding: 10px 18px; border: 1px solid #ddd; border-radius: 20px; background: white; font-size: 13px; cursor: pointer; }
+        .tag { padding: 10px 18px; border: 1px solid #ddd; border-radius: 20px; background: white; font-size: 13px; cursor: pointer; transition: 0.2s; }
         .tag.active { background: var(--pink); color: white; border-color: var(--pink); }
+        .btn-main { background: var(--pink); color: white; border: none; width: 100%; padding: 1.2rem; border-radius: 50px; font-size: 18px; font-weight: 700; cursor: pointer; box-shadow: 0 8px 20px rgba(255,20,147,0.2); transition: transform 0.2s; }
+        .btn-main:active { transform: scale(0.98); }
 
-        /* MASTER CLASS BRANDING */
+        /* JESSICA MASTER CLASS BRANDING */
         #recipe-card { background: white; padding: 45px 30px; border-radius: 4px; box-shadow: 0 4px 30px rgba(0,0,0,0.06); color: #000; }
         .m-header { border-bottom: 2.5px solid var(--pink); margin-bottom: 25px; padding-bottom: 12px; }
         .m-title { font-family: 'Lora', serif; font-size: 26px; font-weight: 700; text-transform: uppercase; color: #000; letter-spacing: -0.01em; }
@@ -33,27 +32,25 @@
         .meta-line { font-size: 14px; margin-bottom: 6px; display: flex; align-items: baseline; }
         .m-dot { color: var(--pink); margin-right: 10px; font-size: 12px; }
         .m-label { font-weight: 800; min-width: 90px; }
-        
         .special-bar { background: #000; color: #fff; padding: 12px; font-size: 11px; font-weight: 800; text-transform: uppercase; margin: 25px 0; text-align: center; letter-spacing: 1.5px; line-height: 1.4; }
         
-        /* THE TABLE GRID */
+        /* TABLE GRID */
         .r-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
         .r-table th { text-align: left; padding: 10px 5px; font-size: 11px; font-weight: 800; text-transform: uppercase; color: #999; border-bottom: 2px solid #eee; }
         .r-table td { padding: 12px 5px; vertical-align: top; font-size: 13px; border-bottom: 1px solid #f2f2f2; }
         
+        /* METHOD STEPS */
         .step-section { margin-top: 35px; }
         .step-head { background: #F2F2F2; padding: 10px 15px; font-weight: 800; font-size: 12px; text-transform: uppercase; margin-bottom: 15px; letter-spacing: 0.5px; }
         .step-txt { margin-bottom: 15px; padding-left: 25px; position: relative; line-height: 1.7; font-size: 14px; }
         .step-txt::before { content: "●"; color: var(--pink); position: absolute; left: 0; font-size: 10px; top: 2px; }
 
-        /* MARKETING SECTION */
-        .promo-box { margin-top: 40px; padding: 30px; background: #000; color: #fff; border-radius: 16px; text-align: center; }
-        .promo-box h4 { font-family: 'Lora', serif; font-size: 22px; margin-bottom: 10px; color: var(--pink); }
-        .promo-box p { font-size: 14px; color: #ccc; margin-bottom: 20px; line-height: 1.5; }
-        .btn-promo { display: inline-block; background: var(--pink); color: white; padding: 12px 25px; border-radius: 50px; text-decoration: none; font-weight: 700; font-size: 14px; }
-
+        /* MARKETING & UTILITY */
+        .course-promo { margin-top: 40px; padding: 30px; background: #000; color: #fff; border-radius: 16px; text-align: center; }
+        .course-promo h4 { font-family: 'Lora', serif; font-size: 22px; margin-bottom: 10px; color: var(--pink); }
+        .btn-course { display: inline-block; background: var(--pink); color: white; padding: 12px 25px; border-radius: 50px; text-decoration: none; font-weight: 700; font-size: 14px; margin-top: 15px; }
         .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 30px 0; }
-        .btn-sub { border: 2.5px solid var(--pink); background: transparent; color: var(--pink); padding: 14px; border-radius: 8px; font-weight: 800; text-transform: uppercase; font-size: 12px; cursor: pointer; text-align: center; text-decoration: none; }
+        .btn-sub { border: 2.5px solid var(--pink); background: transparent; color: var(--pink); padding: 14px; border-radius: 8px; font-weight: 800; text-transform: uppercase; font-size: 11px; cursor: pointer; text-align: center; text-decoration: none; }
 
         .vid-wrap { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 16px; background: #000; }
         .vid-wrap iframe { position: absolute; top:0; left: 0; width: 100%; height: 100%; }
@@ -73,7 +70,6 @@
     <div id="sc2" class="screen">
         <div class="wrap">
             <textarea id="prompt" rows="4" placeholder="What are we baking today?"></textarea>
-            <h3>Dietary Needs</h3>
             <div class="tags">
                 <div class="tag">Gluten-Free</div><div class="tag">Vegan</div><div class="tag">Nut-Free</div><div class="tag">Dairy-Free</div><div class="tag">Egg-Free</div><div class="tag">Healthy</div><div class="tag">Whole Foods</div>
             </div>
@@ -85,7 +81,7 @@
         <div class="wrap">
             <div class="hero" style="padding:1.5rem;"><h1>Chef Jessica is<br><em>Crafting...</em></h1></div>
             <div class="vid-wrap"><iframe id="player" src="https://www.youtube.com/embed/videoseries?list=PL7K6PlzZmS-YzdkFZP74h1va8EkYpvl77&autoplay=1&mute=1" frameborder="0"></iframe></div>
-            <div id="timer" style="text-align:center; margin-top:20px; font-weight:800; font-size:20px;">15s</div>
+            <div id="timer" style="text-align:center; margin-top:20px; font-weight:800; font-size:24px; color:var(--pink);">15s</div>
         </div>
     </div>
 
@@ -93,7 +89,7 @@
         <div class="wrap">
             <div id="recipe-card">
                 <div class="m-header">
-                    <div class="m-title" id="out-title">RECIPE LOADING...</div>
+                    <div class="m-title" id="out-title">MASTER RECIPE</div>
                     <div class="m-author">RECIPE BY: JESSICA MCKENZIE</div>
                 </div>
                 <div class="meta-line"><span class="m-dot">●</span> <span class="m-label">WHY:</span> <span id="out-why">Professional Analysis</span></div>
@@ -113,12 +109,11 @@
                 <a class="btn-sub" id="shop-link" href="#" target="_blank">🛒 Shop Ingredients</a>
             </div>
 
-            <div class="promo-box">
+            <div class="course-promo">
                 <h4>Master the Art of Plant-Based Baking</h4>
-                <p>Ready for more? Explore Jessica’s <b>Online Masterclass Series</b> and professional coaching.</p>
-                <a href="https://yourcourseurl.com" class="btn-promo">View Courses →</a>
+                <p>Join Jessica’s Professional Online Masterclass Series.</p>
+                <a href="https://yourcourseurl.com" class="btn-course">View Online Courses →</a>
             </div>
-
             <button class="btn-main" onclick="location.reload()" style="background:#222; margin-top:2rem;">New Recipe</button>
         </div>
     </div>
@@ -134,7 +129,7 @@
         function toS2() {
             lead.email = document.getElementById('email').value;
             lead.phone = document.getElementById('phone').value;
-            if(!lead.email || !lead.phone) return alert("Required");
+            if(!lead.email || !lead.phone) return alert("Details Required");
             document.getElementById('sc1').classList.remove('active');
             document.getElementById('sc2').classList.add('active');
         }
@@ -171,14 +166,14 @@
             if(!timerDone || !finalRecipe) return;
             const r = finalRecipe;
             document.getElementById('out-title').innerText = (r.match(/TITLE:\s*(.*)/i) || [null, "Master Recipe"])[1].toUpperCase();
-            document.getElementById('out-why').innerText = (r.match(/WHY:\s*(.*)/i) || [null, "Technique focus"])[1];
+            document.getElementById('out-why').innerText = (r.match(/WHY:\s*(.*)/i) || [null, "Precision technique"])[1];
             document.getElementById('out-about').innerText = (r.match(/ABOUT:\s*(.*)/i) || [null, "Professional Ratio"])[1];
             document.getElementById('out-tech').innerText = (r.match(/TECHNIQUE:\s*(.*)/i) || [null, "Texture Mastery"])[1];
-            document.getElementById('out-makes').innerText = (r.match(/MAKES:\s*(.*)/i) || [null, "Batch"])[1];
+            document.getElementById('out-makes').innerText = (r.match(/MAKES:\s*(.*)/i) || [null, "Standard Batch"])[1];
 
-            const ingBlock = r.split(/METHOD:/i)[0].split(/INGREDIENTS:/i)[1] || "";
+            const ingPart = r.split(/METHOD:/i)[0].split(/INGREDIENTS:/i)[1] || "";
             let rows = "";
-            ingBlock.split('\n').forEach(line => {
+            ingPart.split('\n').forEach(line => {
                 if(line.includes('|')) {
                     const c = line.split('|').map(x => x.trim());
                     rows += `<tr><td>${c[0]}</td><td>${c[1]}</td><td>${c[2]}</td></tr>`;
@@ -186,9 +181,9 @@
             });
             document.getElementById('ing-body').innerHTML = rows;
 
-            const stepBlock = r.split(/METHOD:/i)[1] || "";
+            const stepPart = r.split(/METHOD:/i)[1] || "";
             let steps = "<div class='step-head'>Preparation Steps</div>";
-            stepBlock.split('\n').filter(l => l.trim().length > 5).forEach(l => {
+            stepPart.split('\n').filter(l => l.trim().length > 5).forEach(l => {
                 steps += `<div class="step-txt">${l.replace(/^\d+\.\s*/, '')}</div>`;
             });
             document.getElementById('method-body').innerHTML = steps;
