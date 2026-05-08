@@ -14,30 +14,27 @@
         .screen.active { display: block; }
         .wrap { max-width: 600px; margin: 0 auto; padding: 2.5rem 1.25rem 6rem; }
         
-        /* CONSISTENT BRANDING */
+        /* BRANDING */
         .hero { background: var(--pink); border-radius: 12px; padding: 2.5rem 1.5rem; margin-bottom: 2rem; text-align: center; color: white; box-shadow: 0 10px 30px rgba(255,20,147,0.15); }
         .hero h1 { font-family: 'Lora', serif; font-size: 32px; font-weight: 400; line-height: 1.1; }
-        .hero h1 em { color: #000; font-style: italic; display: block; margin-top: 4px; font-size: 24px; }
         
         input, select, textarea { width: 100%; padding: 1.2rem; border: 1px solid rgba(0,0,0,0.1); border-radius: 12px; margin-bottom: 1rem; font-size: 16px; font-family: inherit; background: white; outline: none; }
         h3 { font-size: 11px; font-weight: 800; color: #999; text-transform: uppercase; letter-spacing: 0.12em; margin: 2rem 0 1rem; }
 
-        /* PHONE INPUT ROW */
         .phone-row { display: flex; gap: 8px; margin-bottom: 1rem; }
-        .phone-row select { width: 150px; font-size: 13px; padding: 1.2rem 0.5rem; }
+        .phone-row select { width: 150px; font-size: 13px; }
         .phone-row input { flex: 1; }
 
         .btn-main { background: var(--pink); color: white; border: none; width: 100%; padding: 1.2rem; border-radius: 50px; font-size: 18px; font-weight: 700; cursor: pointer; box-shadow: 0 8px 20px rgba(255,20,147,0.2); }
 
-        /* TAGS */
         .tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 1rem; }
-        .tag { padding: 10px 18px; border: 1px solid #ddd; border-radius: 20px; background: white; font-size: 13px; cursor: pointer; transition: 0.2s; }
+        .tag { padding: 10px 18px; border: 1px solid #ddd; border-radius: 20px; background: white; font-size: 13px; cursor: pointer; }
         .tag.active { background: var(--pink); color: white; border-color: var(--pink); }
 
-        /* MASTER CLASS BRANDING (MATCHING PDF) */
+        /* MASTER CLASS RESULT */
         #recipe-card { background: white; padding: 45px 30px; border-radius: 4px; box-shadow: 0 4px 30px rgba(0,0,0,0.06); color: #000; }
         .m-header { border-bottom: 2.5px solid var(--pink); margin-bottom: 25px; padding-bottom: 12px; }
-        .m-title { font-family: 'Lora', serif; font-size: 26px; font-weight: 700; text-transform: uppercase; color: #000; }
+        .m-title { font-family: 'Lora', serif; font-size: 26px; font-weight: 700; text-transform: uppercase; }
         .meta-line { font-size: 14px; margin-bottom: 6px; display: flex; align-items: baseline; }
         .m-dot { color: var(--pink); margin-right: 10px; font-size: 12px; }
         .special-bar { background: #000; color: #fff; padding: 12px; font-size: 11px; font-weight: 800; text-transform: uppercase; margin: 25px 0; text-align: center; letter-spacing: 1.5px; }
@@ -45,14 +42,22 @@
         .r-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
         .r-table th { text-align: left; padding: 10px 5px; font-size: 11px; font-weight: 800; text-transform: uppercase; color: #999; border-bottom: 2px solid #eee; }
         .r-table td { padding: 12px 5px; vertical-align: top; font-size: 13px; border-bottom: 1px solid #f2f2f2; }
+        
         .step-head { background: #F2F2F2; padding: 10px 15px; font-weight: 800; font-size: 12px; text-transform: uppercase; margin-bottom: 15px; }
         .step-txt { margin-bottom: 15px; padding-left: 25px; position: relative; line-height: 1.7; font-size: 14px; }
         .step-txt::before { content: "●"; color: var(--pink); position: absolute; left: 0; font-size: 10px; top: 2px; }
 
+        /* UTILITY & PROMO */
+        .course-promo { margin-top: 40px; padding: 30px; background: #000; color: #fff; border-radius: 16px; text-align: center; }
+        .course-promo h4 { font-family: 'Lora', serif; font-size: 22px; margin-bottom: 10px; color: var(--pink); }
+        .btn-course { display: inline-block; background: var(--pink); color: white; padding: 12px 25px; border-radius: 50px; text-decoration: none; font-weight: 700; font-size: 14px; margin-top: 15px; }
+        
         .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 30px 0; }
         .btn-sub { border: 2.5px solid var(--pink); background: transparent; color: var(--pink); padding: 14px; border-radius: 8px; font-weight: 800; text-transform: uppercase; font-size: 11px; cursor: pointer; text-align: center; text-decoration: none; }
+        
         .vid-wrap { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 16px; background: #000; }
         .vid-wrap iframe { position: absolute; top:0; left: 0; width: 100%; height: 100%; }
+        .status-txt { font-size: 10px; color: #ccc; text-align: center; margin-top: 20px; font-family: monospace; text-transform: uppercase; }
     </style>
 </head>
 <body>
@@ -66,6 +71,7 @@
                 <input type="tel" id="phone" placeholder="Phone Number">
             </div>
             <button class="btn-main" onclick="validateAndGo()">Continue to Recipe →</button>
+            <div class="status-txt" id="ip-log">CONNECTING...</div>
         </div>
     </div>
 
@@ -75,13 +81,16 @@
             <textarea id="prompt" rows="4" placeholder="What are we baking today?"></textarea>
             
             <h3>Allergies & Intolerances</h3>
-            <div class="tags"><div class="tag">Gluten</div><div class="tag">Nuts</div><div class="tag">Dairy</div><div class="tag">Eggs</div><div class="tag">Soy</div><div class="tag">Shellfish</div></div>
+            <div class="tags"><div class="tag">Gluten</div><div class="tag">Nuts</div><div class="tag">Dairy</div><div class="tag">Eggs</div><div class="tag">Soy</div><div class="tag">Corn</div></div>
 
-            <h3>Cuisine & Meal Type</h3>
-            <div class="tags"><div class="tag">Italian</div><div class="tag">French</div><div class="tag">Asian</div><div class="tag">American</div><div class="tag">Breakfast</div><div class="tag">Dinner</div><div class="tag">Dessert</div></div>
+            <h3>Meal Type</h3>
+            <div class="tags"><div class="tag">Breakfast</div><div class="tag">Brunch</div><div class="tag">Lunch</div><div class="tag">Dinner</div><div class="tag">Dessert</div><div class="tag">Snack</div></div>
+
+            <h3>Cuisine Style</h3>
+            <div class="tags"><div class="tag">Italian</div><div class="tag">French</div><div class="tag">Asian</div><div class="tag">Mediterranean</div><div class="tag">Mexican</div><div class="tag">American</div></div>
 
             <h3>Dietary Preferences</h3>
-            <div class="tags"><div class="tag">Vegan</div><div class="tag">Vegetarian</div><div class="tag">Halal</div><div class="tag">Gluten-free</div><div class="tag">Healthy</div></div>
+            <div class="tags"><div class="tag">Vegan</div><div class="tag">Vegetarian</div><div class="tag">Gluten-free</div><div class="tag">Healthy</div><div class="tag">Whole Foods</div></div>
 
             <button class="btn-main" onclick="startChef()">✨ Generate Master Recipe</button>
         </div>
@@ -113,11 +122,19 @@
                 </table>
                 <div id="method-body"></div>
             </div>
+
             <div class="btn-row">
                 <button class="btn-sub" onclick="downloadPDF()">⬇️ Download PDF</button>
                 <a class="btn-sub" id="shop-link" href="#" target="_blank">🛒 Shop Ingredients</a>
             </div>
-            <button class="btn-main" onclick="location.reload()" style="background:#222; margin-top:2rem;">Start New Recipe</button>
+
+            <div class="course-promo">
+                <h4>Master the Art of Plant-Based Baking</h4>
+                <p>Loved this recipe? Join Jessica’s Professional Online Masterclass Series.</p>
+                <a href="https://yourcourseurl.com" class="btn-course">View Courses →</a>
+            </div>
+
+            <button class="btn-main" onclick="location.reload()" style="background:#222; margin-top:2rem;">New Recipe</button>
         </div>
     </div>
 
@@ -127,16 +144,15 @@
         let finalRecipe = "";
         let timerDone = false;
 
-        // POPULATE COUNTRIES
-        const countries = [{n:"Australia",c:"+61"},{n:"Canada",c:"+1"},{n:"United States",c:"+1"},{n:"United Kingdom",c:"+44"},{n:"Ireland",c:"+353"},{n:"New Zealand",c:"+64"},{n:"Singapore",c:"+65"}];
+        const countries = [{n:"Australia",c:"+61"},{n:"Canada",c:"+1"},{n:"United States",c:"+1"},{n:"United Kingdom",c:"+44"},{n:"Ireland",c:"+353"},{n:"New Zealand",c:"+64"}];
         const select = document.getElementById('country-code');
         countries.forEach(ct => { let opt = document.createElement('option'); opt.value = ct.c; opt.innerHTML = `${ct.n} (${ct.c})`; select.appendChild(opt); });
 
         function validateAndGo() {
             const email = document.getElementById('email').value;
             const phone = document.getElementById('phone').value.replace(/\D/g,'');
-            if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return alert("Invalid Email");
-            if(phone.length < 7) return alert("Invalid Phone");
+            if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return alert("Valid email required.");
+            if(phone.length < 7) return alert("Valid phone required.");
             lead.email = email; lead.phone = document.getElementById('country-code').value + " " + phone;
             document.getElementById('sc1').classList.remove('active');
             document.getElementById('sc2').classList.add('active');
