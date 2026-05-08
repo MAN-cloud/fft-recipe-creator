@@ -14,17 +14,26 @@
         .screen.active { display: block; }
         .wrap { max-width: 600px; margin: 0 auto; padding: 2.5rem 1.25rem 6rem; }
         
-        /* GENERAL UI */
+        /* SCENE 1 UI ENHANCEMENTS */
         .hero { background: var(--pink); border-radius: 12px; padding: 2.5rem 1.5rem; margin-bottom: 2rem; text-align: center; color: white; box-shadow: 0 10px 30px rgba(255,20,147,0.15); }
         .hero h1 { font-family: 'Lora', serif; font-size: 32px; font-weight: 400; line-height: 1.1; }
-        textarea, input { width: 100%; padding: 1.2rem; border: 1px solid rgba(0,0,0,0.1); border-radius: 12px; margin-bottom: 1rem; font-size: 16px; font-family: inherit; background: white; }
-        .tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 2rem; }
-        .tag { padding: 10px 18px; border: 1px solid #ddd; border-radius: 20px; background: white; font-size: 13px; cursor: pointer; transition: 0.2s; }
-        .tag.active { background: var(--pink); color: white; border-color: var(--pink); }
+        input, select, textarea { width: 100%; padding: 1.2rem; border: 1px solid rgba(0,0,0,0.1); border-radius: 12px; margin-bottom: 1rem; font-size: 16px; font-family: inherit; background: white; outline: none; }
+        input:focus { border-color: var(--pink); }
+        
+        /* PHONE INPUT ROW */
+        .phone-row { display: flex; gap: 8px; margin-bottom: 1rem; }
+        .phone-row select { width: 140px; font-size: 14px; padding: 1.2rem 0.5rem; }
+        .phone-row input { flex: 1; }
+
         .btn-main { background: var(--pink); color: white; border: none; width: 100%; padding: 1.2rem; border-radius: 50px; font-size: 18px; font-weight: 700; cursor: pointer; box-shadow: 0 8px 20px rgba(255,20,147,0.2); transition: transform 0.2s; }
         .btn-main:active { transform: scale(0.98); }
 
-        /* JESSICA MASTER CLASS BRANDING */
+        /* TAGS */
+        .tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 2rem; }
+        .tag { padding: 10px 18px; border: 1px solid #ddd; border-radius: 20px; background: white; font-size: 13px; cursor: pointer; }
+        .tag.active { background: var(--pink); color: white; border-color: var(--pink); }
+
+        /* JESSICA MASTER CLASS BRANDING (MATCHING TIRAMISU PDF) */
         #recipe-card { background: white; padding: 45px 30px; border-radius: 4px; box-shadow: 0 4px 30px rgba(0,0,0,0.06); color: #000; }
         .m-header { border-bottom: 2.5px solid var(--pink); margin-bottom: 25px; padding-bottom: 12px; }
         .m-title { font-family: 'Lora', serif; font-size: 26px; font-weight: 700; text-transform: uppercase; color: #000; letter-spacing: -0.01em; }
@@ -34,26 +43,22 @@
         .m-label { font-weight: 800; min-width: 90px; }
         .special-bar { background: #000; color: #fff; padding: 12px; font-size: 11px; font-weight: 800; text-transform: uppercase; margin: 25px 0; text-align: center; letter-spacing: 1.5px; line-height: 1.4; }
         
-        /* TABLE GRID */
+        /* TABLE & STEPS */
         .r-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
         .r-table th { text-align: left; padding: 10px 5px; font-size: 11px; font-weight: 800; text-transform: uppercase; color: #999; border-bottom: 2px solid #eee; }
         .r-table td { padding: 12px 5px; vertical-align: top; font-size: 13px; border-bottom: 1px solid #f2f2f2; }
-        
-        /* METHOD STEPS */
-        .step-section { margin-top: 35px; }
         .step-head { background: #F2F2F2; padding: 10px 15px; font-weight: 800; font-size: 12px; text-transform: uppercase; margin-bottom: 15px; letter-spacing: 0.5px; }
         .step-txt { margin-bottom: 15px; padding-left: 25px; position: relative; line-height: 1.7; font-size: 14px; }
         .step-txt::before { content: "●"; color: var(--pink); position: absolute; left: 0; font-size: 10px; top: 2px; }
 
-        /* MARKETING & UTILITY */
+        /* UTILITY */
         .course-promo { margin-top: 40px; padding: 30px; background: #000; color: #fff; border-radius: 16px; text-align: center; }
-        .course-promo h4 { font-family: 'Lora', serif; font-size: 22px; margin-bottom: 10px; color: var(--pink); }
         .btn-course { display: inline-block; background: var(--pink); color: white; padding: 12px 25px; border-radius: 50px; text-decoration: none; font-weight: 700; font-size: 14px; margin-top: 15px; }
         .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 30px 0; }
         .btn-sub { border: 2.5px solid var(--pink); background: transparent; color: var(--pink); padding: 14px; border-radius: 8px; font-weight: 800; text-transform: uppercase; font-size: 11px; cursor: pointer; text-align: center; text-decoration: none; }
-
         .vid-wrap { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 16px; background: #000; }
         .vid-wrap iframe { position: absolute; top:0; left: 0; width: 100%; height: 100%; }
+        .status-txt { font-size: 10px; color: #ccc; text-align: center; margin-top: 20px; font-family: monospace; text-transform: uppercase; }
     </style>
 </head>
 <body>
@@ -61,15 +66,23 @@
     <div id="sc1" class="screen active">
         <div class="wrap">
             <div class="hero"><h1>Chef Jessica's<br><em>Recipe Creator</em></h1></div>
-            <input type="email" id="email" placeholder="Email Address">
-            <input type="tel" id="phone" placeholder="Phone Number">
-            <button class="btn-main" onclick="toS2()">Continue to Recipe →</button>
+            
+            <input type="email" id="email" placeholder="Email Address" required>
+            
+            <div class="phone-row">
+                <select id="country-code"></select>
+                <input type="tel" id="phone" placeholder="Phone Number" required>
+            </div>
+
+            <button class="btn-main" onclick="validateAndGo()">Continue to Recipe →</button>
+            <div class="status-txt" id="ip-log">CONNECTING TO SECURE NODE...</div>
         </div>
     </div>
 
     <div id="sc2" class="screen">
         <div class="wrap">
             <textarea id="prompt" rows="4" placeholder="What are we baking today?"></textarea>
+            <h3>Dietary Needs</h3>
             <div class="tags">
                 <div class="tag">Gluten-Free</div><div class="tag">Vegan</div><div class="tag">Nut-Free</div><div class="tag">Dairy-Free</div><div class="tag">Egg-Free</div><div class="tag">Healthy</div><div class="tag">Whole Foods</div>
             </div>
@@ -92,10 +105,10 @@
                     <div class="m-title" id="out-title">MASTER RECIPE</div>
                     <div class="m-author">RECIPE BY: JESSICA MCKENZIE</div>
                 </div>
-                <div class="meta-line"><span class="m-dot">●</span> <span class="m-label">WHY:</span> <span id="out-why">Professional Analysis</span></div>
-                <div class="meta-line"><span class="m-dot">●</span> <span class="m-label">ABOUT:</span> <span id="out-about">Master Class Standard</span></div>
-                <div class="meta-line"><span class="m-dot">●</span> <span class="m-label">TECHNIQUE:</span> <span id="out-tech">Precision Baking</span></div>
-                <div class="meta-line"><span class="m-dot">●</span> <span class="m-label">MAKES:</span> <span id="out-makes">Standard Batch</span></div>
+                <div class="meta-line"><span class="m-dot">●</span> <span class="m-label">WHY:</span> <span id="out-why">Analyzing...</span></div>
+                <div class="meta-line"><span class="m-dot">●</span> <span class="m-label">ABOUT:</span> <span id="out-about">Analyzing...</span></div>
+                <div class="meta-line"><span class="m-dot">●</span> <span class="m-label">TECHNIQUE:</span> <span id="out-tech">Analyzing...</span></div>
+                <div class="meta-line"><span class="m-dot">●</span> <span class="m-label">MAKES:</span> <span id="out-makes">Analyzing...</span></div>
                 <div class="special-bar">Unique Special Ingredient: PANACEGG, Potato Protein CW</div>
                 <table class="r-table">
                     <thead><tr><th>Ingredient</th><th>Qty</th><th>Method</th></tr></thead>
@@ -111,28 +124,57 @@
 
             <div class="course-promo">
                 <h4>Master the Art of Plant-Based Baking</h4>
-                <p>Join Jessica’s Professional Online Masterclass Series.</p>
-                <a href="https://yourcourseurl.com" class="btn-course">View Online Courses →</a>
+                <p>Unlock professional techniques in Jessica’s online studio.</p>
+                <a href="https://yourcourseurl.com" class="btn-course">Explore Courses →</a>
             </div>
-            <button class="btn-main" onclick="location.reload()" style="background:#222; margin-top:2rem;">New Recipe</button>
+            <button class="btn-main" onclick="location.reload()" style="background:#222; margin-top:2rem;">Start New Recipe</button>
         </div>
     </div>
 
     <script>
         const API = 'https://fft-recipe.man-4bb.workers.dev/chat';
-        let lead = { email: '', phone: '' };
+        let lead = { email: '', phone: '', ip: '' };
         let finalRecipe = "";
         let timerDone = false;
 
-        document.querySelectorAll('.tag').forEach(t => t.onclick = () => t.classList.toggle('active'));
+        // 1. POPULATE COUNTRIES (Priority First)
+        const countries = [
+            {n: "Australia", c: "+61"}, {n: "Canada", c: "+1"}, 
+            {n: "United States", c: "+1"}, {n: "United Kingdom", c: "+44"},
+            {n: "Afghanistan", c: "+93"}, {n: "Albania", c: "+355"}, {n: "Algeria", c: "+213"}, {n: "Andorra", c: "+376"}, {n: "Angola", c: "+244"}, {n: "Argentina", c: "+54"}, {n: "Austria", c: "+43"}, {n: "Bahamas", c: "+1-242"}, {n: "Bahrain", c: "+973"}, {n: "Bangladesh", c: "+880"}, {n: "Belgium", c: "+32"}, {n: "Brazil", c: "+55"}, {n: "Chile", c: "+56"}, {n: "China", c: "+86"}, {n: "Colombia", c: "+57"}, {n: "Denmark", c: "+45"}, {n: "Egypt", c: "+20"}, {n: "Finland", c: "+358"}, {n: "France", c: "+33"}, {n: "Germany", c: "+49"}, {n: "Greece", c: "+30"}, {n: "Hong Kong", c: "+852"}, {n: "India", c: "+91"}, {n: "Indonesia", c: "+62"}, {n: "Ireland", c: "+353"}, {n: "Israel", c: "+972"}, {n: "Italy", c: "+39"}, {n: "Japan", c: "+81"}, {n: "Korea", c: "+82"}, {n: "Malaysia", c: "+60"}, {n: "Mexico", c: "+52"}, {n: "Netherlands", c: "+31"}, {n: "New Zealand", c: "+64"}, {n: "Norway", c: "+47"}, {n: "Pakistan", c: "+92"}, {n: "Philippines", c: "+63"}, {n: "Poland", c: "+48"}, {n: "Portugal", c: "+351"}, {n: "Russia", c: "+7"}, {n: "Saudi Arabia", c: "+966"}, {n: "Singapore", c: "+65"}, {n: "South Africa", c: "+27"}, {n: "Spain", c: "+34"}, {n: "Sweden", c: "+46"}, {n: "Switzerland", c: "+41"}, {n: "Taiwan", c: "+886"}, {n: "Thailand", c: "+66"}, {n: "Turkey", c: "+90"}, {n: "UAE", c: "+971"}, {n: "Vietnam", c: "+84"}
+        ];
 
-        function toS2() {
-            lead.email = document.getElementById('email').value;
-            lead.phone = document.getElementById('phone').value;
-            if(!lead.email || !lead.phone) return alert("Details Required");
+        const select = document.getElementById('country-code');
+        countries.forEach(ct => {
+            let opt = document.createElement('option');
+            opt.value = ct.c;
+            opt.innerHTML = `${ct.n} (${ct.c})`;
+            select.appendChild(opt);
+        });
+
+        // 2. LEAD VALIDATION
+        function validateAndGo() {
+            const email = document.getElementById('email').value;
+            const phone = document.getElementById('phone').value.replace(/\D/g,'');
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+            if(!emailRegex.test(email)) return alert("Please enter a valid email address.");
+            if(phone.length < 7) return alert("Please enter a valid phone number (digits only).");
+
+            lead.email = email;
+            lead.phone = document.getElementById('country-code').value + " " + phone;
+            
             document.getElementById('sc1').classList.remove('active');
             document.getElementById('sc2').classList.add('active');
         }
+
+        // 3. CORE APP LOGIC
+        fetch('https://ipapi.co/json/').then(r => r.json()).then(d => {
+            lead.ip = d.ip;
+            document.getElementById('ip-log').innerText = "ID: " + d.ip;
+        });
+
+        document.querySelectorAll('.tag').forEach(t => t.onclick = () => t.classList.toggle('active'));
 
         async function startChef() {
             const req = document.getElementById('prompt').value;
@@ -155,10 +197,12 @@
             let s = 15;
             const clock = setInterval(() => {
                 s--; document.getElementById('timer').innerText = s + "s";
-                if(s <= 0) { clearInterval(clock); timerDone = true; 
-                document.getElementById('sc3').classList.remove('active');
-                document.getElementById('sc4').classList.add('active');
-                render(); }
+                if(s <= 0) { 
+                    clearInterval(clock); timerDone = true; 
+                    document.getElementById('sc3').classList.remove('active');
+                    document.getElementById('sc4').classList.add('active');
+                    render(); 
+                }
             }, 1000);
         }
 
@@ -169,7 +213,7 @@
             document.getElementById('out-why').innerText = (r.match(/WHY:\s*(.*)/i) || [null, "Precision technique"])[1];
             document.getElementById('out-about').innerText = (r.match(/ABOUT:\s*(.*)/i) || [null, "Professional Ratio"])[1];
             document.getElementById('out-tech').innerText = (r.match(/TECHNIQUE:\s*(.*)/i) || [null, "Texture Mastery"])[1];
-            document.getElementById('out-makes').innerText = (r.match(/MAKES:\s*(.*)/i) || [null, "Standard Batch"])[1];
+            document.getElementById('out-makes').innerText = (r.match(/MAKES:\s*(.*)/i) || [null, "Batch"])[1];
 
             const ingPart = r.split(/METHOD:/i)[0].split(/INGREDIENTS:/i)[1] || "";
             let rows = "";
@@ -191,7 +235,13 @@
 
         function downloadPDF() {
             const element = document.getElementById('recipe-card');
-            html2pdf().from(element).set({ margin: 15, filename: 'Chef_Jessica_Recipe.pdf', image: { type: 'jpeg', quality: 1 }, html2canvas: { scale: 3 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } }).save();
+            html2pdf().from(element).set({ 
+                margin: 15, 
+                filename: 'Chef_Jessica_Recipe.pdf', 
+                image: { type: 'jpeg', quality: 1 }, 
+                html2canvas: { scale: 3 }, 
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } 
+            }).save();
         }
     </script>
 </body>
