@@ -487,7 +487,7 @@ var progressTimer=null;
 var elapsed=0;
 var currentRating=0;
 var isMuted=true;
-var videoIds=["lccMSsfGtEo","8uW59BkL7wI"];
+var PLAYLIST_ID="PL7K6PlzZmS-YzdkFZP74h1va8EkYpvl77";
 
 var photoAlbums=[
   {name:"Vegan Chicken",url:"https://photos.app.goo.gl/gTUwVQYApusMDP9w5",tags:["chicken","nugget","poultry","tender"]},
@@ -646,8 +646,9 @@ function startVideo(){
   isMuted=true;
   document.getElementById('muteBtn').textContent='🔇 Unmute';
   document.getElementById('continueBtn').style.display='none';
-  var vid=videoIds[Math.floor(Math.random()*videoIds.length)];
-  document.getElementById('ytFrame').src='https://www.youtube.com/embed/'+vid+'?autoplay=1&mute=1&controls=0&loop=1&playlist='+vid+'&playsinline=1&rel=0';
+  // Pick random start index so different video plays each time
+  var startIdx=Math.floor(Math.random()*10);
+  document.getElementById('ytFrame').src='https://www.youtube.com/embed/videoseries?list='+PLAYLIST_ID+'&autoplay=1&mute=1&controls=0&playsinline=1&rel=0&index='+startIdx;
 }
 
 function generate(){
