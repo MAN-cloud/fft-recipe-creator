@@ -30,14 +30,15 @@
         .tag { padding: 10px 18px; border: 1px solid #ddd; border-radius: 20px; background: white; font-size: 12px; cursor: pointer; font-weight: 600; }
         .tag.active { background: var(--pink); color: white; border-color: var(--pink); }
 
+        /* RECIPE CARD - LOGO ALWAYS VISIBLE TOP RIGHT */
         #recipe-card { background: white; padding: 60px 40px; border-radius: 4px; box-shadow: 0 4px 30px rgba(0,0,0,0.06); color: #000; position: relative; }
-        .pdf-logo { display: none; position: absolute; top: 25px; right: 30px; width: 160px; }
+        .card-brand-logo { position: absolute; top: 30px; right: 30px; width: 160px; height: auto; display: block; }
         
-        .m-header { border-bottom: 2.5px solid var(--pink); margin-bottom: 25px; padding-bottom: 12px; }
+        .m-header { border-bottom: 2.5px solid var(--pink); margin-bottom: 25px; padding-bottom: 12px; padding-right: 170px; } /* Padding so title doesn't hit logo */
         .m-title { font-family: 'Lora', serif; font-size: 26px; font-weight: 700; text-transform: uppercase; }
         .meta-line { font-size: 14px; margin-bottom: 6px; display: flex; }
         .m-dot { color: var(--pink); margin-right: 10px; font-weight: bold; }
-        .special-bar { background: #000; color: #fff; padding: 12px; font-size: 11px; font-weight: 800; text-transform: uppercase; margin: 25px 0; text-align: center; letter-spacing: 1.5px; }
+        .special-bar { background: #000; color: #fff; padding: 12px; font-size: 11px; font-weight: 800; text-transform: uppercase; margin: 25px 0; text-align: center; letter-spacing: 1.5px; line-height: 1.4; }
         
         .r-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
         .r-table th { text-align: left; padding: 10px 5px; font-size: 11px; color: #999; border-bottom: 2px solid #eee; text-transform: uppercase; }
@@ -102,23 +103,37 @@
     <div id="sc4" class="screen">
         <div class="wrap">
             <div id="recipe-card">
-                <img src="FFT LOGO NEW 2026.jpg" class="pdf-logo" id="pdf-logo">
-                <div class="m-header"><div class="m-title" id="out-title">MASTER RECIPE</div><div class="m-author">RECIPE BY: JESSICA MCKENZIE</div></div>
+                <img src="FFT LOGO NEW 2026.jpg" class="card-brand-logo">
+                
+                <div class="m-header">
+                    <div class="m-title" id="out-title">MASTER RECIPE</div>
+                    <div class="m-author">RECIPE BY: JESSICA MCKENZIE</div>
+                </div>
+                
                 <div class="meta-line"><span class="m-dot">●</span> <b>WHY:</b>&nbsp;<span id="out-why">...</span></div>
                 <div class="meta-line"><span class="m-dot">●</span> <b>ABOUT:</b>&nbsp;<span id="out-about">...</span></div>
                 <div class="meta-line"><span class="m-dot">●</span> <b>TECHNIQUE:</b>&nbsp;<span id="out-tech">...</span></div>
                 <div class="meta-line"><span class="m-dot">●</span> <b>MAKES:</b>&nbsp;<span id="out-makes">...</span></div>
-                <div class="special-bar">Unique Special Ingredient: PANACEGG, Potato Protein CW</div>
+                
+                <div class="special-bar">Unique Special Ingredient: GERBET, PANACEGG, Potato Protein CW</div>
+                
                 <table class="r-table"><thead><tr><th>Ingredient</th><th>Qty</th><th>Method</th></tr></thead><tbody id="ing-body"></tbody></table>
                 <div id="method-body"></div>
+                
                 <div style="text-align:center; padding-top:40px; border-top:1px solid #eee; margin-top:40px;"><img src="FFT LOGO NEW 2026.jpg" style="height:35px; opacity:0.8;"></div>
             </div>
-            <div class="btn-row"><button class="btn-sub" onclick="downloadPDF()">⬇️ Download PDF</button><a class="btn-sub" href="https://photos.app.goo.gl/YourSharedAlbum" target="_blank">📸 Share Results</a></div>
+            
+            <div class="btn-row">
+                <button class="btn-sub" onclick="downloadPDF()">⬇️ Download PDF</button>
+                <a class="btn-sub" href="https://photos.app.goo.gl/YourSharedAlbum" target="_blank">📸 Share Results</a>
+            </div>
+            
             <div class="promo-box">
                 <h4 id="course-title">Master Class Series</h4>
-                <p>Loved this recipe? Take your plant-based skills to the next level.</p>
+                <p>Take your professional plant-based skills to the next level.</p>
                 <a id="course-btn" href="https://freefromthat.com/TRAINING" class="btn-promo" target="_blank">View Course →</a>
             </div>
+            
             <button class="btn-main" onclick="location.reload()" style="background:#222; margin-top:2rem;">New Recipe</button>
             <div class="brand-footer"><img src="FFT LOGO NEW 2026.jpg"></div>
         </div>
@@ -131,17 +146,10 @@
         let timerDone = false;
 
         const priority = [{n:"Australia",c:"+61"},{n:"Canada",c:"+1"},{n:"United States",c:"+1"},{n:"United Kingdom",c:"+44"}];
-        const fullList = [
-            {n:"Afghanistan",c:"+93"},{n:"Albania",c:"+355"},{n:"Algeria",c:"+213"},{n:"Andorra",c:"+376"},{n:"Angola",c:"+244"},{n:"Argentina",c:"+54"},{n:"Armenia",c:"+374"},{n:"Austria",c:"+43"},{n:"Azerbaijan",c:"+994"},{n:"Bahamas",c:"+1242"},{n:"Bahrain",c:"+973"},{n:"Bangladesh",c:"+880"},{n:"Barbados",c:"+1246"},{n:"Belarus",c:"+375"},{n:"Belgium",c:"+32"},{n:"Belize",c:"+501"},{n:"Bermuda",c:"+1441"},{n:"Bolivia",c:"+591"},{n:"Bosnia",c:"+387"},{n:"Brazil",c:"+55"},{n:"Bulgaria",c:"+359"},{n:"Cambodia",c:"+855"},{n:"Cayman Islands",c:"+1345"},{n:"Chile",c:"+56"},{n:"China",c:"+86"},{n:"Colombia",c:"+57"},{n:"Costa Rica",c:"+506"},{n:"Croatia",c:"+385"},{n:"Cyprus",c:"+357"},{n:"Czech Republic",c:"+420"},{n:"Denmark",c:"+45"},{n:"Dominican Republic",c:"+1809"},{n:"Ecuador",c:"+593"},{n:"Egypt",c:"+20"},{n:"El Salvador",c:"+503"},{n:"Estonia",c:"+372"},{n:"Fiji",c:"+679"},{n:"Finland",c:"+358"},{n:"France",c:"+33"},{n:"Georgia",c:"+995"},{n:"Germany",c:"+49"},{n:"Greece",c:"+30"},{n:"Guatemala",c:"+502"},{n:"Honduras",c:"+504"},{n:"Hong Kong",c:"+852"},{n:"Hungary",c:"+36"},{n:"Iceland",c:"+354"},{n:"India",c:"+91"},{n:"Indonesia",c:"+62"},{n:"Ireland",c:"+353"},{n:"Israel",c:"+972"},{n:"Italy",c:"+39"},{n:"Jamaica",c:"+1876"},{n:"Japan",c:"+81"},{n:"Jordan",c:"+962"},{n:"Kazakhstan",c:"+7"},{n:"Kenya",c:"+254"},{n:"Kuwait",c:"+965"},{n:"Latvia",c:"+371"},{n:"Lebanon",c:"+961"},{n:"Liechtenstein",c:"+423"},{n:"Lithuania",c:"+370"},{n:"Luxembourg",c:"+352"},{n:"Macau",c:"+853"},{n:"Malaysia",c:"+60"},{n:"Malta",c:"+356"},{n:"Mauritius",c:"+230"},{n:"Mexico",c:"+52"},{n:"Monaco",c:"+377"},{n:"Montenegro",c:"+382"},{n:"Morocco",c:"+212"},{n:"Netherlands",c:"+31"},{n:"New Zealand",c:"+64"},{n:"Nicaragua",c:"+505"},{n:"Nigeria",c:"+234"},{n:"Norway",c:"+47"},{n:"Oman",c:"+968"},{n:"Pakistan",c:"+92"},{n:"Panama",c:"+507"},{n:"Paraguay",c:"+595"},{n:"Peru",c:"+51"},{n:"Philippines",c:"+63"},{n:"Poland",c:"+48"},{n:"Portugal",c:"+351"},{n:"Puerto Rico",c:"+1"},{n:"Qatar",c:"+974"},{n:"Romania",c:"+40"},{n:"Russia",c:"+7"},{n:"Saudi Arabia",c:"+966"},{n:"Serbia",c:"+381"},{n:"Singapore",c:"+65"},{n:"Slovakia",c:"+421"},{n:"Slovenia",c:"+386"},{n:"South Africa",c:"+27"},{n:"South Korea",c:"+82"},{n:"Spain",c:"+34"},{n:"Sri Lanka",c:"+94"},{n:"Sweden",c:"+46"},{n:"Switzerland",c:"+41"},{n:"Taiwan",c:"+886"},{n:"Thailand",c:"+66"},{n:"Trinidad & Tobago",c:"+1868"},{n:"Turkey",c:"+90"},{n:"UAE",c:"+971"},{n:"Ukraine",c:"+380"},{n:"Uruguay",c:"+598"},{n:"Vatican City",c:"+379"},{n:"Venezuela",c:"+58"},{n:"Vietnam",c:"+84"}
-        ].sort((a,b) => a.n.localeCompare(b.n));
+        const fullList = [{n:"Afghanistan",c:"+93"},{n:"Albania",c:"+355"},{n:"Algeria",c:"+213"},{n:"Andorra",c:"+376"},{n:"Angola",c:"+244"},{n:"Argentina",c:"+54"},{n:"Armenia",c:"+374"},{n:"Austria",c:"+43"},{n:"Azerbaijan",c:"+994"},{n:"Bahamas",c:"+1242"},{n:"Bahrain",c:"+973"},{n:"Bangladesh",c:"+880"},{n:"Barbados",c:"+1246"},{n:"Belarus",c:"+375"},{n:"Belgium",c:"+32"},{n:"Belize",c:"+501"},{n:"Bermuda",c:"+1441"},{n:"Bolivia",c:"+591"},{n:"Bosnia",c:"+387"},{n:"Brazil",c:"+55"},{n:"Bulgaria",c:"+359"},{n:"Cambodia",c:"+855"},{n:"Cayman Islands",c:"+1345"},{n:"Chile",c:"+56"},{n:"China",c:"+86"},{n:"Colombia",c:"+57"},{n:"Costa Rica",c:"+506"},{n:"Croatia",c:"+385"},{n:"Cyprus",c:"+357"},{n:"Czech Republic",c:"+420"},{n:"Denmark",c:"+45"},{n:"Dominican Republic",c:"+1809"},{n:"Ecuador",c:"+593"},{n:"Egypt",c:"+20"},{n:"El Salvador",c:"+503"},{n:"Estonia",c:"+372"},{n:"Fiji",c:"+679"},{n:"Finland",c:"+358"},{n:"France",c:"+33"},{n:"Georgia",c:"+995"},{n:"Germany",c:"+49"},{n:"Greece",c:"+30"},{n:"Guatemala",c:"+502"},{n:"Honduras",c:"+504"},{n:"Hong Kong",c:"+852"},{n:"Hungary",c:"+36"},{n:"Iceland",c:"+354"},{n:"India",c:"+91"},{n:"Indonesia",c:"+62"},{n:"Ireland",c:"+353"},{n:"Israel",c:"+972"},{n:"Italy",c:"+39"},{n:"Jamaica",c:"+1876"},{n:"Japan",c:"+81"},{n:"Jordan",c:"+962"},{n:"Kazakhstan",c:"+7"},{n:"Kenya",c:"+254"},{n:"Kuwait",c:"+965"},{n:"Latvia",c:"+371"},{n:"Lebanon",c:"+961"},{n:"Liechtenstein",c:"+423"},{n:"Lithuania",c:"+370"},{n:"Luxembourg",c:"+352"},{n:"Macau",c:"+853"},{n:"Malaysia",c:"+60"},{n:"Malta",c:"+356"},{n:"Mauritius",c:"+230"},{n:"Mexico",c:"+52"},{n:"Monaco",c:"+377"},{n:"Montenegro",c:"+382"},{n:"Morocco",c:"+212"},{n:"Netherlands",c:"+31"},{n:"New Zealand",c:"+64"},{n:"Nicaragua",c:"+505"},{n:"Nigeria",c:"+234"},{n:"Norway",c:"+47"},{n:"Oman",c:"+968"},{n:"Pakistan",c:"+92"},{n:"Panama",c:"+507"},{n:"Paraguay",c:"+595"},{n:"Peru",c:"+51"},{n:"Philippines",c:"+63"},{n:"Poland",c:"+48"},{n:"Portugal",c:"+351"},{n:"Puerto Rico",c:"+1"},{n:"Qatar",c:"+974"},{n:"Romania",c:"+40"},{n:"Russia",c:"+7"},{n:"Saudi Arabia",c:"+966"},{n:"Serbia",c:"+381"},{n:"Singapore",c:"+65"},{n:"Slovakia",c:"+421"},{n:"Slovenia",c:"+386"},{n:"South Africa",c:"+27"},{n:"South Korea",c:"+82"},{n:"Spain",c:"+34"},{n:"Sri Lanka",c:"+94"},{n:"Sweden",c:"+46"},{n:"Switzerland",c:"+41"},{n:"Taiwan",c:"+886"},{n:"Thailand",c:"+66"},{n:"Trinidad & Tobago",c:"+1868"},{n:"Turkey",c:"+90"},{n:"UAE",c:"+971"},{n:"Ukraine",c:"+380"},{n:"Uruguay",c:"+598"},{n:"Vatican City",c:"+379"},{n:"Venezuela",c:"+58"},{n:"Vietnam",c:"+84"}].sort((a,b) => a.n.localeCompare(b.n));
         
         const select = document.getElementById('country-code');
-        [...priority, {n:"----------",c:""}, ...fullList].forEach(ct => {
-            let opt = document.createElement('option');
-            opt.value = ct.c; opt.disabled = ct.n.includes("---");
-            opt.innerHTML = ct.n + (ct.c ? ` (${ct.c})` : "");
-            select.appendChild(opt);
-        });
+        [...priority, {n:"----------",c:""}, ...fullList].forEach(ct => { let opt = document.createElement('option'); opt.value = ct.c; opt.disabled = ct.n.includes("---"); opt.innerHTML = ct.n + (ct.c ? ` (${ct.c})` : ""); select.appendChild(opt); });
 
         function validateAndGo() {
             const email = document.getElementById('email').value;
@@ -161,15 +169,12 @@
             document.getElementById('sc2').classList.remove('active');
             document.getElementById('sc3').classList.add('active');
             document.getElementById('player').src += "&cb=" + Date.now();
-
             fetch(API, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ message: req, lead: lead, tags: tags }) })
             .then(res => res.json()).then(data => { finalRecipe = data.response; render(); });
-
             let s = 15;
             const clock = setInterval(() => {
                 s--; document.getElementById('timer').innerText = s + "s";
-                if(s <= 0) { clearInterval(clock); timerDone = true; 
-                document.getElementById('sc3').classList.remove('active'); document.getElementById('sc4').classList.add('active'); render(); }
+                if(s <= 0) { clearInterval(clock); timerDone = true; document.getElementById('sc3').classList.remove('active'); document.getElementById('sc4').classList.add('active'); render(); }
             }, 1000);
         }
 
@@ -183,13 +188,6 @@
             document.getElementById('out-about').innerText = scrub((r.match(/ABOUT:\s*(.*)/i) || [null, "Professional Standard"])[1]);
             document.getElementById('out-tech').innerText = scrub((r.match(/TECHNIQUE:\s*(.*)/i) || [null, "Texture Mastery"])[1]);
             document.getElementById('out-makes').innerText = scrub((r.match(/MAKES:\s*(.*)/i) || [null, "Batch"])[1]);
-
-            if(r.toLowerCase().includes("lasagna") || r.toLowerCase().includes("pasta")) {
-                document.getElementById('course-title').innerText = "Vegan Cuisine Course";
-            } else if(r.toLowerCase().includes("macaron") || r.toLowerCase().includes("cake") || r.toLowerCase().includes("dessert")) {
-                document.getElementById('course-title').innerText = "Elegant Desserts Course";
-            }
-
             const ingPart = r.split(/METHOD:/i)[0].split(/INGREDIENTS:/i)[1] || "";
             let rows = "";
             ingPart.split('\n').forEach(line => {
@@ -199,7 +197,6 @@
                 }
             });
             document.getElementById('ing-body').innerHTML = rows;
-
             const stepPart = r.split(/METHOD:/i)[1] || "";
             let steps = "<div class='step-head'>Preparation Steps</div>";
             stepPart.split('\n').filter(l => l.trim().length > 5).forEach(l => {
@@ -210,12 +207,10 @@
 
         function downloadPDF() {
             const element = document.getElementById('recipe-card');
-            const logo = document.getElementById('pdf-logo');
-            logo.style.display = 'block'; 
             html2pdf().from(element).set({ 
                 margin: 15, filename: 'Chef_Jessica_Recipe.pdf', image: { type: 'jpeg', quality: 1 }, 
                 html2canvas: { scale: 3, useCORS: true }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } 
-            }).save().then(() => { logo.style.display = 'none'; });
+            }).save();
         }
     </script>
 </body>
