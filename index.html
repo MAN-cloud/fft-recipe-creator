@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chef Jessica's Recipe Creator - Rev 80</title>
+  <title>Chef Jessica's Recipe Creator - Rev 86</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;700&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
   <style>
@@ -37,7 +37,7 @@
       display: block;
     }
     .wrap {
-      max-width: 750px;
+      max-width: 800px;
       margin: 0 auto;
       padding: 2.5rem 1.5rem 5rem;
       min-height: 100vh;
@@ -96,7 +96,6 @@
       font-weight: 700;
       cursor: pointer;
       margin-top: 1rem;
-      box-shadow: 0 10px 20px rgba(255,20,147,0.2);
     }
     .tags {
       display: flex;
@@ -110,7 +109,6 @@
       background: white;
       font-size: 13px;
       cursor: pointer;
-      font-weight: 500;
     }
     .tag.active {
       background: var(--pink);
@@ -119,8 +117,8 @@
     }
     #recipe-card {
       background: white;
-      padding: 60px 50px;
-      border-radius: 4px;
+      padding: 60px;
+      color: #000;
       position: relative;
       border: 1px solid #eee;
       box-shadow: 0 4px 40px rgba(0,0,0,0.05);
@@ -128,25 +126,34 @@
     .card-brand-logo {
       position: absolute;
       top: 45px;
-      right: 50px;
+      right: 60px;
       width: 180px;
     }
     .m-header {
       border-bottom: 3px solid var(--pink);
       margin-bottom: 35px;
       padding-bottom: 18px;
-      padding-right: 200px;
+      padding-right: 210px;
     }
     .m-title {
       font-family: 'Lora', serif;
-      font-size: 30px;
+      font-size: 32px;
       text-transform: uppercase;
       font-weight: 700;
+      line-height: 1.1;
+    }
+    .m-author {
+      font-size: 13px;
+      font-weight: 800;
+      color: #444;
+      margin-top: 5px;
+      text-transform: uppercase;
     }
     .meta-line {
       font-size: 15px;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
       display: flex;
+      line-height: 1.5;
     }
     .m-dot {
       color: var(--pink);
@@ -156,13 +163,13 @@
     .special-bar {
       background: #000;
       color: #fff;
-      padding: 16px;
+      padding: 18px;
       font-size: 12px;
       font-weight: 800;
       text-transform: uppercase;
       margin: 30px 0;
       text-align: center;
-      letter-spacing: 1.5px;
+      letter-spacing: 2px;
     }
     .r-table {
       width: 100%;
@@ -178,21 +185,23 @@
       text-transform: uppercase;
     }
     .r-table td {
-      padding: 18px 5px;
+      padding: 20px 5px;
       font-size: 15px;
       border-bottom: 1px solid #f5f5f5;
+      vertical-align: top;
     }
     .step-head {
       background: #F8F8F8;
-      padding: 15px 20px;
+      padding: 18px 20px;
       font-weight: 800;
-      font-size: 13px;
+      font-size: 14px;
       text-transform: uppercase;
-      margin-top: 40px;
+      margin-top: 45px;
+      border-left: 5px solid var(--pink);
     }
     .step-txt {
-      margin: 20px 0;
-      padding-left: 35px;
+      margin: 22px 0;
+      padding-left: 40px;
       position: relative;
       line-height: 1.9;
       font-size: 16px;
@@ -202,8 +211,19 @@
       color: var(--pink);
       position: absolute;
       left: 0;
-      font-size: 12px;
+      font-size: 14px;
       top: 2px;
+    }
+    .legal-footer {
+      margin-top: 60px;
+      font-size: 10px;
+      color: #aaa;
+      text-align: center;
+      border-top: 1px solid #eee;
+      padding-top: 30px;
+      line-height: 1.6;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
     .brand-footer {
       padding: 50px 0;
@@ -241,7 +261,6 @@
       color: var(--pink);
       font-family: 'Lora', serif;
       font-size: 24px;
-      margin-bottom: 15px;
     }
     .btn-promo {
       display: inline-block;
@@ -273,57 +292,90 @@
 <body>
   <div id="sc1" class="screen active">
     <div class="wrap">
-      <div class="hero"><h1>Chef Jessica's<br><em>Recipe Creator</em></h1></div>
+      <div class="hero">
+        <h1>Chef Jessica's<br><em>Recipe Creator</em></h1>
+      </div>
       <input type="email" id="email" placeholder="Email Address">
       <div class="phone-row">
         <select id="country-code"></select>
         <input type="tel" id="phone" placeholder="Phone Number">
       </div>
       <button class="btn-main" onclick="validateAndGo()">Continue to Recipe →</button>
-      <div class="brand-footer"><img src="FFT LOGO NEW 2026.jpg"></div>
+      <div class="brand-footer">
+        <img src="FFT LOGO NEW 2026.jpg">
+      </div>
     </div>
   </div>
 
   <div id="sc2" class="screen">
     <div class="wrap">
-      <div class="hero"><h1>Chef Jessica's<br><em>Recipe Creator</em></h1></div>
-      <textarea id="prompt" rows="3" placeholder="What are we baking today?"></textarea>
+      <div class="hero">
+        <h1>Chef Jessica's<br><em>Recipe Creator</em></h1>
+      </div>
+      <textarea id="prompt" rows="3" placeholder="What are we technical baking today?"></textarea>
       
       <h3>Allergies & Intolerances</h3>
       <div class="tags">
-        <div class="tag">Gluten</div><div class="tag">Nuts</div><div class="tag">Dairy</div>
-        <div class="tag">Eggs</div><div class="tag">Soy</div><div class="tag">Corn</div><div class="tag">Shellfish</div>
+        <div class="tag">Gluten</div>
+        <div class="tag">Nuts</div>
+        <div class="tag">Dairy</div>
+        <div class="tag">Eggs</div>
+        <div class="tag">Soy</div>
+        <div class="tag">Corn</div>
+        <div class="tag">Shellfish</div>
       </div>
 
       <h3>Meal Type</h3>
       <div class="tags">
-        <div class="tag">Breakfast</div><div class="tag">Brunch</div>
-        <div class="tag">Lunch</div><div class="tag">Dinner</div><div class="tag">Dessert</div>
+        <div class="tag">Breakfast</div>
+        <div class="tag">Brunch</div>
+        <div class="tag">Lunch</div>
+        <div class="tag">Dinner</div>
+        <div class="tag">Dessert</div>
+        <div class="tag">Snack</div>
       </div>
 
       <h3>Cuisine Style</h3>
       <div class="tags">
-        <div class="tag">Italian</div><div class="tag">French</div><div class="tag">Asian</div>
-        <div class="tag">Mediterranean</div><div class="tag">Mexican</div><div class="tag">American</div>
+        <div class="tag">Italian</div>
+        <div class="tag">French</div>
+        <div class="tag">Asian</div>
+        <div class="tag">Mediterranean</div>
+        <div class="tag">Mexican</div>
+        <div class="tag">American</div>
+        <div class="tag">Indian</div>
+        <div class="tag">Middle Eastern</div>
       </div>
 
       <h3>Dietary Preferences</h3>
       <div class="tags">
-        <div class="tag">Vegan</div><div class="tag">Vegetarian</div>
-        <div class="tag">Healthy</div><div class="tag">Whole Foods</div>
+        <div class="tag">Vegan</div>
+        <div class="tag">Vegetarian</div>
+        <div class="tag">Healthy</div>
+        <div class="tag">Whole Foods</div>
+        <div class="tag">Halal</div>
+        <div class="tag">Kosher</div>
       </div>
 
       <button class="btn-main" onclick="startChef()">✨ Generate Master Recipe</button>
-      <div class="brand-footer"><img src="FFT LOGO NEW 2026.jpg"></div>
+      <div class="brand-footer">
+        <img src="FFT LOGO NEW 2026.jpg">
+      </div>
     </div>
   </div>
 
   <div id="sc3" class="screen">
     <div class="wrap">
-      <div class="hero"><h1>Chef Jessica is<br><em>Crafting...</em></h1></div>
-      <div class="vid-wrap"><iframe id="player" src="https://www.youtube.com/embed/videoseries?list=PL7K6PlzZmS-YzdkFZP74h1va8EkYpvl77&autoplay=1&mute=1" frameborder="0"></iframe></div>
+      <div class="hero">
+        <h1>Chef Jessica is<br><em>Crafting...</em></h1>
+      </div>
+      <div class="vid-wrap">
+        <iframe id="player" src="https://www.youtube.com/embed/videoseries?list=PL7K6PlzZmS-YzdkFZP74h1va8EkYpvl77&autoplay=1&mute=1" frameborder="0"></iframe>
+      </div>
       <div id="timer" style="text-align:center; margin-top:20px; font-weight:800; font-size:24px; color:var(--pink);">15s</div>
-      <div class="brand-footer"><img src="FFT LOGO NEW 2026.jpg"></div>
+      <div class="brand-footer">
+        <img src="FFT LOGO NEW 2026.jpg">
+      </div>
     </div>
   </div>
 
@@ -333,20 +385,29 @@
         <img src="FFT LOGO NEW 2026.jpg" class="card-brand-logo">
         <div class="m-header">
           <div class="m-title" id="out-title">MASTER RECIPE</div>
-          <div class="m-author">RECIPE BY: JESSICA MCKENZIE</div>
+          <div class="m-author">RECIPE BY: Jessica McKenzie</div>
         </div>
         <div class="meta-line"><span class="m-dot">●</span> <b>WHY:</b>&nbsp;<span id="out-why">...</span></div>
         <div class="meta-line"><span class="m-dot">●</span> <b>ABOUT:</b>&nbsp;<span id="out-about">...</span></div>
         <div class="meta-line"><span class="m-dot">●</span> <b>TECHNIQUE:</b>&nbsp;<span id="out-tech">...</span></div>
         <div class="meta-line"><span class="m-dot">●</span> <b>MAKES:</b>&nbsp;<span id="out-makes">...</span></div>
         <div class="special-bar">Unique Special Ingredient: GERBET, PANACEGG, Potato Protein CW</div>
-        <table class="r-table"><thead><tr><th>Ingredient</th><th>Qty</th><th>Method</th></tr></thead><tbody id="ing-body"></tbody></table>
+        <table class="r-table">
+          <thead>
+            <tr>
+              <th>Ingredient</th>
+              <th>Qty</th>
+              <th>Method</th>
+            </tr>
+          </thead>
+          <tbody id="ing-body"></tbody>
+        </table>
         <div id="method-body"></div>
-        <div style="text-align:center; padding-top:50px; border-top:1px solid #eee; margin-top:40px;"><img src="FFT LOGO NEW 2026.jpg" style="height:45px; opacity:0.9;"></div>
+        <div class="legal-footer">This document can only be used by students who enrolled and cannot be shared, copied or printed without express written consent of Free From That.</div>
       </div>
       <div class="btn-row">
         <button class="btn-sub" onclick="downloadPDF()">⬇️ Download PDF</button>
-        <a class="btn-sub" href="https://photos.app.goo.gl/YourSharedAlbumLink" target="_blank">📸 Share Results</a>
+        <a class="btn-sub" href="https://photos.app.goo.gl/YourActualAlbumLink" target="_blank">📸 Share Results</a>
       </div>
       <div class="promo-box">
         <h4 id="course-title">Master Class Series</h4>
@@ -354,7 +415,9 @@
         <a id="course-btn" href="https://freefromthat.com/TRAINING" class="btn-promo" target="_blank">View Course →</a>
       </div>
       <button class="btn-main" onclick="location.reload()" style="background:#222; margin-top:2rem;">Start New Recipe</button>
-      <div class="brand-footer"><img src="FFT LOGO NEW 2026.jpg"></div>
+      <div class="brand-footer">
+        <img src="FFT LOGO NEW 2026.jpg">
+      </div>
     </div>
   </div>
 
@@ -364,7 +427,13 @@
     let finalRecipe = "";
     let timerDone = false;
 
-    const priority = [{n:"Australia",c:"+61"},{n:"Canada",c:"+1"},{n:"United States",c:"+1"},{n:"United Kingdom",c:"+44"}];
+    const priority = [
+      {n:"Australia",c:"+61"},
+      {n:"Canada",c:"+1"},
+      {n:"United States",c:"+1"},
+      {n:"United Kingdom",c:"+44"}
+    ];
+
     const countries = [
       {n:"Afghanistan",c:"+93"},{n:"Albania",c:"+355"},{n:"Algeria",c:"+213"},{n:"Andorra",c:"+376"},{n:"Angola",c:"+244"},{n:"Antigua & Barbuda",c:"+1268"},{n:"Argentina",c:"+54"},{n:"Armenia",c:"+374"},{n:"Austria",c:"+43"},{n:"Azerbaijan",c:"+994"},{n:"Bahamas",c:"+1242"},{n:"Bahrain",c:"+973"},{n:"Bangladesh",c:"+880"},{n:"Barbados",c:"+1246"},{n:"Belarus",c:"+375"},{n:"Belgium",c:"+32"},{n:"Belize",c:"+501"},{n:"Benin",c:"+229"},{n:"Bermuda",c:"+1441"},{n:"Bhutan",c:"+975"},{n:"Bolivia",c:"+591"},{n:"Bosnia",c:"+387"},{n:"Botswana",c:"+267"},{n:"Brazil",c:"+55"},{n:"Brunei",c:"+673"},{n:"Bulgaria",c:"+359"},{n:"Burkina Faso",c:"+226"},{n:"Burundi",c:"+257"},{n:"Cambodia",c:"+855"},{n:"Cameroon",c:"+237"},{n:"Cape Verde",c:"+238"},{n:"Cayman Islands",c:"+1345"},{n:"Central African Rep",c:"+236"},{n:"Chad",c:"+235"},{n:"Chile",c:"+56"},{n:"China",c:"+86"},{n:"Colombia",c:"+57"},{n:"Comoros",c:"+269"},{n:"Congo",c:"+242"},{n:"Costa Rica",c:"+506"},{n:"Croatia",c:"+385"},{n:"Cuba",c:"+53"},{n:"Cyprus",c:"+357"},{n:"Czech Republic",c:"+420"},{n:"Denmark",c:"+45"},{n:"Djibouti",c:"+253"},{n:"Dominica",c:"+1767"},{n:"Dominican Republic",c:"+1809"},{n:"Ecuador",c:"+593"},{n:"Egypt",c:"+20"},{n:"El Salvador",c:"+503"},{n:"Equatorial Guinea",c:"+240"},{n:"Eritrea",c:"+291"},{n:"Estonia",c:"+372"},{n:"Ethiopia",c:"+251"},{n:"Fiji",c:"+679"},{n:"Finland",c:"+358"},{n:"France",c:"+33"},{n:"Gabon",c:"+241"},{n:"Gambia",c:"+220"},{n:"Georgia",c:"+995"},{n:"Germany",c:"+49"},{n:"Ghana",c:"+233"},{n:"Greece",c:"+30"},{n:"Grenada",c:"+1473"},{n:"Guatemala",c:"+502"},{n:"Guinea",c:"+224"},{n:"Guyana",c:"+592"},{n:"Haiti",c:"+509"},{n:"Honduras",c:"+504"},{n:"Hong Kong",c:"+852"},{n:"Hungary",c:"+36"},{n:"Iceland",c:"+354"},{n:"India",c:"+91"},{n:"Indonesia",c:"+62"},{n:"Iran",c:"+98"},{n:"Iraq",c:"+964"},{n:"Ireland",c:"+353"},{n:"Israel",c:"+972"},{n:"Italy",c:"+39"},{n:"Ivory Coast",c:"+225"},{n:"Jamaica",c:"+1876"},{n:"Japan",c:"+81"},{n:"Jordan",c:"+962"},{n:"Kazakhstan",c:"+7"},{n:"Kenya",c:"+254"},{n:"Kuwait",c:"+965"},{n:"Kyrgyzstan",c:"+996"},{n:"Laos",c:"+856"},{n:"Latvia",c:"+371"},{n:"Lebanon",c:"+961"},{n:"Lesotho",c:"+266"},{n:"Liberia",c:"+231"},{n:"Libya",c:"+218"},{n:"Liechtenstein",c:"+423"},{n:"Lithuania",c:"+370"},{n:"Luxembourg",c:"+352"},{n:"Macau",c:"+853"},{n:"Macedonia",c:"+389"},{n:"Madagascar",c:"+261"},{n:"Malawi",c:"+265"},{n:"Malaysia",c:"+60"},{n:"Maldives",c:"+960"},{n:"Mali",c:"+223"},{n:"Malta",c:"+356"},{n:"Mauritania",c:"+222"},{n:"Mauritius",c:"+230"},{n:"Mexico",c:"+52"},{n:"Moldova",c:"+373"},{n:"Monaco",c:"+377"},{n:"Mongolia",c:"+976"},{n:"Montenegro",c:"+382"},{n:"Morocco",c:"+212"},{n:"Mozambique",c:"+258"},{n:"Myanmar",c:"+95"},{n:"Namibia",c:"+264"},{n:"Nepal",c:"+977"},{n:"Netherlands",c:"+31"},{n:"New Zealand",c:"+64"},{n:"Nicaragua",c:"+505"},{n:"Niger",c:"+227"},{n:"Nigeria",c:"+234"},{n:"Norway",c:"+47"},{n:"Oman",c:"+968"},{n:"Pakistan",c:"+92"},{n:"Panama",c:"+507"},{n:"Papua New Guinea",c:"+675"},{n:"Paraguay",c:"+595"},{n:"Peru",c:"+51"},{n:"Philippines",c:"+63"},{n:"Poland",c:"+48"},{n:"Portugal",c:"+351"},{n:"Puerto Rico",c:"+1"},{n:"Qatar",c:"+974"},{n:"Romania",c:"+40"},{n:"Russia",c:"+7"},{n:"Rwanda",c:"+250"},{n:"Saudi Arabia",c:"+966"},{n:"Senegal",c:"+221"},{n:"Serbia",c:"+381"},{n:"Seychelles",c:"+248"},{n:"Singapore",c:"+65"},{n:"Slovakia",c:"+421"},{n:"Slovenia",c:"+386"},{n:"Somalia",c:"+252"},{n:"South Africa",c:"+27"},{n:"South Korea",c:"+82"},{n:"Spain",c:"+34"},{n:"Sri Lanka",c:"+94"},{n:"Sudan",c:"+249"},{n:"Suriname",c:"+597"},{n:"Swaziland",c:"+268"},{n:"Sweden",c:"+46"},{n:"Switzerland",c:"+41"},{n:"Syria",c:"+963"},{n:"Taiwan",c:"+886"},{n:"Tajikistan",c:"+992"},{n:"Tanzania",c:"+255"},{n:"Thailand",c:"+66"},{n:"Togo",c:"+228"},{n:"Tonga",c:"+676"},{n:"Trinidad & Tobago",c:"+1868"},{n:"Tunisia",c:"+216"},{n:"Turkey",c:"+90"},{n:"Turkmenistan",c:"+993"},{n:"UAE",c:"+971"},{n:"Uganda",c:"+256"},{n:"Ukraine",c:"+380"},{n:"Uruguay",c:"+598"},{n:"Uzbekistan",c:"+998"},{n:"Vanuatu",c:"+678"},{n:"Vatican City",c:"+379"},{n:"Venezuela",c:"+58"},{n:"Vietnam",c:"+84"},{n:"Yemen",c:"+967"},{n:"Zambia",c:"+260"},{n:"Zimbabwe",c:"+263"}
     ].sort((a,b) => a.n.localeCompare(b.n));
@@ -419,8 +488,11 @@
       document.getElementById('out-about').innerText = scrub((r.match(/ABOUT:\s*(.*)/i) || [null, "Professional Standard"])[1]);
       document.getElementById('out-tech').innerText = scrub((r.match(/TECHNIQUE:\s*(.*)/i) || [null, "Texture Mastery"])[1]);
       document.getElementById('out-makes').innerText = scrub((r.match(/MAKES:\s*(.*)/i) || [null, "Batch"])[1]);
-      if(r.toLowerCase().includes("macaron")) { document.getElementById('course-title').innerText = "Technical Macaron Course"; }
-      else if(r.toLowerCase().includes("pasta")) { document.getElementById('course-title').innerText = "Vegan Cuisine Course"; }
+      
+      const courseTitle = document.getElementById('course-title');
+      if(r.toLowerCase().includes("macaron")) { courseTitle.innerText = "Technical Macaron Course"; }
+      else if(r.toLowerCase().includes("tiramisu")) { courseTitle.innerText = "Technical Tiramisu Course"; }
+
       const ingPart = r.split(/METHOD:/i)[0].split(/INGREDIENTS:/i)[1] || "";
       let rows = "";
       ingPart.split('\n').forEach(line => {
@@ -430,6 +502,7 @@
         }
       });
       document.getElementById('ing-body').innerHTML = rows;
+
       const stepPart = r.split(/METHOD:/i)[1] || "";
       let steps = "<div class='step-head'>Preparation Steps</div>";
       stepPart.split('\n').filter(l => l.trim().length > 5).forEach(l => {
@@ -441,7 +514,7 @@
     function downloadPDF() {
       const element = document.getElementById('recipe-card');
       html2pdf().from(element).set({
-        margin: 15, filename: 'Chef_Jessica_Recipe.pdf',
+        margin: 10, filename: 'Chef_Jessica_Recipe.pdf',
         html2canvas: { scale: 3, useCORS: true },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
       }).save();
