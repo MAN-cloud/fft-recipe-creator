@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chef Jessica's Recipe Creator - Rev 86</title>
+  <title>Chef Jessica's Recipe Creator - Rev 89</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;700&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
   <style>
@@ -37,7 +37,7 @@
       display: block;
     }
     .wrap {
-      max-width: 800px;
+      max-width: 850px;
       margin: 0 auto;
       padding: 2.5rem 1.5rem 5rem;
       min-height: 100vh;
@@ -96,6 +96,7 @@
       font-weight: 700;
       cursor: pointer;
       margin-top: 1rem;
+      box-shadow: 0 10px 20px rgba(255,20,147,0.2);
     }
     .tags {
       display: flex;
@@ -127,49 +128,50 @@
       position: absolute;
       top: 45px;
       right: 60px;
-      width: 180px;
+      width: 190px;
     }
     .m-header {
-      border-bottom: 3px solid var(--pink);
+      border-bottom: 4px solid var(--pink);
       margin-bottom: 35px;
       padding-bottom: 18px;
       padding-right: 210px;
     }
     .m-title {
       font-family: 'Lora', serif;
-      font-size: 32px;
+      font-size: 34px;
       text-transform: uppercase;
       font-weight: 700;
       line-height: 1.1;
     }
     .m-author {
-      font-size: 13px;
+      font-size: 14px;
       font-weight: 800;
-      color: #444;
-      margin-top: 5px;
+      color: #333;
+      margin-top: 8px;
       text-transform: uppercase;
     }
     .meta-line {
-      font-size: 15px;
+      font-size: 16px;
       margin-bottom: 12px;
       display: flex;
       line-height: 1.5;
     }
     .m-dot {
       color: var(--pink);
-      margin-right: 15px;
+      margin-right: 18px;
       font-weight: 900;
+      font-size: 18px;
     }
     .special-bar {
       background: #000;
       color: #fff;
-      padding: 18px;
-      font-size: 12px;
+      padding: 20px;
+      font-size: 13px;
       font-weight: 800;
       text-transform: uppercase;
       margin: 30px 0;
       text-align: center;
-      letter-spacing: 2px;
+      letter-spacing: 2.5px;
     }
     .r-table {
       width: 100%;
@@ -178,98 +180,98 @@
     }
     .r-table th {
       text-align: left;
-      padding: 15px 5px;
-      font-size: 12px;
-      color: #888;
+      padding: 18px 5px;
+      font-size: 13px;
+      color: #777;
       border-bottom: 2px solid #eee;
       text-transform: uppercase;
     }
     .r-table td {
-      padding: 20px 5px;
-      font-size: 15px;
-      border-bottom: 1px solid #f5f5f5;
+      padding: 22px 5px;
+      font-size: 16px;
+      border-bottom: 1px solid #f0f0f0;
       vertical-align: top;
     }
     .step-head {
-      background: #F8F8F8;
-      padding: 18px 20px;
+      background: #F4F4F4;
+      padding: 20px;
       font-weight: 800;
-      font-size: 14px;
+      font-size: 15px;
       text-transform: uppercase;
-      margin-top: 45px;
-      border-left: 5px solid var(--pink);
+      margin-top: 50px;
+      border-left: 6px solid var(--pink);
     }
     .step-txt {
-      margin: 22px 0;
-      padding-left: 40px;
+      margin: 25px 0;
+      padding-left: 45px;
       position: relative;
-      line-height: 1.9;
-      font-size: 16px;
+      line-height: 2.0;
+      font-size: 17px;
     }
     .step-txt::before {
       content: "●";
       color: var(--pink);
       position: absolute;
       left: 0;
-      font-size: 14px;
-      top: 2px;
+      font-size: 15px;
+      top: 4px;
     }
     .legal-footer {
-      margin-top: 60px;
-      font-size: 10px;
-      color: #aaa;
+      margin-top: 80px;
+      font-size: 11px;
+      color: #999;
       text-align: center;
       border-top: 1px solid #eee;
-      padding-top: 30px;
-      line-height: 1.6;
+      padding-top: 40px;
+      line-height: 1.8;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: 1px;
     }
     .brand-footer {
-      padding: 50px 0;
+      padding: 60px 0;
       text-align: center;
       margin-top: auto;
     }
     .brand-footer img {
-      height: 48px;
+      height: 50px;
     }
     .btn-row {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 15px;
-      margin: 35px 0;
+      gap: 20px;
+      margin: 40px 0;
     }
     .btn-sub {
-      border: 2.5px solid var(--pink);
+      border: 3px solid var(--pink);
       color: var(--pink);
-      padding: 16px;
+      padding: 18px;
       text-align: center;
       text-decoration: none;
       font-weight: 800;
-      font-size: 12px;
-      border-radius: 8px;
+      font-size: 13px;
+      border-radius: 10px;
       text-transform: uppercase;
     }
     .promo-box {
-      padding: 40px;
+      padding: 50px;
       background: #000;
       color: #fff;
-      border-radius: 16px;
+      border-radius: 20px;
       text-align: center;
     }
     .promo-box h4 {
       color: var(--pink);
       font-family: 'Lora', serif;
-      font-size: 24px;
+      font-size: 26px;
     }
     .btn-promo {
       display: inline-block;
       background: var(--pink);
       color: white;
-      padding: 15px 35px;
-      border-radius: 50px;
+      padding: 18px 40px;
+      border-radius: 60px;
       text-decoration: none;
-      margin-top: 20px;
+      margin-top: 25px;
       font-weight: 700;
     }
     .vid-wrap {
@@ -277,7 +279,7 @@
       padding-bottom: 56.25%;
       height: 0;
       background: #000;
-      border-radius: 16px;
+      border-radius: 20px;
       overflow: hidden;
     }
     .vid-wrap iframe {
@@ -292,26 +294,20 @@
 <body>
   <div id="sc1" class="screen active">
     <div class="wrap">
-      <div class="hero">
-        <h1>Chef Jessica's<br><em>Recipe Creator</em></h1>
-      </div>
+      <div class="hero"><h1>Chef Jessica's<br><em>Recipe Creator</em></h1></div>
       <input type="email" id="email" placeholder="Email Address">
       <div class="phone-row">
         <select id="country-code"></select>
         <input type="tel" id="phone" placeholder="Phone Number">
       </div>
       <button class="btn-main" onclick="validateAndGo()">Continue to Recipe →</button>
-      <div class="brand-footer">
-        <img src="FFT LOGO NEW 2026.jpg">
-      </div>
+      <div class="brand-footer"><img src="FFT LOGO NEW 2026.jpg"></div>
     </div>
   </div>
 
   <div id="sc2" class="screen">
     <div class="wrap">
-      <div class="hero">
-        <h1>Chef Jessica's<br><em>Recipe Creator</em></h1>
-      </div>
+      <div class="hero"><h1>Chef Jessica's<br><em>Recipe Creator</em></h1></div>
       <textarea id="prompt" rows="3" placeholder="What are we technical baking today?"></textarea>
       
       <h3>Allergies & Intolerances</h3>
@@ -358,24 +354,18 @@
       </div>
 
       <button class="btn-main" onclick="startChef()">✨ Generate Master Recipe</button>
-      <div class="brand-footer">
-        <img src="FFT LOGO NEW 2026.jpg">
-      </div>
+      <div class="brand-footer"><img src="FFT LOGO NEW 2026.jpg"></div>
     </div>
   </div>
 
   <div id="sc3" class="screen">
     <div class="wrap">
-      <div class="hero">
-        <h1>Chef Jessica is<br><em>Crafting...</em></h1>
-      </div>
+      <div class="hero"><h1>Chef Jessica is<br><em>Crafting...</em></h1></div>
       <div class="vid-wrap">
         <iframe id="player" src="https://www.youtube.com/embed/videoseries?list=PL7K6PlzZmS-YzdkFZP74h1va8EkYpvl77&autoplay=1&mute=1" frameborder="0"></iframe>
       </div>
       <div id="timer" style="text-align:center; margin-top:20px; font-weight:800; font-size:24px; color:var(--pink);">15s</div>
-      <div class="brand-footer">
-        <img src="FFT LOGO NEW 2026.jpg">
-      </div>
+      <div class="brand-footer"><img src="FFT LOGO NEW 2026.jpg"></div>
     </div>
   </div>
 
@@ -385,13 +375,13 @@
         <img src="FFT LOGO NEW 2026.jpg" class="card-brand-logo">
         <div class="m-header">
           <div class="m-title" id="out-title">MASTER RECIPE</div>
-          <div class="m-author">RECIPE BY: Jessica McKenzie</div>
+          <div class="m-author">RECIPE BY: JESSICA MCKENZIE</div>
         </div>
         <div class="meta-line"><span class="m-dot">●</span> <b>WHY:</b>&nbsp;<span id="out-why">...</span></div>
         <div class="meta-line"><span class="m-dot">●</span> <b>ABOUT:</b>&nbsp;<span id="out-about">...</span></div>
         <div class="meta-line"><span class="m-dot">●</span> <b>TECHNIQUE:</b>&nbsp;<span id="out-tech">...</span></div>
         <div class="meta-line"><span class="m-dot">●</span> <b>MAKES:</b>&nbsp;<span id="out-makes">...</span></div>
-        <div class="special-bar">Unique Special Ingredient: GERBET, PANACEGG, Potato Protein CW</div>
+        <div class="special-bar" id="out-special-bar">Unique Special Ingredient: GERBET, PANACEGG, Potato Protein CW</div>
         <table class="r-table">
           <thead>
             <tr>
@@ -407,7 +397,7 @@
       </div>
       <div class="btn-row">
         <button class="btn-sub" onclick="downloadPDF()">⬇️ Download PDF</button>
-        <a class="btn-sub" href="https://photos.app.goo.gl/YourActualAlbumLink" target="_blank">📸 Share Results</a>
+        <a class="btn-sub" href="https://photos.app.goo.gl/0" target="_blank">📸 Share Results</a>
       </div>
       <div class="promo-box">
         <h4 id="course-title">Master Class Series</h4>
@@ -415,9 +405,7 @@
         <a id="course-btn" href="https://freefromthat.com/TRAINING" class="btn-promo" target="_blank">View Course →</a>
       </div>
       <button class="btn-main" onclick="location.reload()" style="background:#222; margin-top:2rem;">Start New Recipe</button>
-      <div class="brand-footer">
-        <img src="FFT LOGO NEW 2026.jpg">
-      </div>
+      <div class="brand-footer"><img src="FFT LOGO NEW 2026.jpg"></div>
     </div>
   </div>
 
@@ -484,28 +472,30 @@
       if(!timerDone || !finalRecipe) return;
       const r = finalRecipe;
       document.getElementById('out-title').innerText = scrub((r.match(/TITLE:\s*(.*)/i) || [null, "Master Recipe"])[1]).toUpperCase();
-      document.getElementById('out-why').innerText = scrub((r.match(/WHY:\s*(.*)/i) || [null, "Technique focus"])[1]);
+      document.getElementById('out-why').innerText = scrub((r.match(/WHY:\s*(.*)/i) || [null, "Texture focus"])[1]);
       document.getElementById('out-about').innerText = scrub((r.match(/ABOUT:\s*(.*)/i) || [null, "Professional Standard"])[1]);
       document.getElementById('out-tech').innerText = scrub((r.match(/TECHNIQUE:\s*(.*)/i) || [null, "Texture Mastery"])[1]);
       document.getElementById('out-makes').innerText = scrub((r.match(/MAKES:\s*(.*)/i) || [null, "Batch"])[1]);
       
-      const courseTitle = document.getElementById('course-title');
-      if(r.toLowerCase().includes("macaron")) { courseTitle.innerText = "Technical Macaron Course"; }
-      else if(r.toLowerCase().includes("tiramisu")) { courseTitle.innerText = "Technical Tiramisu Course"; }
+      const sb = (r.match(/SPECIAL_BAR:\s*(.*)/i) || [null, "GERBET, PANACEGG, Potato Protein CW"])[1];
+      document.getElementById('out-special-bar').innerText = "Unique Special Ingredient: " + sb.toUpperCase();
 
-      const ingPart = r.split(/METHOD:/i)[0].split(/INGREDIENTS:/i)[1] || "";
+      if(r.toLowerCase().includes("macaron")) { document.getElementById('course-title').innerText = "Technical Macaron Course"; }
+      else if(r.toLowerCase().includes("tiramisu")) { document.getElementById('course-title').innerText = "Technical Tiramisu Course"; }
+
+      const ingSection = r.split(/INGREDIENTS_START/i)[1]?.split(/INGREDIENTS_END/i)[0] || "";
       let rows = "";
-      ingPart.split('\n').forEach(line => {
+      ingSection.trim().split('\n').forEach(line => {
         if(line.includes('|')) {
           const c = line.split('|').map(x => scrub(x));
-          if(c[0] && c[0] !== "-") rows += `<tr><td>${c[0]}</td><td>${c[1] || '-'}</td><td>${c[2] || '-'}</td></tr>`;
+          rows += `<tr><td>${c[0]}</td><td>${c[1] || '-'}</td><td>${c[2] || '-'}</td></tr>`;
         }
       });
       document.getElementById('ing-body').innerHTML = rows;
 
-      const stepPart = r.split(/METHOD:/i)[1] || "";
+      const methodSection = r.split(/METHOD_START/i)[1]?.split(/METHOD_END/i)[0] || "";
       let steps = "<div class='step-head'>Preparation Steps</div>";
-      stepPart.split('\n').filter(l => l.trim().length > 5).forEach(l => {
+      methodSection.trim().split('\n').filter(l => l.trim().length > 2).forEach(l => {
         steps += `<div class="step-txt">${scrub(l).replace(/^\d+\.\s*/, '').replace(/^- /, '')}</div>`;
       });
       document.getElementById('method-body').innerHTML = steps;
