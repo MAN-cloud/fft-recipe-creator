@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chef Jessica's Recipe Creator - Rev 89</title>
+  <title>Chef Jessica's Recipe Creator - Rev 90</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;700&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
   <style>
@@ -116,6 +116,8 @@
       color: white;
       border-color: var(--pink);
     }
+    
+    /* DATASHEET LAYOUT - TIRAMISU STYLE */
     #recipe-card {
       background: white;
       padding: 60px;
@@ -132,9 +134,9 @@
     }
     .m-header {
       border-bottom: 4px solid var(--pink);
-      margin-bottom: 35px;
-      padding-bottom: 18px;
-      padding-right: 210px;
+      margin-bottom: 40px;
+      padding-bottom: 20px;
+      padding-right: 220px;
     }
     .m-title {
       font-family: 'Lora', serif;
@@ -154,7 +156,7 @@
       font-size: 16px;
       margin-bottom: 12px;
       display: flex;
-      line-height: 1.5;
+      line-height: 1.6;
     }
     .m-dot {
       color: var(--pink);
@@ -169,14 +171,14 @@
       font-size: 13px;
       font-weight: 800;
       text-transform: uppercase;
-      margin: 30px 0;
+      margin: 40px 0;
       text-align: center;
       letter-spacing: 2.5px;
     }
     .r-table {
       width: 100%;
       border-collapse: collapse;
-      margin: 30px 0;
+      margin: 40px 0;
     }
     .r-table th {
       text-align: left;
@@ -227,68 +229,16 @@
       text-transform: uppercase;
       letter-spacing: 1px;
     }
-    .brand-footer {
-      padding: 60px 0;
-      text-align: center;
-      margin-top: auto;
-    }
-    .brand-footer img {
-      height: 50px;
-    }
-    .btn-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
-      margin: 40px 0;
-    }
-    .btn-sub {
-      border: 3px solid var(--pink);
-      color: var(--pink);
-      padding: 18px;
-      text-align: center;
-      text-decoration: none;
-      font-weight: 800;
-      font-size: 13px;
-      border-radius: 10px;
-      text-transform: uppercase;
-    }
-    .promo-box {
-      padding: 50px;
-      background: #000;
-      color: #fff;
-      border-radius: 20px;
-      text-align: center;
-    }
-    .promo-box h4 {
-      color: var(--pink);
-      font-family: 'Lora', serif;
-      font-size: 26px;
-    }
-    .btn-promo {
-      display: inline-block;
-      background: var(--pink);
-      color: white;
-      padding: 18px 40px;
-      border-radius: 60px;
-      text-decoration: none;
-      margin-top: 25px;
-      font-weight: 700;
-    }
-    .vid-wrap {
-      position: relative;
-      padding-bottom: 56.25%;
-      height: 0;
-      background: #000;
-      border-radius: 20px;
-      overflow: hidden;
-    }
-    .vid-wrap iframe {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-    }
+
+    .brand-footer { padding: 60px 0; text-align: center; margin-top: auto; }
+    .brand-footer img { height: 50px; }
+    .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 40px 0; }
+    .btn-sub { border: 3px solid var(--pink); color: var(--pink); padding: 18px; text-align: center; text-decoration: none; font-weight: 800; font-size: 13px; border-radius: 10px; text-transform: uppercase; }
+    .promo-box { padding: 50px; background: #000; color: #fff; border-radius: 20px; text-align: center; }
+    .promo-box h4 { color: var(--pink); font-family: 'Lora', serif; font-size: 26px; }
+    .btn-promo { display: inline-block; background: var(--pink); color: white; padding: 18px 40px; border-radius: 60px; text-decoration: none; margin-top: 25px; font-weight: 700; }
+    .vid-wrap { position: relative; padding-bottom: 56.25%; height: 0; background: #000; border-radius: 20px; overflow: hidden; }
+    .vid-wrap iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
   </style>
 </head>
 <body>
@@ -361,9 +311,7 @@
   <div id="sc3" class="screen">
     <div class="wrap">
       <div class="hero"><h1>Chef Jessica is<br><em>Crafting...</em></h1></div>
-      <div class="vid-wrap">
-        <iframe id="player" src="https://www.youtube.com/embed/videoseries?list=PL7K6PlzZmS-YzdkFZP74h1va8EkYpvl77&autoplay=1&mute=1" frameborder="0"></iframe>
-      </div>
+      <div class="vid-wrap"><iframe id="player" src="https://www.youtube.com/embed/videoseries?list=PL7K6PlzZmS-YzdkFZP74h1va8EkYpvl77&autoplay=1&mute=1" frameborder="0"></iframe></div>
       <div id="timer" style="text-align:center; margin-top:20px; font-weight:800; font-size:24px; color:var(--pink);">15s</div>
       <div class="brand-footer"><img src="FFT LOGO NEW 2026.jpg"></div>
     </div>
@@ -375,29 +323,20 @@
         <img src="FFT LOGO NEW 2026.jpg" class="card-brand-logo">
         <div class="m-header">
           <div class="m-title" id="out-title">MASTER RECIPE</div>
-          <div class="m-author">RECIPE BY: JESSICA MCKENZIE</div>
+          <div class="m-author">RECIPE BY: Jessica McKenzie</div>
         </div>
         <div class="meta-line"><span class="m-dot">●</span> <b>WHY:</b>&nbsp;<span id="out-why">...</span></div>
         <div class="meta-line"><span class="m-dot">●</span> <b>ABOUT:</b>&nbsp;<span id="out-about">...</span></div>
         <div class="meta-line"><span class="m-dot">●</span> <b>TECHNIQUE:</b>&nbsp;<span id="out-tech">...</span></div>
         <div class="meta-line"><span class="m-dot">●</span> <b>MAKES:</b>&nbsp;<span id="out-makes">...</span></div>
         <div class="special-bar" id="out-special-bar">Unique Special Ingredient: GERBET, PANACEGG, Potato Protein CW</div>
-        <table class="r-table">
-          <thead>
-            <tr>
-              <th>Ingredient</th>
-              <th>Qty</th>
-              <th>Method</th>
-            </tr>
-          </thead>
-          <tbody id="ing-body"></tbody>
-        </table>
+        <table class="r-table"><thead><tr><th>Ingredient</th><th>Qty</th><th>Method</th></tr></thead><tbody id="ing-body"></tbody></table>
         <div id="method-body"></div>
         <div class="legal-footer">This document can only be used by students who enrolled and cannot be shared, copied or printed without express written consent of Free From That.</div>
       </div>
       <div class="btn-row">
         <button class="btn-sub" onclick="downloadPDF()">⬇️ Download PDF</button>
-        <a class="btn-sub" href="https://photos.app.goo.gl/0" target="_blank">📸 Share Results</a>
+        <a class="btn-sub" href="https://photos.app.goo.gl/YourSharedAlbumLink" target="_blank">📸 Share Results</a>
       </div>
       <div class="promo-box">
         <h4 id="course-title">Master Class Series</h4>
@@ -414,20 +353,189 @@
     let lead = { email: '', phone: '' };
     let finalRecipe = "";
     let timerDone = false;
-
-    const priority = [
-      {n:"Australia",c:"+61"},
-      {n:"Canada",c:"+1"},
-      {n:"United States",c:"+1"},
-      {n:"United Kingdom",c:"+44"}
-    ];
-
-    const countries = [
-      {n:"Afghanistan",c:"+93"},{n:"Albania",c:"+355"},{n:"Algeria",c:"+213"},{n:"Andorra",c:"+376"},{n:"Angola",c:"+244"},{n:"Antigua & Barbuda",c:"+1268"},{n:"Argentina",c:"+54"},{n:"Armenia",c:"+374"},{n:"Austria",c:"+43"},{n:"Azerbaijan",c:"+994"},{n:"Bahamas",c:"+1242"},{n:"Bahrain",c:"+973"},{n:"Bangladesh",c:"+880"},{n:"Barbados",c:"+1246"},{n:"Belarus",c:"+375"},{n:"Belgium",c:"+32"},{n:"Belize",c:"+501"},{n:"Benin",c:"+229"},{n:"Bermuda",c:"+1441"},{n:"Bhutan",c:"+975"},{n:"Bolivia",c:"+591"},{n:"Bosnia",c:"+387"},{n:"Botswana",c:"+267"},{n:"Brazil",c:"+55"},{n:"Brunei",c:"+673"},{n:"Bulgaria",c:"+359"},{n:"Burkina Faso",c:"+226"},{n:"Burundi",c:"+257"},{n:"Cambodia",c:"+855"},{n:"Cameroon",c:"+237"},{n:"Cape Verde",c:"+238"},{n:"Cayman Islands",c:"+1345"},{n:"Central African Rep",c:"+236"},{n:"Chad",c:"+235"},{n:"Chile",c:"+56"},{n:"China",c:"+86"},{n:"Colombia",c:"+57"},{n:"Comoros",c:"+269"},{n:"Congo",c:"+242"},{n:"Costa Rica",c:"+506"},{n:"Croatia",c:"+385"},{n:"Cuba",c:"+53"},{n:"Cyprus",c:"+357"},{n:"Czech Republic",c:"+420"},{n:"Denmark",c:"+45"},{n:"Djibouti",c:"+253"},{n:"Dominica",c:"+1767"},{n:"Dominican Republic",c:"+1809"},{n:"Ecuador",c:"+593"},{n:"Egypt",c:"+20"},{n:"El Salvador",c:"+503"},{n:"Equatorial Guinea",c:"+240"},{n:"Eritrea",c:"+291"},{n:"Estonia",c:"+372"},{n:"Ethiopia",c:"+251"},{n:"Fiji",c:"+679"},{n:"Finland",c:"+358"},{n:"France",c:"+33"},{n:"Gabon",c:"+241"},{n:"Gambia",c:"+220"},{n:"Georgia",c:"+995"},{n:"Germany",c:"+49"},{n:"Ghana",c:"+233"},{n:"Greece",c:"+30"},{n:"Grenada",c:"+1473"},{n:"Guatemala",c:"+502"},{n:"Guinea",c:"+224"},{n:"Guyana",c:"+592"},{n:"Haiti",c:"+509"},{n:"Honduras",c:"+504"},{n:"Hong Kong",c:"+852"},{n:"Hungary",c:"+36"},{n:"Iceland",c:"+354"},{n:"India",c:"+91"},{n:"Indonesia",c:"+62"},{n:"Iran",c:"+98"},{n:"Iraq",c:"+964"},{n:"Ireland",c:"+353"},{n:"Israel",c:"+972"},{n:"Italy",c:"+39"},{n:"Ivory Coast",c:"+225"},{n:"Jamaica",c:"+1876"},{n:"Japan",c:"+81"},{n:"Jordan",c:"+962"},{n:"Kazakhstan",c:"+7"},{n:"Kenya",c:"+254"},{n:"Kuwait",c:"+965"},{n:"Kyrgyzstan",c:"+996"},{n:"Laos",c:"+856"},{n:"Latvia",c:"+371"},{n:"Lebanon",c:"+961"},{n:"Lesotho",c:"+266"},{n:"Liberia",c:"+231"},{n:"Libya",c:"+218"},{n:"Liechtenstein",c:"+423"},{n:"Lithuania",c:"+370"},{n:"Luxembourg",c:"+352"},{n:"Macau",c:"+853"},{n:"Macedonia",c:"+389"},{n:"Madagascar",c:"+261"},{n:"Malawi",c:"+265"},{n:"Malaysia",c:"+60"},{n:"Maldives",c:"+960"},{n:"Mali",c:"+223"},{n:"Malta",c:"+356"},{n:"Mauritania",c:"+222"},{n:"Mauritius",c:"+230"},{n:"Mexico",c:"+52"},{n:"Moldova",c:"+373"},{n:"Monaco",c:"+377"},{n:"Mongolia",c:"+976"},{n:"Montenegro",c:"+382"},{n:"Morocco",c:"+212"},{n:"Mozambique",c:"+258"},{n:"Myanmar",c:"+95"},{n:"Namibia",c:"+264"},{n:"Nepal",c:"+977"},{n:"Netherlands",c:"+31"},{n:"New Zealand",c:"+64"},{n:"Nicaragua",c:"+505"},{n:"Niger",c:"+227"},{n:"Nigeria",c:"+234"},{n:"Norway",c:"+47"},{n:"Oman",c:"+968"},{n:"Pakistan",c:"+92"},{n:"Panama",c:"+507"},{n:"Papua New Guinea",c:"+675"},{n:"Paraguay",c:"+595"},{n:"Peru",c:"+51"},{n:"Philippines",c:"+63"},{n:"Poland",c:"+48"},{n:"Portugal",c:"+351"},{n:"Puerto Rico",c:"+1"},{n:"Qatar",c:"+974"},{n:"Romania",c:"+40"},{n:"Russia",c:"+7"},{n:"Rwanda",c:"+250"},{n:"Saudi Arabia",c:"+966"},{n:"Senegal",c:"+221"},{n:"Serbia",c:"+381"},{n:"Seychelles",c:"+248"},{n:"Singapore",c:"+65"},{n:"Slovakia",c:"+421"},{n:"Slovenia",c:"+386"},{n:"Somalia",c:"+252"},{n:"South Africa",c:"+27"},{n:"South Korea",c:"+82"},{n:"Spain",c:"+34"},{n:"Sri Lanka",c:"+94"},{n:"Sudan",c:"+249"},{n:"Suriname",c:"+597"},{n:"Swaziland",c:"+268"},{n:"Sweden",c:"+46"},{n:"Switzerland",c:"+41"},{n:"Syria",c:"+963"},{n:"Taiwan",c:"+886"},{n:"Tajikistan",c:"+992"},{n:"Tanzania",c:"+255"},{n:"Thailand",c:"+66"},{n:"Togo",c:"+228"},{n:"Tonga",c:"+676"},{n:"Trinidad & Tobago",c:"+1868"},{n:"Tunisia",c:"+216"},{n:"Turkey",c:"+90"},{n:"Turkmenistan",c:"+993"},{n:"UAE",c:"+971"},{n:"Uganda",c:"+256"},{n:"Ukraine",c:"+380"},{n:"Uruguay",c:"+598"},{n:"Uzbekistan",c:"+998"},{n:"Vanuatu",c:"+678"},{n:"Vatican City",c:"+379"},{n:"Venezuela",c:"+58"},{n:"Vietnam",c:"+84"},{n:"Yemen",c:"+967"},{n:"Zambia",c:"+260"},{n:"Zimbabwe",c:"+263"}
+    const priority = [{n:"Australia",c:"+61"},{n:"Canada",c:"+1"},{n:"United States",c:"+1"},{n:"United Kingdom",c:"+44"}];
+    const fullCountries = [
+      {n:"Afghanistan",c:"+93"},
+      {n:"Albania",c:"+355"},
+      {n:"Algeria",c:"+213"},
+      {n:"Andorra",c:"+376"},
+      {n:"Angola",c:"+244"},
+      {n:"Antigua & Barbuda",c:"+1268"},
+      {n:"Argentina",c:"+54"},
+      {n:"Armenia",c:"+374"},
+      {n:"Austria",c:"+43"},
+      {n:"Azerbaijan",c:"+994"},
+      {n:"Bahamas",c:"+1242"},
+      {n:"Bahrain",c:"+973"},
+      {n:"Bangladesh",c:"+880"},
+      {n:"Barbados",c:"+1246"},
+      {n:"Belarus",c:"+375"},
+      {n:"Belgium",c:"+32"},
+      {n:"Belize",c:"+501"},
+      {n:"Benin",c:"+229"},
+      {n:"Bermuda",c:"+1441"},
+      {n:"Bhutan",c:"+975"},
+      {n:"Bolivia",c:"+591"},
+      {n:"Bosnia",c:"+387"},
+      {n:"Botswana",c:"+267"},
+      {n:"Brazil",c:"+55"},
+      {n:"Brunei",c:"+673"},
+      {n:"Bulgaria",c:"+359"},
+      {n:"Burkina Faso",c:"+226"},
+      {n:"Burundi",c:"+257"},
+      {n:"Cambodia",c:"+855"},
+      {n:"Cameroon",c:"+237"},
+      {n:"Cape Verde",c:"+238"},
+      {n:"Cayman Islands",c:"+1345"},
+      {n:"Central African Rep",c:"+236"},
+      {n:"Chad",c:"+235"},
+      {n:"Chile",c:"+56"},
+      {n:"China",c:"+86"},
+      {n:"Colombia",c:"+57"},
+      {n:"Comoros",c:"+269"},
+      {n:"Congo",c:"+242"},
+      {n:"Costa Rica",c:"+506"},
+      {n:"Croatia",c:"+385"},
+      {n:"Cuba",c:"+53"},
+      {n:"Cyprus",c:"+357"},
+      {n:"Czech Republic",c:"+420"},
+      {n:"Denmark",c:"+45"},
+      {n:"Djibouti",c:"+253"},
+      {n:"Dominica",c:"+1767"},
+      {n:"Dominican Republic",c:"+1809"},
+      {n:"Ecuador",c:"+593"},
+      {n:"Egypt",c:"+20"},
+      {n:"El Salvador",c:"+503"},
+      {n:"Equatorial Guinea",c:"+240"},
+      {n:"Eritrea",c:"+291"},
+      {n:"Estonia",c:"+372"},
+      {n:"Ethiopia",c:"+251"},
+      {n:"Fiji",c:"+679"},
+      {n:"Finland",c:"+358"},
+      {n:"France",c:"+33"},
+      {n:"Gabon",c:"+241"},
+      {n:"Gambia",c:"+220"},
+      {n:"Georgia",c:"+995"},
+      {n:"Germany",c:"+49"},
+      {n:"Ghana",c:"+233"},
+      {n:"Greece",c:"+30"},
+      {n:"Grenada",c:"+1473"},
+      {n:"Guatemala",c:"+502"},
+      {n:"Guinea",c:"+224"},
+      {n:"Guyana",c:"+592"},
+      {n:"Haiti",c:"+509"},
+      {n:"Honduras",c:"+504"},
+      {n:"Hong Kong",c:"+852"},
+      {n:"Hungary",c:"+36"},
+      {n:"Iceland",c:"+354"},
+      {n:"India",c:"+91"},
+      {n:"Indonesia",c:"+62"},
+      {n:"Iran",c:"+98"},
+      {n:"Iraq",c:"+964"},
+      {n:"Ireland",c:"+353"},
+      {n:"Israel",c:"+972"},
+      {n:"Italy",c:"+39"},
+      {n:"Ivory Coast",c:"+225"},
+      {n:"Jamaica",c:"+1876"},
+      {n:"Japan",c:"+81"},
+      {n:"Jordan",c:"+962"},
+      {n:"Kazakhstan",c:"+7"},
+      {n:"Kenya",c:"+254"},
+      {n:"Kuwait",c:"+965"},
+      {n:"Kyrgyzstan",c:"+996"},
+      {n:"Laos",c:"+856"},
+      {n:"Latvia",c:"+371"},
+      {n:"Lebanon",c:"+961"},
+      {n:"Lesotho",c:"+266"},
+      {n:"Liberia",c:"+231"},
+      {n:"Libya",c:"+218"},
+      {n:"Liechtenstein",c:"+423"},
+      {n:"Lithuania",c:"+370"},
+      {n:"Luxembourg",c:"+352"},
+      {n:"Macau",c:"+853"},
+      {n:"Macedonia",c:"+389"},
+      {n:"Madagascar",c:"+261"},
+      {n:"Malawi",c:"+265"},
+      {n:"Malaysia",c:"+60"},
+      {n:"Maldives",c:"+960"},
+      {n:"Mali",c:"+223"},
+      {n:"Malta",c:"+356"},
+      {n:"Mauritania",c:"+222"},
+      {n:"Mauritius",c:"+230"},
+      {n:"Mexico",c:"+52"},
+      {n:"Moldova",c:"+373"},
+      {n:"Monaco",c:"+377"},
+      {n:"Mongolia",c:"+976"},
+      {n:"Montenegro",c:"+382"},
+      {n:"Morocco",c:"+212"},
+      {n:"Mozambique",c:"+258"},
+      {n:"Myanmar",c:"+95"},
+      {n:"Namibia",c:"+264"},
+      {n:"Nepal",c:"+977"},
+      {n:"Netherlands",c:"+31"},
+      {n:"New Zealand",c:"+64"},
+      {n:"Nicaragua",c:"+505"},
+      {n:"Niger",c:"+227"},
+      {n:"Nigeria",c:"+234"},
+      {n:"Norway",c:"+47"},
+      {n:"Oman",c:"+968"},
+      {n:"Pakistan",c:"+92"},
+      {n:"Panama",c:"+507"},
+      {n:"Papua New Guinea",c:"+675"},
+      {n:"Paraguay",c:"+595"},
+      {n:"Peru",c:"+51"},
+      {n:"Philippines",c:"+63"},
+      {n:"Poland",c:"+48"},
+      {n:"Portugal",c:"+351"},
+      {n:"Puerto Rico",c:"+1"},
+      {n:"Qatar",c:"+974"},
+      {n:"Romania",c:"+40"},
+      {n:"Russia",c:"+7"},
+      {n:"Rwanda",c:"+250"},
+      {n:"Saudi Arabia",c:"+966"},
+      {n:"Senegal",c:"+221"},
+      {n:"Serbia",c:"+381"},
+      {n:"Seychelles",c:"+248"},
+      {n:"Singapore",c:"+65"},
+      {n:"Slovakia",c:"+421"},
+      {n:"Slovenia",c:"+386"},
+      {n:"Somalia",c:"+252"},
+      {n:"South Africa",c:"+27"},
+      {n:"South Korea",c:"+82"},
+      {n:"Spain",c:"+34"},
+      {n:"Sri Lanka",c:"+94"},
+      {n:"Sudan",c:"+249"},
+      {n:"Suriname",c:"+597"},
+      {n:"Swaziland",c:"+268"},
+      {n:"Sweden",c:"+46"},
+      {n:"Switzerland",c:"+41"},
+      {n:"Syria",c:"+963"},
+      {n:"Taiwan",c:"+886"},
+      {n:"Tajikistan",c:"+992"},
+      {n:"Tanzania",c:"+255"},
+      {n:"Thailand",c:"+66"},
+      {n:"Togo",c:"+228"},
+      {n:"Tonga",c:"+676"},
+      {n:"Trinidad & Tobago",c:"+1868"},
+      {n:"Tunisia",c:"+216"},
+      {n:"Turkey",c:"+90"},
+      {n:"Turkmenistan",c:"+993"},
+      {n:"UAE",c:"+971"},
+      {n:"Uganda",c:"+256"},
+      {n:"Ukraine",c:"+380"},
+      {n:"Uruguay",c:"+598"},
+      {n:"Uzbekistan",c:"+998"},
+      {n:"Vanuatu",c:"+678"},
+      {n:"Vatican City",c:"+379"},
+      {n:"Venezuela",c:"+58"},
+      {n:"Vietnam",c:"+84"},
+      {n:"Yemen",c:"+967"},
+      {n:"Zambia",c:"+260"},
+      {n:"Zimbabwe",c:"+263"}
     ].sort((a,b) => a.n.localeCompare(b.n));
 
     const select = document.getElementById('country-code');
-    [...priority, {n:"----------",c:""}, ...countries].forEach(ct => {
+    [...priority, {n:"----------",c:""}, ...fullCountries].forEach(ct => {
       let opt = document.createElement('option');
       opt.value = ct.c; opt.disabled = ct.n.includes("---");
       opt.innerHTML = ct.n + (ct.c ? ` (${ct.c})` : "");
@@ -472,7 +580,7 @@
       if(!timerDone || !finalRecipe) return;
       const r = finalRecipe;
       document.getElementById('out-title').innerText = scrub((r.match(/TITLE:\s*(.*)/i) || [null, "Master Recipe"])[1]).toUpperCase();
-      document.getElementById('out-why').innerText = scrub((r.match(/WHY:\s*(.*)/i) || [null, "Texture focus"])[1]);
+      document.getElementById('out-why').innerText = scrub((r.match(/WHY:\s*(.*)/i) || [null, "Technique focus"])[1]);
       document.getElementById('out-about').innerText = scrub((r.match(/ABOUT:\s*(.*)/i) || [null, "Professional Standard"])[1]);
       document.getElementById('out-tech').innerText = scrub((r.match(/TECHNIQUE:\s*(.*)/i) || [null, "Texture Mastery"])[1]);
       document.getElementById('out-makes').innerText = scrub((r.match(/MAKES:\s*(.*)/i) || [null, "Batch"])[1]);
@@ -493,9 +601,10 @@
       });
       document.getElementById('ing-body').innerHTML = rows;
 
-      const methodSection = r.split(/METHOD_START/i)[1]?.split(/METHOD_END/i)[0] || "";
+      const methodMatch = r.match(/METHOD_START([\s\S]*?)METHOD_END/i);
+      const methodContent = methodMatch ? methodMatch[1] : (r.split(/METHOD:/i)[1] || "");
       let steps = "<div class='step-head'>Preparation Steps</div>";
-      methodSection.trim().split('\n').filter(l => l.trim().length > 2).forEach(l => {
+      methodContent.trim().split('\n').filter(l => l.trim().length > 3).forEach(l => {
         steps += `<div class="step-txt">${scrub(l).replace(/^\d+\.\s*/, '').replace(/^- /, '')}</div>`;
       });
       document.getElementById('method-body').innerHTML = steps;
