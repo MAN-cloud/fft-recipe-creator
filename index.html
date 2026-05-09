@@ -17,11 +17,11 @@
         .hero { background: var(--pink); border-radius: 12px; padding: 2.5rem 1.5rem; margin-bottom: 2rem; text-align: center; color: white; }
         .hero h1 { font-family: 'Lora', serif; font-size: 30px; font-weight: 400; line-height: 1.1; }
 
-        input, select, textarea { width: 100%; padding: 1.2rem; border: 1px solid rgba(0,0,0,0.1); border-radius: 12px; margin-bottom: 1rem; font-size: 16px; font-family: inherit; background: white; outline: none; }
+        input, select, textarea { width: 100%; padding: 1.2rem; border: 1px solid rgba(0,0,0,0.1); border-radius: 12px; margin-bottom: 1rem; font-size: 16px; background: white; outline: none; }
         h3 { font-size: 11px; font-weight: 800; color: #999; text-transform: uppercase; letter-spacing: 0.12em; margin: 1.5rem 0 1rem; }
 
         .phone-row { display: flex; gap: 8px; margin-bottom: 1rem; }
-        .phone-row select { width: 170px; font-size: 13px; }
+        .phone-row select { width: 180px; font-size: 13px; }
         .phone-row input { flex: 1; }
 
         .btn-main { background: var(--pink); color: white; border: none; width: 100%; padding: 1.2rem; border-radius: 50px; font-size: 18px; font-weight: 700; cursor: pointer; box-shadow: 0 8px 20px rgba(255,20,147,0.2); }
@@ -30,7 +30,6 @@
         .tag { padding: 10px 18px; border: 1px solid #ddd; border-radius: 20px; background: white; font-size: 12px; cursor: pointer; font-weight: 600; }
         .tag.active { background: var(--pink); color: white; border-color: var(--pink); }
 
-        /* RECIPE CARD LOGO POSITIONS */
         #recipe-card { background: white; padding: 60px 40px; border-radius: 4px; box-shadow: 0 4px 30px rgba(0,0,0,0.06); color: #000; position: relative; }
         .pdf-logo { display: none; position: absolute; top: 25px; right: 30px; width: 160px; }
         
@@ -48,9 +47,8 @@
         .step-txt { margin-bottom: 15px; padding-left: 25px; position: relative; line-height: 1.7; font-size: 14px; }
         .step-txt::before { content: "●"; color: var(--pink); position: absolute; left: 0; font-size: 10px; top: 2px; }
 
-        /* FOOTER BRANDING */
         .brand-footer { margin-top: auto; padding: 30px 0; text-align: center; width: 100%; }
-        .brand-footer img { height: 40px; width: auto; }
+        .brand-footer img { height: 45px; width: auto; }
 
         .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 25px 0; }
         .btn-sub { border: 2.5px solid var(--pink); background: transparent; color: var(--pink); padding: 14px; border-radius: 8px; font-weight: 800; text-transform: uppercase; font-size: 11px; cursor: pointer; text-align: center; text-decoration: none; }
@@ -83,6 +81,10 @@
             <div class="tags"><div class="tag">Gluten</div><div class="tag">Nuts</div><div class="tag">Dairy</div><div class="tag">Eggs</div><div class="tag">Soy</div><div class="tag">Corn</div></div>
             <h3>Meal Type</h3>
             <div class="tags"><div class="tag">Breakfast</div><div class="tag">Brunch</div><div class="tag">Lunch</div><div class="tag">Dinner</div><div class="tag">Dessert</div></div>
+            <h3>Cuisine Style</h3>
+            <div class="tags"><div class="tag">Italian</div><div class="tag">French</div><div class="tag">Asian</div><div class="tag">Mediterranean</div><div class="tag">Mexican</div><div class="tag">American</div></div>
+            <h3>Dietary Preferences</h3>
+            <div class="tags"><div class="tag">Vegan</div><div class="tag">Vegetarian</div><div class="tag">Healthy</div><div class="tag">Whole Foods</div></div>
             <button class="btn-main" onclick="startChef()">✨ Generate Master Recipe</button>
             <div class="brand-footer"><img src="FFT LOGO NEW 2026.jpg"></div>
         </div>
@@ -129,9 +131,17 @@
         let timerDone = false;
 
         const priority = [{n:"Australia",c:"+61"},{n:"Canada",c:"+1"},{n:"United States",c:"+1"},{n:"United Kingdom",c:"+44"}];
-        const others = [{n:"Austria",c:"+43"},{n:"Belgium",c:"+32"},{n:"Denmark",c:"+45"},{n:"France",c:"+33"},{n:"Germany",c:"+49"},{n:"Greece",c:"+30"},{n:"Ireland",c:"+353"},{n:"Italy",c:"+39"},{n:"Japan",c:"+81"},{n:"Mexico",c:"+52"},{n:"Netherlands",c:"+31"},{n:"New Zealand",c:"+64"},{n:"Norway",c:"+47"},{n:"Spain",c:"+34"},{n:"Sweden",c:"+46"},{n:"Switzerland",c:"+41"}].sort((a,b) => a.n.localeCompare(b.n));
+        const fullList = [
+            {n:"Afghanistan",c:"+93"},{n:"Albania",c:"+355"},{n:"Algeria",c:"+213"},{n:"Andorra",c:"+376"},{n:"Angola",c:"+244"},{n:"Argentina",c:"+54"},{n:"Armenia",c:"+374"},{n:"Austria",c:"+43"},{n:"Azerbaijan",c:"+994"},{n:"Bahamas",c:"+1242"},{n:"Bahrain",c:"+973"},{n:"Bangladesh",c:"+880"},{n:"Barbados",c:"+1246"},{n:"Belarus",c:"+375"},{n:"Belgium",c:"+32"},{n:"Belize",c:"+501"},{n:"Bermuda",c:"+1441"},{n:"Bolivia",c:"+591"},{n:"Bosnia",c:"+387"},{n:"Brazil",c:"+55"},{n:"Bulgaria",c:"+359"},{n:"Cambodia",c:"+855"},{n:"Cayman Islands",c:"+1345"},{n:"Chile",c:"+56"},{n:"China",c:"+86"},{n:"Colombia",c:"+57"},{n:"Costa Rica",c:"+506"},{n:"Croatia",c:"+385"},{n:"Cyprus",c:"+357"},{n:"Czech Republic",c:"+420"},{n:"Denmark",c:"+45"},{n:"Dominican Republic",c:"+1809"},{n:"Ecuador",c:"+593"},{n:"Egypt",c:"+20"},{n:"El Salvador",c:"+503"},{n:"Estonia",c:"+372"},{n:"Fiji",c:"+679"},{n:"Finland",c:"+358"},{n:"France",c:"+33"},{n:"Georgia",c:"+995"},{n:"Germany",c:"+49"},{n:"Greece",c:"+30"},{n:"Guatemala",c:"+502"},{n:"Honduras",c:"+504"},{n:"Hong Kong",c:"+852"},{n:"Hungary",c:"+36"},{n:"Iceland",c:"+354"},{n:"India",c:"+91"},{n:"Indonesia",c:"+62"},{n:"Ireland",c:"+353"},{n:"Israel",c:"+972"},{n:"Italy",c:"+39"},{n:"Jamaica",c:"+1876"},{n:"Japan",c:"+81"},{n:"Jordan",c:"+962"},{n:"Kazakhstan",c:"+7"},{n:"Kenya",c:"+254"},{n:"Kuwait",c:"+965"},{n:"Latvia",c:"+371"},{n:"Lebanon",c:"+961"},{n:"Liechtenstein",c:"+423"},{n:"Lithuania",c:"+370"},{n:"Luxembourg",c:"+352"},{n:"Macau",c:"+853"},{n:"Malaysia",c:"+60"},{n:"Malta",c:"+356"},{n:"Mauritius",c:"+230"},{n:"Mexico",c:"+52"},{n:"Monaco",c:"+377"},{n:"Montenegro",c:"+382"},{n:"Morocco",c:"+212"},{n:"Netherlands",c:"+31"},{n:"New Zealand",c:"+64"},{n:"Nicaragua",c:"+505"},{n:"Nigeria",c:"+234"},{n:"Norway",c:"+47"},{n:"Oman",c:"+968"},{n:"Pakistan",c:"+92"},{n:"Panama",c:"+507"},{n:"Paraguay",c:"+595"},{n:"Peru",c:"+51"},{n:"Philippines",c:"+63"},{n:"Poland",c:"+48"},{n:"Portugal",c:"+351"},{n:"Puerto Rico",c:"+1"},{n:"Qatar",c:"+974"},{n:"Romania",c:"+40"},{n:"Russia",c:"+7"},{n:"Saudi Arabia",c:"+966"},{n:"Serbia",c:"+381"},{n:"Singapore",c:"+65"},{n:"Slovakia",c:"+421"},{n:"Slovenia",c:"+386"},{n:"South Africa",c:"+27"},{n:"South Korea",c:"+82"},{n:"Spain",c:"+34"},{n:"Sri Lanka",c:"+94"},{n:"Sweden",c:"+46"},{n:"Switzerland",c:"+41"},{n:"Taiwan",c:"+886"},{n:"Thailand",c:"+66"},{n:"Trinidad & Tobago",c:"+1868"},{n:"Turkey",c:"+90"},{n:"UAE",c:"+971"},{n:"Ukraine",c:"+380"},{n:"Uruguay",c:"+598"},{n:"Vatican City",c:"+379"},{n:"Venezuela",c:"+58"},{n:"Vietnam",c:"+84"}
+        ].sort((a,b) => a.n.localeCompare(b.n));
+        
         const select = document.getElementById('country-code');
-        [...priority, {n:"----------",c:""}, ...others].forEach(ct => { let opt = document.createElement('option'); opt.value = ct.c; opt.disabled = ct.n.includes("---"); opt.innerHTML = ct.n + (ct.c ? ` (${ct.c})` : ""); select.appendChild(opt); });
+        [...priority, {n:"----------",c:""}, ...fullList].forEach(ct => {
+            let opt = document.createElement('option');
+            opt.value = ct.c; opt.disabled = ct.n.includes("---");
+            opt.innerHTML = ct.n + (ct.c ? ` (${ct.c})` : "");
+            select.appendChild(opt);
+        });
 
         function validateAndGo() {
             const email = document.getElementById('email').value;
@@ -174,7 +184,6 @@
             document.getElementById('out-tech').innerText = scrub((r.match(/TECHNIQUE:\s*(.*)/i) || [null, "Texture Mastery"])[1]);
             document.getElementById('out-makes').innerText = scrub((r.match(/MAKES:\s*(.*)/i) || [null, "Batch"])[1]);
 
-            // Suggest Specific Courses
             if(r.toLowerCase().includes("lasagna") || r.toLowerCase().includes("pasta")) {
                 document.getElementById('course-title').innerText = "Vegan Cuisine Course";
             } else if(r.toLowerCase().includes("macaron") || r.toLowerCase().includes("cake") || r.toLowerCase().includes("dessert")) {
