@@ -673,14 +673,24 @@ function generate(){
     if(elapsed>=15){
       clearInterval(progressTimer);
       document.getElementById('ytFrame').src='';
-      if(recipe){goToScreen(4);}
-      else{
+      if(recipe){
+        goToScreen(4);
+      } else {
+        // Show continue button on desktop while waiting
         if(isDesktop()){
           var cb=document.getElementById('continueBtn');
-          cb.style.display='block';cb.textContent='Almost ready...';
+          cb.style.display='block';
+          cb.textContent='⏳ Almost ready...';
           cb.onclick=function(){};
         }
-        var waitTimer=setInterval(function(){if(recipe){clearInterval(waitTimer);goToScreen(4);}},500);
+        // Keep checking every 500ms until recipe arrives
+        var waitTimer=setInterval(function(){
+          if(recipe){
+            clearInterval(waitTimer);
+            document.getElementById('continueBtn').style.display='none';
+            goToScreen(4);
+          }
+        },500);
       }
     }
   },1000);
