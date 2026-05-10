@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
+<title>Chef Jessica's Recipe Creator</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow-x:hidden}
+body{font-family:'Inter',sans-serif;background:#FAF8F4;color:#1A1A18;font-size:16px}
+.screen{position:fixed;top:0;left:0;width:100%;height:100%;overflow-y:auto;background:#FAF8F4;transition:transform 0.5s cubic-bezier(0.4,0,0.2,1);z-index:1}
+.screen.below{transform:translateY(100%)}
+.screen.active{transform:translateY(0)}
+.screen.above{transform:translateY(-100%)}
+.wrap{max-width:580px;margin:0 auto;padding:1.25rem 1.25rem 3rem}
+.logo-bar{text-align:center;padding:.75rem;background:#fff;border-bottom:1px solid #FFE4F0;position:sticky;top:0;z-index:10}
+.logo-bar img{height:36px;width:auto}
+.hero{background:#FF1493;border-radius:14px;padding:1.5rem;margin-bottom:1.5rem;text-align:center;margin-top:.75rem}
+.hero-label{font-size:11px;color:#000;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.6rem;font-weight:500}
+.hero h1{font-family:'Lora',serif;font-size:26px;font-weight:400;color:#fff;line-height:1.2}
+.hero h1 em{color:#000;font-style:italic}
+.slbl{font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.07em;margin-bottom:.5rem;margin-top:1.1rem;display:block}
+input[type=email],input[type=tel]{width:100%;padding:.85rem;border:1.5px solid rgba(26,26,24,.12);border-radius:10px;font-family:'Inter',sans-serif;font-size:1rem;background:#fff;color:#1A1A18;margin-bottom:.35rem}
+input:focus{outline:none;border-color:#FF1493}
+input.invalid{border-color:#D85A5A;background:#FAEAEA}
+input.valid{border-color:#2E7D32;background:#F1F8F1}
+.field-err{font-size:.75rem;color:#D85A5A;margin-bottom:.5rem;display:none}
+.field-err.on{display:block}
+select{width:100%;padding:.85rem;border:1.5px solid rgba(26,26,24,.12);border-radius:10px;font-family:'Inter',sans-serif;font-size:1rem;background:#fff;color:#1A1A18;margin-bottom:.5rem;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23888' d='M6 8L0 0h12z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 1rem center}
+select:focus{outline:none;border-color:#FF1493}
+.phone-row{display:flex;gap:.5rem}
+.phone-row select{width:160px;flex-shrink:0}
+.phone-row input{flex:1}
+textarea{width:100%;padding:.75rem;border:1.5px solid rgba(26,26,24,.12);border-radius:10px;font-family:'Inter',sans-serif;font-size:.95rem;background:#fff;color:#1A1A18;resize:none;min-height:80px}
+textarea:focus{outline:none;border-color:#FF1493}
+.chips{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:.85rem}
+.chip{padding:.4rem .9rem;border:1.5px solid rgba(26,26,24,.12);border-radius:999px;font-size:.8rem;cursor:pointer;background:#fff;color:#555;transition:all .15s;user-select:none;-webkit-user-select:none;display:inline-block}
+.chip.on{background:#FFE4F0;border-color:#FF1493;color:#8B0057;font-weight:500}
+.chip.red{border-color:#F0CBCB}
+.chip.red.on{background:#FAEAEA;border-color:#D85A5A;color:#A32D2D}
+.divider{height:1px;background:rgba(26,26,24,.08);margin:1.1rem 0}
+.btn-pink{width:100%;padding:1rem;background:#FF1493;color:#fff;border:none;border-radius:12px;font-size:1rem;font-weight:600;cursor:pointer;display:block;text-align:center;margin-bottom:.65rem}
+.btn-sm{padding:.5rem 1rem;background:#FF1493;color:#fff;border:none;border-radius:8px;font-size:.8rem;font-weight:600;cursor:pointer}
+.note{font-size:.72rem;color:#aaa;text-align:center;margin-bottom:1.5rem}
+.err{background:#FAEAEA;border:1px solid #D85A5A;border-radius:10px;padding:1rem;margin-bottom:1rem;font-size:.88rem;color:#A32D2D;display:none}
+.err.on{display:block}
+.capture-box{background:#fff;border:1.5px solid rgba(26,26,24,.1);border-radius:14px;padding:1.5rem;margin-bottom:1.25rem}
+.capture-box h2{font-family:'Lora',serif;font-size:1.2rem;margin-bottom:.4rem}
+.capture-box p{font-size:.85rem;color:#777;margin-bottom:1.2rem;line-height:1.6}
+.location-bar{font-size:.8rem;color:#888;margin-bottom:.8rem;padding:.6rem;background:#FAF8F4;border-radius:8px;text-align:center}
+#screen3{background:#1A1A18}
+.loading-wrap{height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem;text-align:center}
+.spinner{width:60px;height:60px;border:4px solid rgba(255,20,147,.3);border-top-color:#FF1493;border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 1.5rem}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-title{font-family:'Lora',serif;font-size:1.3rem;color:#fff;margin-bottom:.5rem}
+.loading-msg{font-size:.85rem;color:rgba(255,255,255,.6);margin-bottom:1.5rem}
+.loading-progress{width:200px;height:4px;background:rgba(255,255,255,.2);border-radius:2px;overflow:hidden}
+.loading-bar{height:100%;background:#FF1493;border-radius:2px;width:0%}
+.r-hdr{background:#1A1A18;color:#fff;border-radius:14px;padding:1.4rem;margin-bottom:1rem}
+.r-sub{font-size:.68rem;opacity:.5;text-transform:uppercase;letter-spacing:.09em;margin-bottom:.4rem}
+.r-title{font-family:'Lora',serif;font-size:1.4rem;line-height:1.2;margin-bottom:.3rem}
+.r-tagline{font-size:.85rem;opacity:.65;margin-bottom:.9rem}
+.r-meta{display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem}
+.r-mi{text-align:center;background:rgba(255,255,255,.07);border-radius:8px;padding:.4rem .2rem}
+.r-ml{font-size:.6rem;opacity:.5;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.12rem}
+.r-mv{font-size:.82rem;font-weight:600}
+.why-box{background:#FFF8F0;border-left:3px solid #FF1493;padding:.75rem 1rem;border-radius:0 8px 8px 0;margin-bottom:1rem;font-size:.85rem;line-height:1.6;color:#333;display:none}
+.why-box strong{color:#FF1493;display:block;margin-bottom:.25rem;font-size:.75rem;text-transform:uppercase;letter-spacing:.05em}
+.r-body{background:#fff;border:1.5px solid rgba(26,26,24,.1);border-radius:14px;padding:1.25rem;margin-bottom:1rem}
+.r-sec{font-family:'Lora',serif;font-size:1.05rem;color:#FF1493;margin-bottom:.75rem;padding-bottom:.4rem;border-bottom:1px solid #FFE4F0}
+.ing-list{list-style:none;margin-bottom:1.25rem}
+.ing-list li{padding:.45rem 0;border-bottom:1px solid rgba(26,26,24,.06);font-size:.9rem;display:flex;align-items:flex-start;gap:8px}
+.ing-dot{width:6px;height:6px;border-radius:50%;background:#FF1493;flex-shrink:0;margin-top:.45rem}
+.steps-list{list-style:none;counter-reset:s}
+.steps-list li{counter-increment:s;padding:.75rem 0 .75rem 2.75rem;border-bottom:1px solid rgba(26,26,24,.06);font-size:.9rem;line-height:1.6;position:relative}
+.steps-list li::before{content:counter(s);position:absolute;left:0;top:.75rem;width:26px;height:26px;border-radius:50%;background:#FFE4F0;color:#FF1493;font-size:.75rem;font-weight:600;display:flex;align-items:center;justify-content:center}
+.chef-note{background:#FFE4F0;border-radius:10px;padding:1rem;margin-top:1rem;display:none}
+.chef-note-lbl{font-size:.68rem;font-weight:600;color:#8B0057;text-transform:uppercase;letter-spacing:.07em;margin-bottom:.35rem}
+.chef-note p{font-size:.88rem;line-height:1.6;font-style:italic}
+.buy-box{background:#fff;border:1.5px solid #FF1493;border-radius:14px;padding:1.25rem;margin-bottom:1rem}
+.buy-box h3{font-family:'Lora',serif;font-size:1rem;color:#FF1493;margin-bottom:.75rem;padding-bottom:.4rem;border-bottom:1px solid #FFE4F0}
+.buy-link{display:flex;align-items:center;gap:10px;padding:.65rem;border:1px solid rgba(26,26,24,.08);border-radius:10px;text-decoration:none;color:#1A1A18;margin-bottom:.5rem;background:#FAF8F4}
+.buy-icon{width:32px;height:32px;background:#FF1493;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1rem}
+.buy-txt{font-size:.85rem;font-weight:500}
+.buy-sub{font-size:.72rem;color:#999}
+.photos-box{background:#E8F4FD;border:1.5px solid #4285F4;border-radius:14px;padding:1.25rem;margin-bottom:1rem;text-align:center}
+.photos-box h3{font-family:'Lora',serif;font-size:1rem;color:#4285F4;margin-bottom:.5rem}
+.photos-box p{font-size:.82rem;color:#555;margin-bottom:.75rem;line-height:1.5}
+.photos-links{display:flex;flex-wrap:wrap;gap:.5rem;justify-content:center}
+.photos-link{background:#4285F4;color:#fff;padding:.4rem .9rem;border-radius:20px;font-size:.78rem;font-weight:600;text-decoration:none}
+.rating-box{background:#fff;border:1.5px solid rgba(26,26,24,.1);border-radius:14px;padding:1.25rem;margin-bottom:1rem}
+.rating-box h3{font-family:'Lora',serif;font-size:1rem;margin-bottom:.75rem}
+.stars{display:flex;gap:8px;margin-bottom:1rem}
+.star{font-size:1.8rem;cursor:pointer;opacity:.3;color:#FF1493}
+.star.on{opacity:1}
+.rating-comment{width:100%;padding:.75rem;border:1.5px solid rgba(26,26,24,.12);border-radius:10px;font-family:'Inter',sans-serif;font-size:.9rem;background:#fff;resize:none;min-height:70px;margin-bottom:.75rem}
+.rating-comment:focus{outline:none;border-color:#FF1493}
+.rating-thanks{background:#FFE4F0;border-radius:10px;padding:.75rem;text-align:center;font-size:.85rem;color:#8B0057;display:none}
+.train-grid{display:grid;grid-template-columns:1fr 1fr;gap:.65rem;margin-bottom:1rem}
+.train-card{background:#FDF5EA;border:1px solid rgba(196,133,42,.2);border-radius:12px;padding:.85rem}
+.train-card h4{font-size:.8rem;font-weight:600;margin-bottom:.2rem}
+.train-card p{font-size:.72rem;color:#888;margin-bottom:.4rem}
+.train-card a{font-size:.75rem;color:#C4852A;text-decoration:none;font-weight:600}
+.pdf-box{background:#FDF5EA;border:1px solid rgba(196,133,42,.2);border-radius:14px;padding:1.25rem;text-align:center;margin-bottom:1rem}
+.pdf-box h3{font-family:'Lora',serif;font-size:1rem;margin-bottom:.3rem}
+.pdf-box p{font-size:.82rem;color:#888;margin-bottom:1rem;line-height:1.5}
+.past-box{background:#fff;border:1.5px solid rgba(26,26,24,.1);border-radius:14px;padding:1.25rem;margin-bottom:1rem}
+.past-box h3{font-family:'Lora',serif;font-size:1rem;margin-bottom:.75rem}
+.past-item{display:flex;align-items:center;justify-content:space-between;padding:.65rem;border:1px solid rgba(26,26,24,.08);border-radius:10px;margin-bottom:.5rem;background:#FAF8F4}
+.past-item-name{font-size:.85rem;font-weight:500}
+.past-item-date{font-size:.72rem;color:#aaa}
+.change-bar{text-align:center;padding:.75rem;font-size:.85rem;color:#FF1493;cursor:pointer;border-top:1px solid rgba(26,26,24,.06);margin-top:.5rem;font-weight:600}
+/* CHEF JESSICA RECIPE CARD STYLE */
+.jess-header{background:#FF1493;padding:1.25rem 1.25rem .75rem;color:#fff}
+.jess-header-top{font-size:.65rem;letter-spacing:.08em;opacity:.8;margin-bottom:.75rem;text-align:center}
+.jess-title{font-family:'Lora',serif;font-size:clamp(1.2rem,4vw,2rem);font-style:italic;line-height:1.2;margin-bottom:.35rem}
+.jess-tagline{font-size:.85rem;opacity:.85;margin-bottom:.5rem}
+.jess-makes{font-size:.75rem;font-weight:700;letter-spacing:.05em}
+.jess-science-row{display:flex;gap:0;background:#fff;border-bottom:2px solid #FF1493}
+.jess-science-text{flex:1;padding:1rem 1.25rem}
+.jess-science-item{display:flex;gap:.5rem;margin-bottom:.6rem;font-size:.82rem;line-height:1.5;color:#333}
+.jess-science-label{color:#FF1493;font-weight:700;font-size:.75rem;white-space:nowrap;margin-top:.1rem;min-width:80px}
+.jess-ai-image{width:140px;flex-shrink:0;background:#f5f5f5;display:flex;align-items:center;justify-content:center;border-left:1px solid #eee}
+.jess-ai-placeholder{text-align:center;font-size:.72rem;color:#aaa;padding:1rem;line-height:1.6}
+.jess-ai-placeholder{font-size:2rem;display:block;margin-bottom:.25rem}
+.jess-special-bar{background:#FF1493;padding:.75rem 1.25rem;font-size:.78rem;font-weight:700;color:#fff;letter-spacing:.03em}
+.jess-meta-bar{display:grid;grid-template-columns:repeat(4,1fr);background:#FFE4F0;padding:.75rem 1.25rem}
+.jess-meta-item{text-align:left}
+.jess-meta-label{font-size:.65rem;font-weight:700;color:#FF1493;letter-spacing:.07em;margin-bottom:.2rem}
+.jess-meta-value{font-size:.9rem;font-weight:500;color:#1A1A18}
+.jess-two-col{display:grid;grid-template-columns:1fr 1fr;gap:0;background:#fff;border-bottom:1px solid #eee}
+@media(max-width:600px){
+  .jess-two-col{grid-template-columns:1fr}
+  .jess-col-left{border-right:none;border-bottom:1px solid #eee}
+  .jess-science-row{flex-direction:column}
+  .jess-ai-image{width:100%;height:120px;border-left:none;border-top:1px solid #eee}
+  .jess-meta-bar{grid-template-columns:repeat(2,1fr);gap:.5rem}
+  .jess-title{font-size:1.3rem}
+}
+.jess-col-left{padding:1rem 1.25rem;border-right:1px solid #eee}
+.jess-col-right{padding:1rem 1.25rem}
+.jess-col-title{font-family:'Lora',serif;font-size:1.1rem;font-style:italic;color:#FF1493;padding-bottom:.4rem;border-bottom:1.5px solid #FF1493;margin-bottom:.75rem}
+.jess-ing-header{display:grid;grid-template-columns:1fr 50px 80px;font-size:.65rem;font-weight:700;color:#FF1493;letter-spacing:.06em;padding-bottom:.35rem;border-bottom:1px solid #FF1493;margin-bottom:.4rem}
+.jess-ing-row{display:grid;grid-template-columns:1fr 50px 80px;padding:.4rem 0;border-bottom:1px solid #f0f0f0;font-size:.82rem;gap:.25rem;align-items:start}
+.jess-ing-name{color:#1A1A18}
+.jess-ing-qty{color:#FF1493;font-weight:700}
+.jess-ing-notes{color:#888;font-style:italic;font-size:.75rem}
+.paywall-screen{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:999;display:none;align-items:center;justify-content:center}
+.paywall-box{background:#fff;border-radius:20px;padding:2rem;max-width:360px;margin:1rem;text-align:center}
+.paywall-box h2{font-family:'Lora',serif;font-size:1.4rem;margin-bottom:.5rem}
+.paywall-box p{font-size:.88rem;color:#666;margin-bottom:1.5rem;line-height:1.6}
+.btn-subscribe{width:100%;padding:1rem;background:#FF1493;color:#fff;border:none;border-radius:12px;font-size:1rem;font-weight:700;cursor:pointer;margin-bottom:.65rem;display:block}
+.btn-skip{font-size:.8rem;color:#aaa;cursor:pointer;text-decoration:underline;background:none;border:none}
+</style>
+</head>
+<body>
+
+<!-- SCREEN 1 -->
+<div id="screen1" class="screen active">
+  <div class="logo-bar"><img src="https://cdn11.bigcommerce.com/s-vy0q26t2h2/images/stencil/250x100/fft_logo_july_2025_1751513237__42332.original.png" alt="Free From That"></div>
+  <div class="wrap">
+    <div class="hero">
+      <div class="hero-label">Chef Jessica's Kitchen</div>
+      <h1>Your <em>perfect</em> recipe</h1>
+    </div>
+    <div class="capture-box">
+      <h2>Let's get started! 👋</h2>
+      <p>Enter your details and Chef Jessica will create a personalised recipe just for you.</p>
+      <div class="location-bar" id="locationBar">🌍 Detecting your location...</div>
+      <span class="slbl">Email address</span>
+      <input type="email" id="captureEmail" placeholder="your@email.com" oninput="validateEmail(this)">
+      <div class="field-err" id="emailErr">Please enter a valid email address</div>
+      <span class="slbl">Phone number</span>
+      <div class="phone-row">
+        <select id="countryCode">
+          <option value="+61">🇦🇺 +61 Australia</option>
+          <option value="+1">🇺🇸 +1 USA</option>
+          <option value="+1">🇨🇦 +1 Canada</option>
+          <option value="+44">🇬🇧 +44 UK</option>
+          <option value="" disabled>──────────</option>
+          <option value="+93">🇦🇫 +93 Afghanistan</option>
+          <option value="+355">🇦🇱 +355 Albania</option>
+          <option value="+213">🇩🇿 +213 Algeria</option>
+          <option value="+54">🇦🇷 +54 Argentina</option>
+          <option value="+374">🇦🇲 +374 Armenia</option>
+          <option value="+43">🇦🇹 +43 Austria</option>
+          <option value="+994">🇦🇿 +994 Azerbaijan</option>
+          <option value="+973">🇧🇭 +973 Bahrain</option>
+          <option value="+880">🇧🇩 +880 Bangladesh</option>
+          <option value="+32">🇧🇪 +32 Belgium</option>
+          <option value="+55">🇧🇷 +55 Brazil</option>
+          <option value="+359">🇧🇬 +359 Bulgaria</option>
+          <option value="+855">🇰🇭 +855 Cambodia</option>
+          <option value="+56">🇨🇱 +56 Chile</option>
+          <option value="+86">🇨🇳 +86 China</option>
+          <option value="+57">🇨🇴 +57 Colombia</option>
+          <option value="+506">🇨🇷 +506 Costa Rica</option>
+          <option value="+385">🇭🇷 +385 Croatia</option>
+          <option value="+357">🇨🇾 +357 Cyprus</option>
+          <option value="+420">🇨🇿 +420 Czech Republic</option>
+          <option value="+45">🇩🇰 +45 Denmark</option>
+          <option value="+20">🇪🇬 +20 Egypt</option>
+          <option value="+372">🇪🇪 +372 Estonia</option>
+          <option value="+251">🇪🇹 +251 Ethiopia</option>
+          <option value="+679">🇫🇯 +679 Fiji</option>
+          <option value="+358">🇫🇮 +358 Finland</option>
+          <option value="+33">🇫🇷 +33 France</option>
+          <option value="+49">🇩🇪 +49 Germany</option>
+          <option value="+233">🇬🇭 +233 Ghana</option>
+          <option value="+30">🇬🇷 +30 Greece</option>
+          <option value="+852">🇭🇰 +852 Hong Kong</option>
+          <option value="+36">🇭🇺 +36 Hungary</option>
+          <option value="+91">🇮🇳 +91 India</option>
+          <option value="+62">🇮🇩 +62 Indonesia</option>
+          <option value="+964">🇮🇶 +964 Iraq</option>
+          <option value="+353">🇮🇪 +353 Ireland</option>
+          <option value="+972">🇮🇱 +972 Israel</option>
+          <option value="+39">🇮🇹 +39 Italy</option>
+          <option value="+81">🇯🇵 +81 Japan</option>
+          <option value="+962">🇯🇴 +962 Jordan</option>
+          <option value="+254">🇰🇪 +254 Kenya</option>
+          <option value="+965">🇰🇼 +965 Kuwait</option>
+          <option value="+961">🇱🇧 +961 Lebanon</option>
+          <option value="+370">🇱🇹 +370 Lithuania</option>
+          <option value="+352">🇱🇺 +352 Luxembourg</option>
+          <option value="+60">🇲🇾 +60 Malaysia</option>
+          <option value="+356">🇲🇹 +356 Malta</option>
+          <option value="+52">🇲🇽 +52 Mexico</option>
+          <option value="+212">🇲🇦 +212 Morocco</option>
+          <option value="+95">🇲🇲 +95 Myanmar</option>
+          <option value="+977">🇳🇵 +977 Nepal</option>
+          <option value="+31">🇳🇱 +31 Netherlands</option>
+          <option value="+64">🇳🇿 +64 New Zealand</option>
+          <option value="+234">🇳🇬 +234 Nigeria</option>
+          <option value="+47">🇳🇴 +47 Norway</option>
+          <option value="+968">🇴🇲 +968 Oman</option>
+          <option value="+92">🇵🇰 +92 Pakistan</option>
+          <option value="+63">🇵🇭 +63 Philippines</option>
+          <option value="+48">🇵🇱 +48 Poland</option>
+          <option value="+351">🇵🇹 +351 Portugal</option>
+          <option value="+974">🇶🇦 +974 Qatar</option>
+          <option value="+40">🇷🇴 +40 Romania</option>
+          <option value="+7">🇷🇺 +7 Russia</option>
+          <option value="+966">🇸🇦 +966 Saudi Arabia</option>
+          <option value="+65">🇸🇬 +65 Singapore</option>
+          <option value="+27">🇿🇦 +27 South Africa</option>
+          <option value="+82">🇰🇷 +82 South Korea</option>
+          <option value="+34">🇪🇸 +34 Spain</option>
+          <option value="+94">🇱🇰 +94 Sri Lanka</option>
+          <option value="+46">🇸🇪 +46 Sweden</option>
+          <option value="+41">🇨🇭 +41 Switzerland</option>
+          <option value="+886">🇹🇼 +886 Taiwan</option>
+          <option value="+255">🇹🇿 +255 Tanzania</option>
+          <option value="+66">🇹🇭 +66 Thailand</option>
+          <option value="+216">🇹🇳 +216 Tunisia</option>
+          <option value="+90">🇹🇷 +90 Turkey</option>
+          <option value="+256">🇺🇬 +256 Uganda</option>
+          <option value="+380">🇺🇦 +380 Ukraine</option>
+          <option value="+971">🇦🇪 +971 UAE</option>
+          <option value="+598">🇺🇾 +598 Uruguay</option>
+          <option value="+58">🇻🇪 +58 Venezuela</option>
+          <option value="+84">🇻🇳 +84 Vietnam</option>
+          <option value="+967">🇾🇪 +967 Yemen</option>
+          <option value="+260">🇿🇲 +260 Zambia</option>
+          <option value="+263">🇿🇼 +263 Zimbabwe</option>
+        </select>
+        <input type="tel" id="capturePhone" placeholder="Phone number">
+      </div>
+      <div class="err" id="captureErr">Please enter a valid email address.</div>
+      <button onclick="submitCapture()" class="btn-pink" style="margin-top:.75rem">✨ Make My Recipe</button>
+      <p class="note">Your details are kept private and never shared.</p>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN 2 -->
+<div id="screen2" class="screen below">
+  <div class="logo-bar"><img src="https://cdn11.bigcommerce.com/s-vy0q26t2h2/images/stencil/250x100/fft_logo_july_2025_1751513237__42332.original.png" alt="Free From That"></div>
+  <div class="wrap">
+    <div class="hero">
+      <div class="hero-label">Chef Jessica's Kitchen</div>
+      <h1>Your <em>perfect</em> recipe</h1>
+    </div>
+    <span class="slbl">What would you like to make?</span>
+    <textarea id="dishReq" placeholder="e.g. A fudgy brownie with crispy edges, light eclairs with cream, a juicy burger for a dinner party..."></textarea>
+    <span class="slbl">Allergies &amp; intolerances</span>
+    <div class="chips" id="allergyChips">
+      <span class="chip red" onclick="tog(this)">Gluten / Wheat</span>
+      <span class="chip red" onclick="tog(this)">Nuts</span>
+      <span class="chip red" onclick="tog(this)">Peanuts</span>
+      <span class="chip red" onclick="tog(this)">Sesame</span>
+      <span class="chip red" onclick="tog(this)">Soy</span>
+      <span class="chip red" onclick="tog(this)">Dairy</span>
+      <span class="chip red" onclick="tog(this)">Eggs</span>
+      <span class="chip red" onclick="tog(this)">Shellfish</span>
+      <span class="chip red" onclick="tog(this)">Fish</span>
+      <span class="chip red" onclick="tog(this)">Corn</span>
+      <span class="chip red" onclick="tog(this)">Mustard</span>
+    </div>
+    <div class="divider"></div>
+    <span class="slbl">Cuisine &amp; meal type</span>
+    <div class="chips" id="cuisineChips">
+      <span class="chip" onclick="tog(this)">Italian</span>
+      <span class="chip" onclick="tog(this)">French</span>
+      <span class="chip" onclick="tog(this)">Asian</span>
+      <span class="chip" onclick="tog(this)">Mexican</span>
+      <span class="chip" onclick="tog(this)">Middle Eastern</span>
+      <span class="chip" onclick="tog(this)">Indian</span>
+      <span class="chip" onclick="tog(this)">American / USA</span>
+    </div>
+    <div class="chips" id="mealChips">
+      <span class="chip" onclick="tog(this)">Breakfast</span>
+      <span class="chip" onclick="tog(this)">Lunch</span>
+      <span class="chip on" onclick="tog(this)">Dinner</span>
+      <span class="chip" onclick="tog(this)">Dessert</span>
+    </div>
+    <div class="divider"></div>
+    <span class="slbl">Dietary preferences</span>
+    <div class="chips" id="dietChips">
+      <span class="chip" onclick="tog(this)">Vegan</span>
+      <span class="chip" onclick="tog(this)">Vegetarian</span>
+      <span class="chip" onclick="tog(this)">Flexitarian</span>
+      <span class="chip" onclick="tog(this)">Whole Food / Healthy</span>
+      <span class="chip" onclick="tog(this)">Halal</span>
+      <span class="chip" onclick="tog(this)">Kosher</span>
+      <span class="chip" onclick="tog(this)">Hindu</span>
+      <span class="chip" onclick="tog(this)">Buddhist</span>
+      <span class="chip" onclick="tog(this)">Gluten-free</span>
+    </div>
+    <div class="err" id="errBox">Something went wrong — please try again.</div>
+    <button onclick="generate()" class="btn-pink">✨ Make My Recipe</button>
+    <p class="note">Your personalised recipe will be created by Chef Jessica</p>
+    <div class="past-box" id="pastBox" style="display:none">
+      <h3>📖 Your Past Recipes</h3>
+      <div id="pastList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN 3: LOADING -->
+<div id="screen3" class="screen below">
+  <div class="loading-wrap">
+    <div class="spinner"></div>
+    <div class="loading-title">Chef Jessica is cooking...</div>
+    <div class="loading-msg" id="loadingMsg">Analysing your preferences...</div>
+    <div class="loading-progress"><div class="loading-bar" id="loadingBar"></div></div>
+  </div>
+</div>
+
+<!-- SCREEN 4: RECIPE -->
+<div id="screen4" class="screen below">
+  <div class="logo-bar"><img src="https://cdn11.bigcommerce.com/s-vy0q26t2h2/images/stencil/250x100/fft_logo_july_2025_1751513237__42332.original.png" alt="Free From That"></div>
+
+  <!-- PINK HEADER like Chef Jessica's style -->
+  <div class="jess-header">
+    <div class="jess-header-top">FREE FROM THAT — CHEF JESSICA McKENZIE — FREEFROMTHAT.COM</div>
+    <div class="jess-title" id="rTitle">Your Recipe</div>
+    <div class="jess-tagline" id="rTagline"></div>
+    <div class="jess-makes">MAKES: <span id="rServes">2</span></div>
+  </div>
+
+  <!-- WHY / ABOUT / TECHNIQUE + AI IMAGE -->
+  <div class="jess-science-row" id="scienceRow" style="display:none">
+    <div class="jess-science-text">
+      <div class="jess-science-item" id="whyRow" style="display:none">
+        <span class="jess-science-label">WHY:</span>
+        <span id="whyText"></span>
+      </div>
+      <div class="jess-science-item" id="aboutRow" style="display:none">
+        <span class="jess-science-label">ABOUT:</span>
+        <span id="aboutText"></span>
+      </div>
+      <div class="jess-science-item" id="techniqueRow" style="display:none">
+        <span class="jess-science-label">TECHNIQUE:</span>
+        <span id="techniqueText"></span>
+      </div>
+    </div>
+    <div class="jess-ai-image" id="aiImageBox">
+      <div class="jess-ai-placeholder">🍽️<br><span>AI Image<br>Coming Soon</span></div>
+    </div>
+  </div>
+
+  <!-- SPECIAL INGREDIENT BAR -->
+  <div class="jess-special-bar" id="specialBar" style="display:none">
+    <span id="specialText"></span>
+  </div>
+
+  <!-- META BAR -->
+  <div class="jess-meta-bar">
+    <div class="jess-meta-item"><div class="jess-meta-label">PREP</div><div class="jess-meta-value" id="rPrep">-</div></div>
+    <div class="jess-meta-item"><div class="jess-meta-label">COOK</div><div class="jess-meta-value" id="rCook">-</div></div>
+    <div class="jess-meta-item"><div class="jess-meta-label">MAKES</div><div class="jess-meta-value" id="rMakes2">2</div></div>
+    <div class="jess-meta-item"><div class="jess-meta-label">LEVEL</div><div class="jess-meta-value" id="rDiff">-</div></div>
+  </div>
+
+  <!-- TWO COLUMN: INGREDIENTS + METHOD -->
+  <div class="jess-two-col">
+    <div class="jess-col-left">
+      <div class="jess-col-title">Ingredients</div>
+      <div class="jess-ing-header">
+        <span>INGREDIENT</span><span>QTY</span><span>NOTES</span>
+      </div>
+      <div id="ingList"></div>
+      <div class="chef-note" id="chefNote">
+        <div class="chef-note-lbl">Chef Jessica's Tip</div>
+        <p id="chefNoteText"></p>
+      </div>
+    </div>
+    <div class="jess-col-right">
+      <div class="jess-col-title">Method</div>
+      <ol class="steps-list" id="stepsList"></ol>
+    </div>
+  </div>
+
+  <div class="wrap" style="padding-top:1rem">
+    <div class="buy-box">
+      <h3>🛒 Where to Buy Your Ingredients</h3>
+      <div id="buyLinks"></div>
+    </div>
+    <div class="photos-box" id="photosBox" style="display:none">
+      <h3>📸 Share Your Creation!</h3>
+      <p>Made this recipe? Share your photo with the Free From That community!</p>
+      <div class="photos-links" id="photoLinks"></div>
+    </div>
+    <div style="margin-bottom:1rem">
+      <div style="font-family:Lora,serif;font-size:1rem;margin-bottom:.6rem">Want to learn more?</div>
+      <div class="train-grid" id="trainGrid"></div>
+    </div>
+    <div class="rating-box">
+      <h3>⭐ Rate This Recipe</h3>
+      <div class="stars">
+        <span class="star" onclick="setRating(1)">★</span>
+        <span class="star" onclick="setRating(2)">★</span>
+        <span class="star" onclick="setRating(3)">★</span>
+        <span class="star" onclick="setRating(4)">★</span>
+        <span class="star" onclick="setRating(5)">★</span>
+      </div>
+      <textarea class="rating-comment" id="ratingComment" placeholder="Leave a comment for Chef Jessica..."></textarea>
+      <button onclick="submitRating()" class="btn-pink">Send to Chef Jessica 💌</button>
+      <div class="rating-thanks" id="ratingThanks">Thank you! Chef Jessica loves hearing from you 🌸</div>
+    </div>
+    <div class="pdf-box">
+      <h3>Download Your Recipe</h3>
+      <p>Beautifully formatted in Chef Jessica's signature style.</p>
+      <button onclick="downloadPDF()" class="btn-pink" id="pdfBtn">⬇ Download PDF</button>
+    </div>
+    <div class="change-bar" onclick="goToScreen(2)">↑ Change my recipe request</div>
+  </div>
+</div>
+
+<!-- PAYWALL -->
+<div class="paywall-screen" id="paywallScreen">
+  <div class="paywall-box">
+    <div style="font-size:2.5rem;margin-bottom:.5rem">🌸</div>
+    <h2>You've used your 5 free recipes!</h2>
+    <p>Subscribe to Chef Jessica's recipe service for unlimited personalised recipes and exclusive content.</p>
+    <button class="btn-subscribe">✨ Subscribe — Coming Soon</button>
+    <button class="btn-skip" onclick="closePaywall()">Maybe later</button>
+  </div>
+</div>
+
+<script>
+var WORKER="https://fft-recipe.man-4bb.workers.dev";
+var SHEETS_URL="https://script.google.com/macros/s/AKfycbxHSfo3ewpxYAZpR41NwdxVm7S91rjLBkwYr3NUD4QRn7_6bifXxxE6SAtS8xg3IsDILg/exec";
+var recipe=null;
+var customerData={email:'',phone:'',country:'',city:'',recipeId:''};
+var loadTimer=null;
+var currentRating=0;
+
+var photoAlbums=[
+  {name:"Vegan Chicken",url:"https://photos.app.goo.gl/gTUwVQYApusMDP9w5",tags:["chicken","nugget","poultry"]},
+  {name:"Vegan Eclairs",url:"https://photos.app.goo.gl/AybrVkhr6Xzshrt49",tags:["eclair","choux","profiterole"]},
+  {name:"Vegan Burgers",url:"https://photos.app.goo.gl/EJDQWM7biwTqBwyF6",tags:["burger","patty"]},
+  {name:"Macarons",url:"https://photos.app.goo.gl/kuV4161WbeoTbayS8",tags:["macaron","meringue"]},
+  {name:"Vegan Cuisine",url:"https://photos.app.goo.gl/dRRWNhvkSk5KzWq49",tags:["cuisine","main","dinner","savory"]},
+  {name:"Pastry & Dessert Bar",url:"https://photos.app.goo.gl/FgXV91mu8tYBmrWp8",tags:["pastry","brownie","bar","tart","cheesecake"]},
+  {name:"Mousse Cakes",url:"https://photos.app.goo.gl/HdTtUGddq9aZTYHXA",tags:["mousse","entremet","tiramisu"]}
+];
+
+var courses=[
+  {name:"Vegan Cheesecakes",url:"https://freefromthat.com/TRAINING-CHEESECAKES",tags:["cheesecake","cheese"]},
+  {name:"Mousse Cakes",url:"https://freefromthat.com/TRAINING-MOUSSE/",tags:["mousse","entremet"]},
+  {name:"Brioche",url:"https://freefromthat.com/TRAINING-BRIOCHE/",tags:["brioche","bread","bun"]},
+  {name:"Vegan Cuisine",url:"https://freefromthat.com/TRAINING-CUISINE",tags:["cuisine","main","dinner"]},
+  {name:"Savory Pastry",url:"https://freefromthat.com/TRAINING-SAVORY",tags:["pastry","tart","quiche","pie"]},
+  {name:"Vegan Burgers",url:"https://freefromthat.com/TRAINING-BURGERS",tags:["burger","patty"]},
+  {name:"Vegan Chicken",url:"https://freefromthat.com/TRAINING-CHICKEN",tags:["chicken","nugget","poultry"]},
+  {name:"Dessert Bar",url:"https://freefromthat.com/TRAINING-DESSERTBAR",tags:["brownie","bar","blondie","fudge"]},
+  {name:"Eclairs",url:"https://freefromthat.com/TRAINING-ECLAIRS",tags:["eclair","choux","profiterole"]},
+  {name:"Macarons",url:"https://freefromthat.com/online-fancymacarons",tags:["macaron","meringue"]},
+  {name:"GF Desserts",url:"https://freefromthat.com/GF-ELEGANT",tags:["gluten-free","gf","celiac"]},
+  {name:"Tiramisu",url:"https://freefromthat.com/TRAINING-TIRAMISU",tags:["tiramisu","coffee","mascarpone"]}
+];
+
+var fftProducts={
+  "PANACEGG":{name:"PANACEGG V2",desc:"Whole-egg replacer — moisture, structure & binding",url:"https://freefromthat.com/products"},
+  "POTATO PROTEIN":{name:"Potato Protein 300CW",desc:"Egg-white replacer — foaming, meringues & mousses",url:"https://freefromthat.com/products"},
+  "GERBET":{name:"GERBET",desc:"Specialist egg-white replacer for macarons",url:"https://freefromthat.com/products"}
+};
+
+function validateEmail(input){
+  var val=input.value.trim();
+  var valid=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
+  var errEl=document.getElementById('emailErr');
+  if(!val.length){input.className='';errEl.classList.remove('on');return;}
+  if(valid){input.classList.add('valid');input.classList.remove('invalid');errEl.classList.remove('on');}
+  else{input.classList.add('invalid');input.classList.remove('valid');errEl.classList.add('on');}
+}
+
+function getUsageCount(){return parseInt(localStorage.getItem('fft_uses')||'0');}
+function incrementUsage(){localStorage.setItem('fft_uses',getUsageCount()+1);}
+function checkPaywall(){return false;/* PAYWALL OFF FOR TESTING */}
+function closePaywall(){document.getElementById('paywallScreen').style.display='none';}
+
+function loadPastRecipes(){try{return JSON.parse(localStorage.getItem('fft_past_recipes')||'[]');}catch(e){return[];}}
+function savePastRecipe(r){
+  var past=loadPastRecipes();
+  past.unshift({title:r.title,date:new Date().toLocaleDateString('en-GB'),data:r});
+  if(past.length>20)past=past.slice(0,20);
+  localStorage.setItem('fft_past_recipes',JSON.stringify(past));
+}
+function renderPastRecipes(){
+  var past=loadPastRecipes();
+  var box=document.getElementById('pastBox');
+  if(!past.length){box.style.display='none';return;}
+  box.style.display='block';
+  document.getElementById('pastList').innerHTML=past.map(function(p,i){
+    return '<div class="past-item"><div><div class="past-item-name">'+p.title+'</div><div class="past-item-date">'+p.date+'</div></div><button class="btn-sm" onclick="loadPastRecipe('+i+')">View</button></div>';
+  }).join('');
+}
+function loadPastRecipe(i){
+  var past=loadPastRecipes();
+  if(!past[i])return;
+  recipe=past[i].data;
+  renderRecipe(recipe);
+  goToScreen(4);
+}
+
+function generateId(){
+  var n=new Date();
+  return 'RCP-'+n.getFullYear().toString().slice(-2)+String(n.getMonth()+1).padStart(2,'0')+String(n.getDate()).padStart(2,'0')+'-'+Math.random().toString(36).substr(2,5).toUpperCase();
+}
+
+fetch('https://ipapi.co/json/')
+  .then(function(r){return r.json();})
+  .then(function(d){
+    customerData.country=d.country_name||'';
+    customerData.city=d.city||'';
+    document.getElementById('locationBar').textContent='📍 '+(d.city?d.city+', ':'')+( d.country_name||'Location detected');
+  })
+  .catch(function(){document.getElementById('locationBar').textContent='🌍 Location not detected';});
+
+function goToScreen(num){
+  ['screen1','screen2','screen3','screen4'].forEach(function(id,i){
+    var el=document.getElementById(id);
+    var n=i+1;
+    if(n<num)el.className='screen above';
+    else if(n===num){el.className='screen active';el.scrollTop=0;}
+    else el.className='screen below';
+  });
+  if(num===2)renderPastRecipes();
+}
+
+function submitCapture(){
+  var email=document.getElementById('captureEmail').value.trim();
+  var errEl=document.getElementById('captureErr');
+  if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+    errEl.classList.add('on');
+    document.getElementById('captureEmail').classList.add('invalid');
+    return;
+  }
+  errEl.classList.remove('on');
+  customerData.email=email;
+  customerData.phone=document.getElementById('countryCode').value+document.getElementById('capturePhone').value;
+  customerData.recipeId=generateId();
+  var now=new Date();
+  fetch(SHEETS_URL,{method:'POST',body:JSON.stringify({type:'customer',recipeId:customerData.recipeId,date:now.toLocaleDateString('en-GB'),time:now.toLocaleTimeString('en-GB'),email:customerData.email,phone:customerData.phone,country:customerData.country,city:customerData.city})}).catch(function(){});
+  goToScreen(2);
+}
+
+function tog(el){el.classList.toggle('on');}
+function chips(id){return Array.from(document.querySelectorAll('#'+id+' .chip.on')).map(function(c){return c.textContent.trim();});}
+function showErr(msg){var e=document.getElementById('errBox');e.textContent=msg||'Something went wrong.';e.classList.add('on');}
+function hideErr(){document.getElementById('errBox').classList.remove('on');}
+
+function setRating(n){currentRating=n;document.querySelectorAll('.star').forEach(function(s,i){s.classList.toggle('on',i<n);});}
+function submitRating(){
+  if(!recipe)return;
+  var comment=document.getElementById('ratingComment').value.trim();
+  var now=new Date();
+  fetch(SHEETS_URL,{method:'POST',body:JSON.stringify({type:'rating',recipeId:customerData.recipeId,recipeName:recipe.title||'',email:customerData.email,rating:currentRating,comment:comment,date:now.toLocaleDateString('en-GB'),time:now.toLocaleTimeString('en-GB')})}).catch(function(){});
+  document.getElementById('ratingThanks').style.display='block';
+  document.getElementById('ratingComment').style.display='none';
+  document.querySelector('.stars').style.display='none';
+  document.querySelector('.rating-box .btn-pink').style.display='none';
+}
+
+function generate(){
+  if(checkPaywall())return;
+  incrementUsage();
+  hideErr();recipe=null;currentRating=0;
+  document.querySelectorAll('.star').forEach(function(s){s.classList.remove('on');});
+  document.getElementById('ratingThanks').style.display='none';
+  document.getElementById('ratingComment').style.display='block';
+  document.querySelector('.stars').style.display='flex';
+  document.querySelector('.rating-box .btn-pink').style.display='block';
+
+  goToScreen(3);
+  var msgs=['Analysing your preferences...','Checking Chef Jessica archive...','Crafting your recipe...','Almost ready...'];
+  var mi=0;
+  var bar=document.getElementById('loadingBar');
+  bar.style.width='0%';
+  if(loadTimer)clearInterval(loadTimer);
+  loadTimer=setInterval(function(){
+    mi=(mi+1)%msgs.length;
+    document.getElementById('loadingMsg').textContent=msgs[mi];
+    var pct=Math.min(parseFloat(bar.style.width||0)+8,90);
+    bar.style.width=pct+'%';
+  },2000);
+
+  var al=chips('allergyChips');
+  var cuisineList=chips('cuisineChips');
+  var mealList=chips('mealChips');
+  var dietList=chips('dietChips');
+  var isVegan=dietList.indexOf('Vegan')!==-1;
+  var isVegetarian=dietList.indexOf('Vegetarian')!==-1;
+  var dishRequest=document.getElementById('dishReq').value||'Surprise me with something delicious';
+
+  var prompt="You are Chef Jessica McKenzie, professional food scientist and chef at Free From That (freefromthat.com). Sound like a food scientist, not a chatbot.\n\n"
+    +"FFT PRODUCT RULES — use the correct product for the correct function:\n"
+    +"- PANACEGG V2: Whole-egg replacer (8 functions — moisture, structure, binding, emulsification). Use in pastries, batters, cakes, quiches. Hydration: mix 10g PANACEGG with 90g water, hydrate 15-20 mins before use. NEVER use for foaming.\n"
+    +"- POTATO PROTEIN 300CW: Egg-WHITE replacer ONLY. Use exclusively for foaming, aeration, meringues, mousses, marshmallows, souffles. NOT interchangeable with PANACEGG.\n"
+    +"- GERBET: ONLY for macarons. No other use.\n"
+    +"In whyItWorks, explain the specific food science role of the FFT product used — e.g. 'PANACEGG provides protein coagulation for structure' or 'Potato Protein 300CW creates the foam matrix for the mousse'.\n"
+    +"Never say 'prepare according to package'. Always give specific preparation instructions.\n\n"
+    +"MEASUREMENTS: Grams (g) and millilitres (ml) only. No imperial.\n\n"
+    +(isVegan?"STRICT VEGAN: no meat, no dairy, no eggs, no honey, no gelatin. 100% plant-based.\n":isVegetarian?"VEGETARIAN: no meat or fish.\n":"Standard recipe. Always replace eggs with the correct FFT product.\n")
+    +"\nRespond ONLY with valid JSON, no markdown:\n"
+    +'{"title":"","tagline":"","whyItWorks":"explain food science of FFT product used","about":"culinary context/history 1-2 sentences","technique":"key professional technique to master","makes":"2 servings","prepTime":"","cookTime":"","difficulty":"Easy or Medium or Advanced","specialIngredients":"name of FFT product and its role","fftProductsUsed":["PANACEGG or POTATO PROTEIN or GERBET"],"ingredients":[{"item":"","qty":"","notes":""}],"steps":[""],"chefNotes":"","trainingKeywords":[]}\n\n'
+    +"Request: "+dishRequest+"\n"
+    +"Cuisine: "+(cuisineList.join(", ")||"any")+"\n"
+    +"Meal: "+(mealList.join(", ")||"dinner")+"\n"
+    +"ALLERGIES - never use: "+(al.join(", ")||"none")+"\n"
+    +"Diet: "+(dietList.join(", ")||"standard")+"\n"
+    +"trainingKeywords: include words like eclair, macaron, brioche, burger, cheesecake, mousse, tiramisu, brownie, chicken etc.";
+
+  fetch(WORKER,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt:prompt})})
+  .then(function(r){if(!r.ok)throw new Error('Error '+r.status);return r.text();})
+  .then(function(text){
+    clearInterval(loadTimer);
+    document.getElementById('loadingBar').style.width='100%';
+    var raw=text.replace(/```json\s*/gi,'').replace(/```\s*/g,'').trim();
+    var fb=raw.indexOf('{'),lb=raw.lastIndexOf('}');
+    if(fb===-1||lb===-1)throw new Error('Could not read recipe.');
+    recipe=JSON.parse(raw.substring(fb,lb+1));
+    var now=new Date();
+    fetch(SHEETS_URL,{method:'POST',body:JSON.stringify({type:'recipe',recipeId:customerData.recipeId,date:now.toLocaleDateString('en-GB'),time:now.toLocaleTimeString('en-GB'),recipeName:recipe.title||'',cuisine:cuisineList.join(', ')||'any',mealType:mealList.join(', ')||'dinner',allergies:al.join(', ')||'none',diet:dietList.join(', ')||'standard',fftProducts:(recipe.fftProductsUsed||[]).join(', ')})}).catch(function(){});
+    savePastRecipe(recipe);
+    renderRecipe(recipe);
+    setTimeout(function(){goToScreen(4);},500);
+  })
+  .catch(function(err){
+    clearInterval(loadTimer);
+    goToScreen(2);
+    showErr(err.message);
+  });
+}
+
+function matchCourses(r){
+  var allText=((r.trainingKeywords||[]).join(' ')+(r.title||'')).toLowerCase();
+  var matched=courses.filter(function(c){return c.tags.some(function(t){return allText.indexOf(t)!==-1;});});
+  return matched.length?matched.slice(0,4):courses.slice(0,4);
+}
+
+function matchPhotos(r){
+  var allText=((r.trainingKeywords||[]).join(' ')+(r.title||'')).toLowerCase();
+  return photoAlbums.filter(function(a){return a.tags.some(function(t){return allText.indexOf(t)!==-1;});});
+}
+
+function renderRecipe(r){
+  document.getElementById('rTitle').textContent=r.title||'Your Recipe';
+  document.getElementById('rTagline').textContent=r.tagline||'';
+  document.getElementById('rPrep').textContent=r.prepTime||'-';
+  document.getElementById('rCook').textContent=r.cookTime||'-';
+  document.getElementById('rServes').textContent=r.makes||'2';
+  document.getElementById('rMakes2').textContent=r.makes||'2';
+  document.getElementById('rDiff').textContent=r.difficulty||'-';
+
+  // AI Image - food photo based on recipe title
+  var aiBox=document.getElementById('aiImageBox');
+  var searchTerm=encodeURIComponent((r.title||'gourmet food').split(' ').slice(0,3).join(' '));
+  aiBox.innerHTML='<img src="https://source.unsplash.com/300x300/?'+searchTerm+',food" style="width:100%;height:100%;object-fit:cover" onerror="this.parentNode.innerHTML=\'🍽️<br><span style=font-size:.7rem;color:#aaa>Image unavailable</span>\'" alt="'+(r.title||'Recipe')+'">';
+
+  // WHY / ABOUT / TECHNIQUE
+  document.getElementById('scienceRow').style.display=hasScience?'flex':'none';
+  if(r.whyItWorks){document.getElementById('whyRow').style.display='flex';document.getElementById('whyText').textContent=r.whyItWorks;}
+  if(r.about){document.getElementById('aboutRow').style.display='flex';document.getElementById('aboutText').textContent=r.about;}
+  if(r.technique){document.getElementById('techniqueRow').style.display='flex';document.getElementById('techniqueText').textContent=r.technique;}
+
+  // Special ingredient bar
+  if(r.specialIngredients){
+    document.getElementById('specialBar').style.display='block';
+    document.getElementById('specialText').textContent='UNIQUE SPECIAL INGREDIENT: '+r.specialIngredients;
+  } else {document.getElementById('specialBar').style.display='none';}
+
+  // Ingredients - new grid style
+  var il=document.getElementById('ingList');il.innerHTML='';
+  (r.ingredients||[]).forEach(function(i){
+    var qty=i.qty?String(i.qty).replace(/g\s*\(.*?\)g?/g,'g').replace(/ml\s*\(.*?\)ml?/g,'ml'):'';
+    il.innerHTML+='<div class="jess-ing-row"><span class="jess-ing-name">'+( i.item||'')+'</span><span class="jess-ing-qty">'+qty+'</span><span class="jess-ing-notes">'+(i.notes||'')+'</span></div>';
+  });
+
+  // Steps
+  var sl=document.getElementById('stepsList');sl.innerHTML='';
+  (r.steps||[]).forEach(function(s){var li=document.createElement('li');li.textContent=s;sl.appendChild(li);});
+
+  // Chef note
+  if(r.chefNotes){document.getElementById('chefNote').style.display='block';document.getElementById('chefNoteText').textContent=r.chefNotes;}
+  else{document.getElementById('chefNote').style.display='none';}
+
+  // Buy links
+  var bl=document.getElementById('buyLinks');
+  bl.innerHTML='<a href="https://freefromthat.com/products" target="_blank" class="buy-link"><div class="buy-icon">🛍</div><div><div class="buy-txt">Free From That Store</div><div class="buy-sub">All FFT professional ingredients</div></div></a>';
+  (r.fftProductsUsed||[]).forEach(function(p){
+    var k=Object.keys(fftProducts).find(function(k){return p.toUpperCase().indexOf(k)!==-1;});
+    if(k){var pr=fftProducts[k];bl.innerHTML+='<a href="'+pr.url+'" target="_blank" class="buy-link"><div class="buy-icon">⭐</div><div><div class="buy-txt">'+pr.name+'</div><div class="buy-sub">'+pr.desc+'</div></div></a>';}
+  });
+
+  // Photos
+  var albums=matchPhotos(r);
+  var pb=document.getElementById('photosBox');
+  if(albums.length){
+    pb.style.display='block';
+    document.getElementById('photoLinks').innerHTML=albums.map(function(a){return '<a href="'+a.url+'" target="_blank" class="photos-link">📷 '+a.name+'</a>';}).join('');
+  } else{pb.style.display='none';}
+
+  // Courses
+  document.getElementById('trainGrid').innerHTML=matchCourses(r).map(function(c){
+    return "<div class='train-card'><h4>"+c.name+"</h4><p>Online course</p><a href='"+c.url+"' target='_blank'>Enrol</a></div>";
+  }).join('');
+}
+
+function downloadPDF(){
+  if(!recipe)return;
+  var btn=document.getElementById('pdfBtn');btn.textContent='Building...';
+  try{
+    var jsPDF=window.jspdf.jsPDF;
+    var doc=new jsPDF({unit:'mm',format:'a4'});
+    var W=210,H=297,M=16,r=recipe;
+
+    // PINK HEADER
+    doc.setFillColor(255,20,147);doc.rect(0,0,W,52,'F');
+
+    // Brand text top left
+    doc.setFont('helvetica','normal');doc.setFontSize(6.5);doc.setTextColor(255,200,230);
+    doc.text('FREE FROM THAT  —  CHEF JESSICA McKENZIE  —  FREEFROMTHAT.COM',M,8);
+
+    // FFT Logo top right - text version
+    doc.setFont('helvetica','bold');doc.setFontSize(9);doc.setTextColor(255,255,255);
+    doc.text('FREEFROMTHAT',W-M,8,{align:'right'});
+    doc.setFont('helvetica','normal');doc.setFontSize(6);doc.setTextColor(255,200,230);
+    doc.text('freefromthat.com',W-M,13,{align:'right'});
+
+    // Recipe title
+    var ts=r.title||'Your Recipe';
+    var tsz=ts.length>45?14:ts.length>35?16:ts.length>25?19:22;
+    doc.setFont('times','italic');doc.setFontSize(tsz);doc.setTextColor(255,255,255);
+    var tl=doc.splitTextToSize(ts,W-M*2);
+    doc.text(tl,M,24);
+
+    // Tagline
+    if(r.tagline){
+      doc.setFont('helvetica','normal');doc.setFontSize(7.5);doc.setTextColor(255,220,240);
+      doc.text(doc.splitTextToSize(r.tagline,W-M*2),M,tl.length>1?37:32);
+    }
+
+    // Makes
+    doc.setFont('helvetica','bold');doc.setFontSize(7);doc.setTextColor(255,200,230);
+    doc.text('MAKES: '+(r.makes||'2 servings'),M,47);
+
+    var y=60;
+
+    // WHY / ABOUT / TECHNIQUE box
+    if(r.whyItWorks||r.about||r.technique){
+      var sciLines=[];
+      if(r.whyItWorks)sciLines.push({label:'WHY:',text:r.whyItWorks});
+      if(r.about)sciLines.push({label:'ABOUT:',text:r.about});
+      if(r.technique)sciLines.push({label:'TECHNIQUE:',text:r.technique});
+
+      var boxH=sciLines.reduce(function(acc,s){
+        return acc+doc.splitTextToSize(s.text,W-M*2-28).length*4+3;
+      },6);
+      doc.setFillColor(255,240,248);doc.roundedRect(M,y-3,W-M*2,boxH,2,2,'F');
+
+      sciLines.forEach(function(s){
+        doc.setFont('helvetica','bold');doc.setFontSize(7);doc.setTextColor(255,20,147);
+        doc.text(s.label,M+3,y+2);
+        doc.setFont('helvetica','normal');doc.setTextColor(26,26,24);
+        var lines=doc.splitTextToSize(s.text,W-M*2-28);
+        doc.text(lines,M+28,y+2);
+        y+=lines.length*4+3;
+      });
+      y+=5;
+    }
+
+    // Special ingredient bar
+    if(r.specialIngredients){
+      doc.setFillColor(255,20,147);doc.roundedRect(M,y,W-M*2,9,2,2,'F');
+      doc.setFont('helvetica','bold');doc.setFontSize(6.5);doc.setTextColor(255,255,255);
+      doc.text('UNIQUE SPECIAL INGREDIENT: '+r.specialIngredients,M+3,y+6);
+      y+=13;
+    }
+
+    // Meta bar
+    doc.setFillColor(255,228,240);doc.rect(0,y,W,13,'F');
+    [{l:'PREP',v:r.prepTime||'-'},{l:'COOK',v:r.cookTime||'-'},{l:'MAKES',v:r.makes||'2'},{l:'LEVEL',v:r.difficulty||'-'}].forEach(function(info,i){
+      var ix=M+i*(W-M*2)/4;
+      doc.setFont('helvetica','bold');doc.setFontSize(5.5);doc.setTextColor(255,20,147);doc.text(info.l,ix,y+5);
+      doc.setFont('helvetica','normal');doc.setFontSize(7.5);doc.setTextColor(26,26,24);doc.text(String(info.v),ix,y+11);
+    });
+    y+=17;
+
+    // Two column layout
+    var c1w=80,c2x=M+c1w+8,c2w=W-c2x-M;
+
+    // Column headers
+    doc.setFont('times','italic');doc.setFontSize(11);doc.setTextColor(255,20,147);
+    doc.text('Ingredients',M,y);
+    doc.setDrawColor(255,20,147);doc.setLineWidth(0.5);doc.line(M,y+1.5,M+c1w,y+1.5);
+    doc.text('Method',c2x,y);
+    doc.line(c2x,y+1.5,c2x+c2w,y+1.5);
+    y+=6;
+
+    // Ingredient column headers
+    doc.setFont('helvetica','bold');doc.setFontSize(5.5);doc.setTextColor(255,20,147);
+    doc.text('INGREDIENT',M+1,y);doc.text('QTY',M+46,y);doc.text('NOTES',M+60,y);
+    doc.setLineWidth(0.3);doc.setDrawColor(255,20,147);doc.line(M,y+1,M+c1w,y+1);
+    y+=5;
+
+    var y1=y,y2=y;
+
+    // Ingredients
+    (r.ingredients||[]).forEach(function(ing){
+      if(y1>H-25)return;
+      var qty=ing.qty?String(ing.qty).replace(/g\s*\(.*?\)g?/g,'g').replace(/ml\s*\(.*?\)ml?/g,'ml'):'';
+      var nl=doc.splitTextToSize(ing.item||'',42);
+      doc.setFont('helvetica','normal');doc.setFontSize(7.5);doc.setTextColor(26,26,24);doc.text(nl,M+1,y1);
+      doc.setFont('helvetica','bold');doc.setFontSize(7.5);doc.setTextColor(255,20,147);doc.text(qty,M+46,y1);
+      var nt=doc.splitTextToSize(ing.notes||'',28);
+      doc.setFont('helvetica','italic');doc.setFontSize(6.5);doc.setTextColor(120,120,120);doc.text(nt,M+60,y1);
+      var rh=Math.max(nl.length,Math.max(1,nt.length))*4.2+2;
+      doc.setDrawColor(255,228,240);doc.setLineWidth(0.2);doc.line(M,y1+rh-0.5,M+c1w,y1+rh-0.5);
+      y1+=rh;
+    });
+
+    // Chef tip
+    if(r.chefNotes&&y1<H-40){
+      y1+=3;
+      var cnl=doc.splitTextToSize(r.chefNotes,c1w-4);
+      var tipH=cnl.length*4+10;
+      doc.setFillColor(255,228,240);doc.roundedRect(M,y1-2,c1w,tipH,2,2,'F');
+      doc.setFont('helvetica','bold');doc.setFontSize(6);doc.setTextColor(139,0,87);
+      doc.text("Chef Jessica's Tip",M+3,y1+3);
+      doc.setFont('helvetica','italic');doc.setFontSize(7);doc.setTextColor(26,26,24);
+      doc.text(cnl,M+3,y1+9);
+    }
+
+    // Method steps
+    (r.steps||[]).forEach(function(step,i){
+      if(y2>H-25)return;
+      doc.setFillColor(255,228,240);doc.circle(c2x+5,y2+2,3.5,'F');
+      doc.setFont('helvetica','bold');doc.setFontSize(6);doc.setTextColor(255,20,147);
+      doc.text(String(i+1),c2x+5,y2+2.8,{align:'center'});
+      var lines=doc.splitTextToSize(step,c2w-11);
+      doc.setFont('helvetica','normal');doc.setFontSize(7.5);doc.setTextColor(26,26,24);
+      doc.text(lines,c2x+10,y2+2);
+      var rh2=lines.length*4.2+4;
+      doc.setDrawColor(255,228,240);doc.setLineWidth(0.2);doc.line(c2x,y2+rh2,c2x+c2w,y2+rh2);
+      y2+=rh2;
+    });
+
+    // Footer
+    doc.setFillColor(255,20,147);doc.rect(0,H-11,W,11,'F');
+    doc.setFont('helvetica','bold');doc.setFontSize(6);doc.setTextColor(255,255,255);
+    doc.text('RECIPE BY: Jessica McKenzie  |  Free From That',M,H-5);
+    doc.setFont('helvetica','normal');doc.setTextColor(255,228,240);
+    doc.text('freefromthat.com/products  —  freefromthat.com/TRAINING',W-M,H-5,{align:'right'});
+
+    doc.save('chef_jessica_'+(r.title||'recipe').replace(/[^a-z0-9]/gi,'_').toLowerCase()+'.pdf');
+    btn.textContent='Downloaded!';setTimeout(function(){btn.textContent='⬇ Download PDF';},3000);
+  }catch(err){console.error(err);btn.textContent='⬇ Download PDF';alert('PDF error: '+err.message);}
+}
+</script>
+</body>
+</html>
