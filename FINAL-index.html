@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Recipe Maker</title>
+<style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Arial;background:#FAF8F4;color:#1A1A18;font-size:16px}.wrap{max-width:700px;margin:0 auto;padding:20px}.hero{background:#1565C0;border-radius:14px;padding:20px;margin-bottom:20px;text-align:center;color:#fff}.hero-label{font-size:11px;color:#90CAF9;text-transform:uppercase;margin-bottom:10px;font-weight:500}.slbl{font-size:13px;font-weight:600;color:#888;text-transform:uppercase;margin-bottom:10px;margin-top:15px;display:block}textarea{width:100%;padding:12px;border:1px solid #ddd;border-radius:10px;font-size:14px;margin-bottom:10px;min-height:100px}select,input{width:100%;padding:12px;border:1px solid #ddd;border-radius:10px;font-size:14px;margin-bottom:10px}.chip{padding:8px 15px;border:1px solid #ddd;border-radius:20px;background:#fff;cursor:pointer;font-size:13px;margin-right:8px;margin-bottom:8px}.chip.selected{background:#1565C0;color:#fff;border-color:#1565C0}.btn{width:100%;padding:12px;background:#1565C0;color:#fff;border:none;border-radius:10px;font-size:16px;font-weight:600;cursor:pointer;margin-bottom:10px}.btn:hover{background:#0D47A1}.chips-row{display:flex;flex-wrap:wrap;margin-bottom:15px}</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hero">
+    <div class="hero-label">AI Kitchen Laboratory</div>
+  </div>
+
+  <form id="form" onsubmit="submitForm(event)">
+    <span class="slbl">What would you like to make?</span>
+    <textarea id="dish" required></textarea>
+
+    <span class="slbl">Allergies</span>
+    <div class="chips-row" id="allergies"></div>
+
+    <span class="slbl">Cuisine</span>
+    <div class="chips-row" id="cuisine"></div>
+
+    <span class="slbl">Meal Type</span>
+    <div class="chips-row" id="meal"></div>
+
+    <button type="submit" class="btn">Make My Recipe</button>
+  </form>
+
+  <div id="result" style="display:none">
+    <h2>Recipe Created!</h2>
+    <button class="btn" onclick="window.location.href='scene-3.html'">See Training Courses →</button>
+    <button class="btn" onclick="location.reload()" style="background:#fff;color:#1565C0;border:2px solid #1565C0">Make Another</button>
+  </div>
+</div>
+
+<script>
+const allergies=['Gluten','Nuts','Dairy','Eggs','Soy'];
+const cuisines=['Italian','French','Asian','Mexican'];
+const meals=['Breakfast','Lunch','Dinner','Dessert'];
+
+function setupChips(id,items){
+  const container=document.getElementById(id);
+  items.forEach(item=>{
+    const chip=document.createElement('button');
+    chip.type='button';
+    chip.className='chip';
+    chip.textContent=item;
+    chip.onclick=(e)=>{e.preventDefault();chip.classList.toggle('selected')};
+    container.appendChild(chip);
+  });
+}
+
+function submitForm(e){
+  e.preventDefault();
+  document.getElementById('form').style.display='none';
+  document.getElementById('result').style.display='block';
+}
+
+setupChips('allergies',allergies);
+setupChips('cuisine',cuisines);
+setupChips('meal',meals);
+</script>
+</body>
+</html>
