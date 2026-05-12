@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Your Recipe</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Lora',serif;background:#FAF8F4;color:#1A1A18;line-height:1.6}
+.wrapper{max-width:900px;margin:0 auto;padding:20px}
+.recipe-card{background:#fff;border-radius:0;margin-bottom:30px;box-shadow:0 4px 6px rgba(0,0,0,0.1)}
+.header{background:#1565C0;color:#fff;padding:60px 40px 40px 40px;text-align:center;position:relative}
+.logo{position:absolute;top:15px;right:20px;width:60px;height:60px;background:#fff;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:11px;color:#1565C0;font-weight:600;text-align:center;padding:8px}
+.header h1{font-size:40px;font-weight:600;margin-bottom:12px;font-family:'Lora',serif}
+.header p{font-size:16px;font-style:italic;opacity:0.95;margin-bottom:30px}
+.meta-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:15px}
+.meta-item{background:rgba(255,255,255,0.2);padding:15px;border-radius:4px;text-align:center}
+.meta-label{font-size:10px;font-weight:600;text-transform:uppercase;opacity:0.85;display:block;margin-bottom:6px;letter-spacing:0.5px}
+.meta-value{font-size:16px;font-weight:600}
+.content{padding:40px;background:#fff}
+.section{margin-bottom:30px}
+.section h2{font-size:16px;color:#1565C0;margin-bottom:20px;font-weight:600;text-transform:uppercase;letter-spacing:1px;border-bottom:2px solid #1565C0;padding-bottom:12px}
+.ingredient-item{display:flex;margin-bottom:12px;font-size:14px;line-height:1.6}
+.ingredient-bullet{color:#1565C0;font-weight:bold;margin-right:15px;flex-shrink:0;font-size:16px}
+.step-item{display:flex;margin-bottom:16px;font-size:14px;line-height:1.7}
+.step-number{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;background:#1565C0;color:#fff;border-radius:50%;margin-right:15px;font-weight:600;flex-shrink:0;font-size:12px;font-family:'Inter',sans-serif}
+.why-box{background:#E3F2FD;border-left:4px solid #1565C0;padding:20px;margin-bottom:25px;border-radius:2px}
+.why-box h3{color:#1565C0;margin-bottom:10px;font-size:13px;font-weight:600;text-transform:uppercase}
+.why-box p{font-size:13px;line-height:1.7;color:#333}
+.product-box{background:#FFF3E0;border-left:4px solid #FF9800;padding:20px;margin-bottom:25px;border-radius:2px}
+.product-box h3{color:#FF6F00;margin-bottom:8px;font-size:13px;font-weight:600;text-transform:uppercase}
+.product-box p{font-size:12px;color:#333;line-height:1.6}
+.product-link{color:#FF6F00;text-decoration:none;font-weight:600}
+.chef-tip{background:#F3E5F5;border-left:4px solid #9C27B0;padding:20px;margin-bottom:25px;border-radius:2px}
+.chef-tip h3{color:#6A1B9A;margin-bottom:10px;font-size:13px;font-weight:600;text-transform:uppercase}
+.chef-tip p{font-size:13px;line-height:1.7;color:#333}
+.buttons{display:grid;grid-template-columns:1fr 1fr;gap:15px;padding:40px;background:#f9f9f9}
+.btn{padding:14px 20px;border:none;border-radius:4px;font-weight:600;cursor:pointer;font-size:14px;text-decoration:none;text-align:center;transition:all 0.2s}
+.btn-primary{background:#1565C0;color:#fff}
+.btn-primary:hover{background:#0D47A1}
+.btn-secondary{background:#fff;color:#1565C0;border:2px solid #1565C0}
+.btn-secondary:hover{background:#f0f0f0}
+.back-btn{display:block;text-align:center;padding:20px;color:#1565C0;text-decoration:none;font-weight:600;font-size:14px;margin-top:20px}
+.back-btn:hover{text-decoration:underline}
+@media(max-width:768px){
+  .meta-grid{grid-template-columns:1fr 1fr}
+  .buttons{grid-template-columns:1fr}
+  .content{padding:20px}
+  .header{padding:20px 20px}
+  .header h1{font-size:28px}
+  .logo{width:50px;height:50px;font-size:9px}
+}
+@media print{
+  body{background:#fff}
+  .buttons{display:none}
+  .back-btn{display:none}
+}
+</style>
+</head>
+<body>
+<div class="wrapper">
+  <div class="recipe-card" id="recipePDF">
+    <div class="header">
+      <div class="logo">FFT LOGO</div>
+      <h1 id="recipeTitle">Recipe</h1>
+      <p id="recipeTagline">One line description</p>
+      <div class="meta-grid">
+        <div class="meta-item">
+          <span class="meta-label">Prep Time</span>
+          <span class="meta-value" id="prepTime">—</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Cook Time</span>
+          <span class="meta-value" id="cookTime">—</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Serves</span>
+          <span class="meta-value" id="servings">—</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Difficulty</span>
+          <span class="meta-value" id="difficulty">—</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="section">
+        <h2>Ingredients</h2>
+        <div id="ingredientsList"></div>
+      </div>
+
+      <div class="section">
+        <h2>Steps</h2>
+        <div id="stepsList"></div>
+      </div>
+
+      <div id="whySection"></div>
+      <div id="productSection"></div>
+
+      <div class="section">
+        <div class="chef-tip">
+          <h3>CHEF TIP</h3>
+          <p id="recipeTip">Enjoy your dish!</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="buttons">
+    <button class="btn btn-primary" onclick="downloadPDF()">📥 Download PDF</button>
+    <button class="btn btn-secondary" onclick="window.location.href='page-3.html'">Sign Up / Login →</button>
+  </div>
+
+  <a href="index.html" class="back-btn">← Make Another Recipe</a>
+</div>
+
+<script>
+const recipe = JSON.parse(sessionStorage.getItem('recipeData') || '{}');
+
+if (!recipe.title) {
+  document.body.innerHTML = '<div style="padding:40px;text-align:center;font-size:18px"><h2>No recipe found</h2><p>Please create a recipe first</p><a href="index.html" style="color:#1565C0;text-decoration:none;font-weight:600">← Go back to recipe maker</a></div>';
+} else {
+  document.getElementById('recipeTitle').textContent = recipe.title;
+  document.getElementById('recipeTagline').textContent = recipe.tagline;
+  document.getElementById('prepTime').textContent = recipe.prepTime;
+  document.getElementById('cookTime').textContent = recipe.cookTime;
+  document.getElementById('servings').textContent = recipe.servings;
+  document.getElementById('difficulty').textContent = recipe.difficulty;
+  document.getElementById('recipeTip').textContent = recipe.tip;
+
+  // Ingredients
+  const ingredientsList = document.getElementById('ingredientsList');
+  if (Array.isArray(recipe.ingredients)) {
+    recipe.ingredients.forEach(ing => {
+      const div = document.createElement('div');
+      div.className = 'ingredient-item';
+      div.innerHTML = `<span class="ingredient-bullet">●</span><span>${ing}</span>`;
+      ingredientsList.appendChild(div);
+    });
+  }
+
+  // Steps
+  const stepsList = document.getElementById('stepsList');
+  if (Array.isArray(recipe.steps)) {
+    recipe.steps.forEach((step, i) => {
+      const div = document.createElement('div');
+      div.className = 'step-item';
+      div.innerHTML = `<span class="step-number">${i+1}</span><div>${step}</div>`;
+      stepsList.appendChild(div);
+    });
+  }
+
+  // Why it Works
+  if (recipe.whyItWorks) {
+    document.getElementById('whySection').innerHTML = `
+      <div class="why-box">
+        <h3>Why It Works</h3>
+        <p>${recipe.whyItWorks}</p>
+      </div>
+    `;
+  }
+
+  // FFT Product
+  if (recipe.fftProduct) {
+    let productInfo = '';
+    if (recipe.fftProduct === 'PANACEGG V2') {
+      productInfo = 'PANACEGG V2 is a whole-egg replacer that provides moisture, binding, structure, and leavening. Use 5g powder + 45g water per egg, hydrated 15-20 minutes before use.';
+    } else if (recipe.fftProduct === 'POTATO PROTEIN 300CW') {
+      productInfo = 'POTATO PROTEIN 300CW is an egg-white replacer specifically for foaming applications (meringues, mousses, marshmallows). Cold water soluble at pH 3-4.';
+    } else if (recipe.fftProduct === 'GERBET') {
+      productInfo = 'GERBET is specifically formulated for macarons. Use 12g GERBET + 108g cold water per 40 macaron shells at pH 6-8.';
+    }
+
+    document.getElementById('productSection').innerHTML = `
+      <div class="product-box">
+        <h3>🛍️ Where to Buy</h3>
+        <p>This recipe uses <strong>${recipe.fftProduct}</strong> from Free From That.</p>
+        <p style="margin-top:10px;font-size:12px">${productInfo}</p>
+        <p style="margin-top:12px"><a href="https://www.freefromthat.com/shop" class="product-link">Visit our shop →</a></p>
+      </div>
+    `;
+  }
+}
+
+function downloadPDF() {
+  const element = document.getElementById('recipePDF');
+  const opt = {
+    margin: 10,
+    filename: `${recipe.title || 'recipe'}.pdf`,
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2 },
+    jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
+  };
+  html2pdf().set(opt).from(element).save();
+}
+</script>
+</body>
+</html>
