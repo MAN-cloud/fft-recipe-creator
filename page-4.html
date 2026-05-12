@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Download & Explore More</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:#FAF8F4;color:#1A1A18;font-size:16px}
+.wrap{max-width:700px;margin:0 auto;padding:20px}
+.success-banner{background:#E8F5E9;border:2px solid #66BB6A;border-radius:14px;padding:20px;margin-bottom:30px;text-align:center}
+.success-banner h2{color:#2E7D32;margin-bottom:10px;font-size:20px}
+.success-banner p{color:#558B2F;font-size:14px}
+.section{margin-bottom:30px}
+.section h3{font-size:18px;color:#1565C0;margin-bottom:15px;font-weight:600}
+.courses-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-bottom:20px}
+.course-card{background:#fff;border:1px solid #ddd;border-radius:10px;padding:15px;text-align:center;transition:all 0.2s;text-decoration:none;color:inherit}
+.course-card:hover{border-color:#1565C0;box-shadow:0 4px 12px rgba(21,101,192,0.15);transform:translateY(-2px)}
+.course-icon{font-size:32px;margin-bottom:10px}
+.course-name{font-weight:600;color:#1565C0;font-size:13px;line-height:1.4}
+.products-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+.product-card{background:#fff;border:1px solid #ddd;border-radius:10px;padding:15px;text-align:center}
+.product-icon{font-size:32px;margin-bottom:10px}
+.product-name{font-weight:600;color:#1565C0;font-size:13px;margin-bottom:8px}
+.product-desc{font-size:12px;color:#777;margin-bottom:10px}
+.btn{width:100%;padding:10px;background:#1565C0;color:#fff;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-size:14px}
+.btn:hover{background:#0D47A1}
+.btn-secondary{background:#fff;color:#1565C0;border:2px solid #1565C0;margin-top:20px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="success-banner">
+    <h2>✓ Recipe Downloaded!</h2>
+    <p>Check your downloads folder for your PDF. Now explore courses and products we think you'll love.</p>
+  </div>
+
+  <div class="section">
+    <h3>🎓 Recommended Training Courses</h3>
+    <div class="courses-grid">
+      <a href="https://www.freefromthat.com/TRAINING-CHEESECAKES" class="course-card">
+        <div class="course-icon">🍰</div>
+        <div class="course-name">Vegan Cheesecakes</div>
+      </a>
+      <a href="https://www.freefromthat.com/TRAINING-MOUSSE/" class="course-card">
+        <div class="course-icon">☁️</div>
+        <div class="course-name">Mousse Cakes</div>
+      </a>
+      <a href="https://www.freefromthat.com/TRAINING-BRIOCHE/" class="course-card">
+        <div class="course-icon">🥐</div>
+        <div class="course-name">Brioche</div>
+      </a>
+      <a href="https://www.freefromthat.com/TRAINING-CUISINE" class="course-card">
+        <div class="course-icon">🍽️</div>
+        <div class="course-name">Vegan Cuisine</div>
+      </a>
+      <a href="https://www.freefromthat.com/TRAINING-SAVORY" class="course-card">
+        <div class="course-icon">🥘</div>
+        <div class="course-name">Savory Pastry</div>
+      </a>
+      <a href="https://www.freefromthat.com/TRAINING-ECLAIRS" class="course-card">
+        <div class="course-icon">✨</div>
+        <div class="course-name">Eclairs</div>
+      </a>
+    </div>
+    <a href="https://www.freefromthat.com/online-courses" style="color:#1565C0;text-decoration:none;font-weight:600">View all courses →</a>
+  </div>
+
+  <div class="section">
+    <h3>🛍️ Free From That Products</h3>
+    <div class="products-grid">
+      <div class="product-card">
+        <div class="product-icon">🥚</div>
+        <div class="product-name">PANACEGG V2</div>
+        <div class="product-desc">Whole-egg replacer for baking</div>
+        <a href="https://www.freefromthat.com/shop/panacegg" class="btn">Learn More</a>
+      </div>
+      <div class="product-card">
+        <div class="product-icon">☁️</div>
+        <div class="product-name">Potato Protein 300CW</div>
+        <div class="product-desc">For foaming & meringues</div>
+        <a href="https://www.freefromthat.com/shop/potato-protein" class="btn">Learn More</a>
+      </div>
+      <div class="product-card">
+        <div class="product-icon">🎨</div>
+        <div class="product-name">GERBET</div>
+        <div class="product-desc">Perfect for macarons</div>
+        <a href="https://www.freefromthat.com/shop/gerbet" class="btn">Learn More</a>
+      </div>
+      <div class="product-card">
+        <div class="product-icon">🛒</div>
+        <div class="product-name">Shop All Products</div>
+        <div class="product-desc">Browse our full range</div>
+        <a href="https://www.freefromthat.com/shop" class="btn">Shop Now</a>
+      </div>
+    </div>
+  </div>
+
+  <button class="btn btn-secondary" onclick="window.location.href='index.html'">← Create Another Recipe</button>
+</div>
+</body>
+</html>
