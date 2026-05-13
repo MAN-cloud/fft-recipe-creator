@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Recipe Card</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;margin:0;padding:0}
+body{font-family:'Lora',serif;background:#f0f0f0;color:#222;line-height:1.5}
+.page{max-width:900px;margin:0 auto;background:#fff;box-shadow:0 0 20px rgba(0,0,0,0.1)}
+.recipe{padding:60px 50px;background:#fff;min-height:100vh}
+.header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:60px}
+.recipe-by{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#000}
+.logo{width:60px;height:60px;border-radius:50%;overflow:hidden;background:#f5f5f5}
+.logo img{width:100%;height:100%;object-fit:contain}
+.recipe-title{font-size:56px;font-weight:400;color:#000;margin:60px 0 15px 0;font-family:'Lora',serif;line-height:1.1}
+.recipe-subtitle{font-size:14px;font-style:italic;color:#666;margin-bottom:40px;line-height:1.6}
+.divider{border-top:2px solid #000;margin:40px 0 40px 0}
+.meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:50px;margin-bottom:40px}
+.meta-item{line-height:1.8}
+.meta-label{font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#000;margin-bottom:6px;display:block}
+.meta-value{font-size:12px;color:#333;line-height:1.8}
+.special-box{background:#f8f8f8;border:1px solid #ddd;padding:18px;margin:40px 0;border-radius:2px}
+.special-label{font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#000;margin-bottom:8px}
+.special-value{font-size:12px;color:#333;line-height:1.6}
+.section-title{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#000;margin:45px 0 25px 0;border-bottom:1px solid #ddd;padding-bottom:12px}
+table{width:100%;border-collapse:collapse;margin:20px 0 40px 0}
+thead{background:#fafafa}
+th{padding:14px 12px;text-align:left;font-weight:700;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:#000;border:1px solid #ddd;border-bottom:2px solid #000}
+td{padding:12px;font-size:11.5px;color:#333;border:1px solid #ddd;line-height:1.7;vertical-align:top}
+.text-section{margin:40px 0}
+.text-section h3{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#000;margin-bottom:12px;border-bottom:1px solid #ddd;padding-bottom:12px}
+.text-section p{font-size:12px;color:#333;line-height:1.8}
+.controls{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-top:40px;padding-top:30px;border-top:1px solid #ddd}
+.btn{padding:13px 20px;border:none;border-radius:3px;font-weight:600;cursor:pointer;font-size:12px;text-decoration:none;text-align:center;transition:all 0.2s}
+.btn-primary{background:#1565C0;color:#fff}
+.btn-primary:hover{background:#0D47A1}
+.btn-back{background:#fff;color:#1565C0;border:2px solid #1565C0}
+.btn-back:hover{background:#f5f5f5}
+.back-link{display:block;text-align:center;color:#1565C0;text-decoration:none;font-weight:600;font-size:12px;margin-top:25px;padding:20px 0}
+@media(max-width:768px){
+  .recipe{padding:40px 25px}
+  .recipe-title{font-size:36px;margin-top:40px}
+  .recipe-image{height:250px}
+  .meta-grid{grid-template-columns:1fr;gap:30px}
+  .controls{grid-template-columns:1fr}
+  .header{margin-bottom:40px}
+}
+@media print{
+  body{background:#fff;margin:0;padding:0}
+  .page{margin:0;box-shadow:none}
+  .controls{display:none}
+  .back-link{display:none}
+  .recipe{padding:40px;margin:0}
+}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="recipe" id="recipePDF">
+    <div class="header">
+      <div class="recipe-by" id="recipeBy">RECIPE BY: Chef Jessica McKenzie</div>
+      <div class="logo">
+        <img src="https://cdn.jsdelivr.net/gh/MAN-cloud/fft-recipe-creator@main/FFT_NEW_LOGO_TRANSPARENT.png" alt="FFT" />
+      </div>
+    </div>
+    
+    <h1 class="recipe-title" id="recipeTitle">Vegan Recipe</h1>
+    <p class="recipe-subtitle" id="recipeSubtitle">A delicious vegan recipe using Free From That products</p>
+    
+    <div class="divider"></div>
+    
+    <div class="meta-grid">
+      <div class="meta-item">
+        <span class="meta-label">WHY</span>
+        <div class="meta-value" id="metaWhy">Vegan Technique</div>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">ABOUT</span>
+        <div class="meta-value" id="metaAbout">Recipe description</div>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">TECHNIQUE</span>
+        <div class="meta-value" id="metaTechnique">Flavor/Texture</div>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">MAKES</span>
+        <div class="meta-value" id="metaMakes">Servings</div>
+      </div>
+    </div>
+    
+    <div class="special-box" id="specialBox" style="display:none">
+      <div class="special-label">SPECIAL INGREDIENT</div>
+      <div class="special-value" id="specialValue">FFT Product</div>
+    </div>
+    
+    <h2 class="section-title">RECIPE</h2>
+    <table>
+      <thead>
+        <tr>
+          <th style="width:32%">INGREDIENT</th>
+          <th style="width:18%">QTY</th>
+          <th style="width:50%">METHOD</th>
+        </tr>
+      </thead>
+      <tbody id="recipeTable">
+        <tr><td colspan="3" style="text-align:center;color:#999">Recipe loading...</td></tr>
+      </tbody>
+    </table>
+    
+    <div class="text-section" id="whySection" style="display:none">
+      <h3>WHY IT WORKS</h3>
+      <p id="whyText"></p>
+    </div>
+    
+    <div class="text-section" id="tipSection" style="display:none">
+      <h3>CHEF TIP</h3>
+      <p id="tipText"></p>
+    </div>
+  </div>
+  
+  <div class="controls">
+    <button class="btn btn-primary" onclick="location.href='page-3.html'">Sign Up / Login →</button>
+    <button class="btn btn-back" onclick="location.href='index.html'">← Make Another Recipe</button>
+  </div>
+  
+  <a href="index.html" class="back-link">← Make Another Recipe</a>
+</div>
+
+<script>
+
+// ── PARSE RECIPE FROM sessionStorage ──────────────────────────────────────
+const recipe = JSON.parse(sessionStorage.getItem('recipeData') || '{}');
+
+if (!recipe.title) {
+  document.body.innerHTML = '<div style="padding:60px;text-align:center"><h2 style="font-size:24px;margin-bottom:20px">No Recipe Found</h2><a href="index.html" style="color:#1565C0;text-decoration:none;font-weight:600;font-size:16px">← Go back</a></div>';
+} else {
+
+  // Title & subtitle
+  document.getElementById('recipeTitle').textContent = recipe.title;
+  document.getElementById('recipeSubtitle').textContent = recipe.tagline || '';
+
+  // Meta grid
+  document.getElementById('metaWhy').textContent = recipe.why || 'Vegan Baking';
+  document.getElementById('metaAbout').textContent = recipe.about || recipe.tagline || '';
+  document.getElementById('metaTechnique').textContent = recipe.technique || 'Flavor/Texture';
+  document.getElementById('metaMakes').textContent = recipe.servings || '';
+
+  // SVG illustration removed
+
+  // FFT Special Ingredient box
+  if (recipe.fftProduct) {
+    document.getElementById('specialBox').style.display = 'block';
+    document.getElementById('specialValue').textContent = recipe.fftProduct + ' - Free From That';
+  }
+
+  // ── RECIPE TABLE: supports both {name,qty} objects AND legacy flat strings ──
+  const table = document.getElementById('recipeTable');
+  table.innerHTML = '';
+
+  if (Array.isArray(recipe.ingredients) && recipe.ingredients.length > 0) {
+    recipe.ingredients.forEach((ing, idx) => {
+      const row = document.createElement('tr');
+      const step = (Array.isArray(recipe.steps) && recipe.steps[idx]) ? recipe.steps[idx] : '';
+
+      let ingName = '';
+      let ingQty  = '';
+
+      if (typeof ing === 'object' && ing !== null) {
+        // New format: { name: "...", qty: "..." }
+        ingName = ing.name || '';
+        ingQty  = ing.qty  || '';
+      } else if (typeof ing === 'string') {
+        // Legacy format: "250g ingredient" — split on first space run after leading digits/units
+        const match = ing.match(/^(\d[\d.,]*\s*(?:g|kg|ml|l|tsp|tbsp|cup|fl oz|oz|lb|pinch|x|pcs?|pieces?)?)\s+(.+)$/i);
+        if (match) {
+          ingQty  = match[1].trim();
+          ingName = match[2].trim();
+        } else {
+          ingName = ing;
+          ingQty  = '';
+        }
+      }
+
+      row.innerHTML = `<td>${ingName}</td><td>${ingQty}</td><td>${step}</td>`;
+      table.appendChild(row);
+    });
+  }
+
+  // Why It Works
+  if (recipe.whyItWorks) {
+    document.getElementById('whySection').style.display = 'block';
+    document.getElementById('whyText').textContent = recipe.whyItWorks;
+  }
+
+  // Chef Tip
+  if (recipe.tip) {
+    document.getElementById('tipSection').style.display = 'block';
+    document.getElementById('tipText').textContent = recipe.tip;
+  }
+}
+</script>
+</body>
+</html>
