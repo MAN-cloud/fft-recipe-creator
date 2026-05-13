@@ -1,3 +1,7 @@
+
+AI Overview
+— This file contains code for a vegan recipe generator that features a spinning logo and redirects.1
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -21,13 +25,18 @@ textarea{min-height:100px;resize:vertical}
 .btn{width:100%;padding:12px;background:#1565C0;color:#fff;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-size:15px;margin-top:20px}
 .btn:hover{background:#0D47A1}
 .btn:disabled{opacity:0.6;cursor:not-allowed}
-.loading{display:none}
-.loading.show{display:block}
 .hidden{display:none}
 .error-box{background:#FAEAEA;border:1px solid #D85A5A;border-radius:8px;padding:12px;margin-bottom:15px;color:#A32D2D;display:none;font-size:13px}
 .error-box.show{display:block}
 .description{font-size:12px;color:rgba(0,0,0,0.7);line-height:1.6;margin-bottom:20px}
 .page-wrapper{max-width:700px;margin:0 auto;padding:20px}
+
+/* SPINNER STYLES */
+.spinner-container{display:none;text-align:center;padding:40px 20px;margin:30px 0}
+.spinner-container.show{display:block}
+.spinner-logo{width:80px;height:80px;margin:0 auto 20px;animation:spin 2s linear infinite}
+.spinner-text{font-size:16px;color:#1565C0;font-weight:600;margin-top:15px}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
@@ -50,15 +59,13 @@ textarea{min-height:100px;resize:vertical}
       <div class="chips" id="allergies"></div>
     </div>
 
-    <button type="submit" class="btn">
-      <span id="btnText">✨ Generate Recipe</span>
-      <span class="loading" id="btnLoading">Chef is cooking...</span>
-    </button>
+    <button type="submit" class="btn" id="submitBtn">✨ Generate Recipe</button>
   </form>
 
-  <div id="result" class="hidden">
-    <button class="btn" onclick="window.location.href='page-2.html'" style="margin-top:0">View Recipe Card →</button>
-    <button class="btn" style="background:#fff;color:#1565C0;border:2px solid #1565C0" onclick="location.reload()">Make Another</button>
+  <!-- SPINNER SHOWS WHILE GENERATING -->
+  <div class="spinner-container" id="spinner">
+    <div class="spinner-logo">🌟</div>
+    <div class="spinner-text">Chef is cooking...</div>
   </div>
 </div>
 
@@ -101,32 +108,16 @@ document.getElementById('recipeForm').addEventListener('submit', async (e) => {
   const dish = document.getElementById('dish').value;
   const allergiesList = getSelectedChips('allergies');
   
-  sessionStorage.setItem('recipeRequest', JSON.stringify({
-    dish, allergiesList
-  }));
-  
+  // Hide form, show spinner
   document.getElementById('recipeForm').style.display = 'none';
-  document.getElementById('btnText').style.display = 'none';
-  document.getElementById('btnLoading').classList.add('show');
+  document.getElementById('spinner').classList.add('show');
   
   try {
     const prompt = `Create a VEGAN recipe for: ${dish}
 Avoid: ${allergiesList.join(', ') || 'nothing'}
 
 RESPOND ONLY WITH JSON:
-{
-  "title": "Recipe Name",
-  "tagline": "One line",
-  "prepTime": "15 min",
-  "cookTime": "30 min",
-  "servings": "2",
-  "difficulty": "Easy",
-  "ingredients": ["item 1", "item 2"],
-  "steps": ["step 1", "step 2"],
-  "whyItWorks": "explanation",
-  "fftProduct": null,
-  "tip": "tip"
-}`;
+{"title":"Recipe Name","tagline":"One line describing technique & vegan approach","prepTime":"15 minutes","cookTime":"30 minutes","servings":"2","difficulty":"Easy","ingredients":["metric amount + ingredient + [imperial]"],"steps":["detailed step with exact temperatures/timings"],"whyItWorks":"Jessica's vegan formula applied to this recipe","fftProduct":"PANACEGG V2 or POTATO PROTEIN 300CW or GERBET","tip":"Chef Jessica's pro tip for vegan success"}`;
 
     const response = await fetch('https://fft-recipe.man-4bb.workers.dev', {
       method: 'POST',
@@ -147,16 +138,15 @@ RESPOND ONLY WITH JSON:
 
     const recipe = JSON.parse(jsonMatch[0]);
     
+    // Save recipe and auto-redirect to page-2
     sessionStorage.setItem('recipeData', JSON.stringify(recipe));
-    document.getElementById('recipeForm').style.display = 'none';
-    document.getElementById('result').classList.remove('hidden');
+    window.location.href = 'page-2.html';
     
   } catch (error) {
     console.error('Error:', error);
     showError('Error: ' + error.message);
     document.getElementById('recipeForm').style.display = 'block';
-    document.getElementById('btnText').style.display = 'inline';
-    document.getElementById('btnLoading').classList.remove('show');
+    document.getElementById('spinner').classList.remove('show');
   }
 });
 
