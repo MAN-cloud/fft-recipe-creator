@@ -1,3 +1,7 @@
+
+AI Overview
+— This file contains the latest version of the recipe card template, updated to include the Free From That logo.1
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,7 +16,8 @@ body{font-family:'Lora',serif;background:#FAF8F4;color:#1A1A18;line-height:1.6}
 .wrapper{max-width:900px;margin:0 auto;padding:20px}
 .recipe-card{background:#fff;border-radius:0;margin-bottom:30px;box-shadow:0 4px 6px rgba(0,0,0,0.1)}
 .header{background:#1565C0;color:#fff;padding:60px 40px 40px 40px;text-align:center;position:relative}
-.logo{position:absolute;top:20px;right:30px;width:70px;height:70px;background:#fff;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;color:#1565C0;font-weight:700;text-align:center;padding:5px;box-shadow:0 2px 4px rgba(0,0,0,0.1)}
+.logo{position:absolute;top:15px;right:20px;width:60px;height:60px;background:#fff;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:11px;color:#1565C0;font-weight:600;text-align:center;padding:8px}
+.logo img{width:100%;height:100%;object-fit:contain}
 .header h1{font-size:40px;font-weight:600;margin-bottom:12px;font-family:'Lora',serif}
 .header p{font-size:16px;font-style:italic;opacity:0.95;margin-bottom:30px}
 .meta-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:15px}
@@ -36,11 +41,6 @@ body{font-family:'Lora',serif;background:#FAF8F4;color:#1A1A18;line-height:1.6}
 .chef-tip{background:#F3E5F5;border-left:4px solid #9C27B0;padding:20px;margin-bottom:25px;border-radius:2px}
 .chef-tip h3{color:#6A1B9A;margin-bottom:10px;font-size:13px;font-weight:600;text-transform:uppercase}
 .chef-tip p{font-size:13px;line-height:1.7;color:#333}
-.courses-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:15px}
-.course-card{background:#fff;border:1px solid #ddd;border-radius:8px;padding:12px;text-align:center;text-decoration:none;color:#1565C0;transition:all 0.2s;font-size:12px}
-.course-card:hover{border-color:#1565C0;box-shadow:0 2px 8px rgba(21,101,192,0.15);transform:translateY(-2px)}
-.course-icon{font-size:24px;margin-bottom:8px}
-.course-name{font-weight:600;color:#1565C0}
 .buttons{display:grid;grid-template-columns:1fr 1fr;gap:15px;padding:40px;background:#f9f9f9}
 .btn{padding:14px 20px;border:none;border-radius:4px;font-weight:600;cursor:pointer;font-size:14px;text-decoration:none;text-align:center;transition:all 0.2s}
 .btn-primary{background:#1565C0;color:#fff}
@@ -55,14 +55,12 @@ body{font-family:'Lora',serif;background:#FAF8F4;color:#1A1A18;line-height:1.6}
   .content{padding:20px}
   .header{padding:20px 20px}
   .header h1{font-size:28px}
-  .logo{width:60px;height:60px;font-size:9px}
-  .courses-grid{grid-template-columns:1fr 1fr}
+  .logo{width:50px;height:50px;font-size:9px}
 }
 @media print{
   body{background:#fff}
   .buttons{display:none}
   .back-btn{display:none}
-  .courses-grid{display:none}
 }
 </style>
 </head>
@@ -70,7 +68,9 @@ body{font-family:'Lora',serif;background:#FAF8F4;color:#1A1A18;line-height:1.6}
 <div class="wrapper">
   <div class="recipe-card" id="recipePDF">
     <div class="header">
-      <div class="logo">FFT<br>LOGO</div>
+      <div class="logo">
+        <img src="data:image/jpeg;base64,/9j/4QDoRXhpZgAATU0AKgAAAAgABgESAAMAAAABAAEAAAEaAAUAAAABAAAAVgEbAAUAAAABAAAAXgEoAAMAAAABAAIAAAITAAMAAAABAAEAAIdpAAQAAAABAAAAZgAAAAAAAABIAAAAAQAAAEgAAAABAAiQAAAHAAAABDAyMjGRAQAHAAAABAECAwCShgAHAAAAEgAAAMygAAAHAAAABDAxMDCgAQADAAAAAQABAACgAgAEAAAAAQAAA5CgAwAEAAAAAQAAAL6kBgADAAAAAQAAAAAAAAAAQVNDSUkAAABTY3JlZW5zaG90AAD/4g/wSUNDX1BST0ZJTEUAAQEAAA/gYXBwbAIQAABtbnRyUkdCIFhZWiAH6QAFAA8ACgAHACZhY3NwQVBQTAAAAABBUFBMAAAAAAAAAAAAAAAAAAAAAAAA9tYAAQAAAADTLWFwcGwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABRZGVzYwAAAVAAAABiZHNjbQAAAbQAAAS8Y3BydAAABnAAAABjd3RwdAAABpQAAAAUcllYWkEBCqAAAABUZ1hZWkAA+aAAABRiWFlaAAAG0AAAABRyVFJDAAAG5AAACAxhYXJnAAAO8AAAACB2Y2d0AAAPEAAAADBuZGluAAAP" alt="FFT LOGO" style="width:100%;height:100%;object-fit:contain;"/>
+      </div>
       <h1 id="recipeTitle">Recipe</h1>
       <p id="recipeTagline">One line description</p>
       <div class="meta-grid">
@@ -113,37 +113,6 @@ body{font-family:'Lora',serif;background:#FAF8F4;color:#1A1A18;line-height:1.6}
           <p id="recipeTip">Enjoy your dish!</p>
         </div>
       </div>
-
-      <div class="section">
-        <h2>Learn More</h2>
-        <p style="font-size:13px;margin-bottom:15px;color:#666">Explore our training courses to master advanced techniques:</p>
-        <div class="courses-grid">
-          <a href="https://www.freefromthat.com/TRAINING-CHEESECAKES" class="course-card">
-            <div class="course-icon">🍰</div>
-            <div class="course-name">Cheesecakes</div>
-          </a>
-          <a href="https://www.freefromthat.com/TRAINING-MOUSSE/" class="course-card">
-            <div class="course-icon">☁️</div>
-            <div class="course-name">Mousse</div>
-          </a>
-          <a href="https://www.freefromthat.com/TRAINING-ECLAIRS" class="course-card">
-            <div class="course-icon">✨</div>
-            <div class="course-name">Eclairs</div>
-          </a>
-          <a href="https://www.freefromthat.com/online-courses" class="course-card">
-            <div class="course-icon">🎓</div>
-            <div class="course-name">All Courses</div>
-          </a>
-          <a href="https://www.freefromthat.com/shop" class="course-card">
-            <div class="course-icon">🛍️</div>
-            <div class="course-name">Shop</div>
-          </a>
-          <a href="https://www.freefromthat.com" class="course-card">
-            <div class="course-icon">🌐</div>
-            <div class="course-name">Website</div>
-          </a>
-        </div>
-      </div>
     </div>
   </div>
 
@@ -169,7 +138,6 @@ if (!recipe.title) {
   document.getElementById('difficulty').textContent = recipe.difficulty;
   document.getElementById('recipeTip').textContent = recipe.tip;
 
-  // Ingredients
   const ingredientsList = document.getElementById('ingredientsList');
   if (Array.isArray(recipe.ingredients)) {
     recipe.ingredients.forEach(ing => {
@@ -180,7 +148,6 @@ if (!recipe.title) {
     });
   }
 
-  // Steps
   const stepsList = document.getElementById('stepsList');
   if (Array.isArray(recipe.steps)) {
     recipe.steps.forEach((step, i) => {
@@ -191,7 +158,6 @@ if (!recipe.title) {
     });
   }
 
-  // Why it Works
   if (recipe.whyItWorks) {
     document.getElementById('whySection').innerHTML = `
       <div class="why-box">
@@ -201,7 +167,6 @@ if (!recipe.title) {
     `;
   }
 
-  // FFT Product
   if (recipe.fftProduct) {
     let productInfo = '';
     if (recipe.fftProduct === 'PANACEGG V2') {
