@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Recipe Card</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;margin:0;padding:0}
+body{font-family:'Lora',serif;background:#f0f0f0;color:#222;line-height:1.5}
+.page{max-width:900px;margin:0 auto;background:#fff;box-shadow:0 0 20px rgba(0,0,0,0.1)}
+.recipe{padding:50px 50px 60px 50px;background:#fff;min-height:100vh}
+
+/* ── NEW EDITORIAL HEADER ── */
+.recipe-by{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#000;margin-bottom:20px}
+.title-row{display:flex;align-items:flex-start;justify-content:space-between;gap:30px;margin-bottom:0}
+.title-left{flex:1}
+.recipe-title{font-size:52px;font-weight:700;color:#000;font-family:'Lora',serif;line-height:1.1;margin-bottom:12px}
+.title-underline{display:none}
+.logo{width:160px;height:160px;border-radius:50%;overflow:hidden;flex-shrink:0;margin-top:-10px}
+.logo img{width:100%;height:100%;object-fit:contain}
+.recipe-subtitle{font-size:14px;font-style:italic;color:#555;margin:18px 0 0 0;line-height:1.6}
+.divider{border-top:2px solid #000;margin:30px 0}
+
+.meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:50px;margin-bottom:40px}
+.meta-item{line-height:1.8}
+.meta-label{font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#000;margin-bottom:6px;display:block}
+.meta-value{font-size:12px;color:#333;line-height:1.8}
+.special-box{background:#f8f8f8;border:1px solid #ddd;padding:18px;margin:40px 0;border-radius:2px}
+.special-label{font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#000;margin-bottom:8px}
+.special-value{font-size:12px;color:#333;line-height:1.6}
+.section-title{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#000;margin:45px 0 25px 0;border-bottom:1px solid #ddd;padding-bottom:12px}
+table{width:100%;border-collapse:collapse;margin:20px 0 40px 0}
+thead{background:#fafafa}
+th{padding:14px 12px;text-align:left;font-weight:700;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:#000;border:1px solid #ddd;border-bottom:2px solid #000}
+td{padding:12px;font-size:11.5px;color:#333;border:1px solid #ddd;line-height:1.7;vertical-align:top}
+.text-section{margin:40px 0}
+.text-section h3{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#000;margin-bottom:12px;border-bottom:1px solid #ddd;padding-bottom:12px}
+.text-section p{font-size:12px;color:#333;line-height:1.8}
+.controls{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-top:40px;padding-top:30px;border-top:1px solid #ddd}
+.btn{padding:13px 20px;border:none;border-radius:3px;font-weight:600;cursor:pointer;font-size:12px;text-decoration:none;text-align:center;transition:all 0.2s}
+.btn-primary{background:#17587E;color:#fff}
+.btn-primary:hover{background:#0e3f5c}
+.btn-back{background:#fff;color:#17587E;border:2px solid #17587E}
+.btn-back:hover{background:#f5f5f5}
+.back-link{display:block;text-align:center;color:#17587E;text-decoration:none;font-weight:600;font-size:12px;margin-top:25px;padding:20px 0}
+.whatsapp-btn{display:flex;align-items:center;justify-content:center;gap:10px;background:#25D366;color:#fff;text-decoration:none;font-weight:600;font-size:14px;padding:14px 20px;border-radius:8px;margin-top:20px;transition:background 0.2s;}
+.whatsapp-btn:hover{background:#1ebe5d}
+.shop-link{display:block;padding:14px 18px;margin-bottom:10px;background:#f0f7f4;border:1px solid #17587E;border-radius:6px;color:#17587E;text-decoration:none;font-size:13px;font-weight:600;transition:all 0.2s}
+.shop-link:hover{background:#17587E;color:#fff}
+.course-link{display:block;padding:14px 18px;margin-bottom:10px;background:#fff8f0;border:1px solid #e8a040;border-radius:6px;color:#c47a15;text-decoration:none;font-size:13px;font-weight:600;transition:all 0.2s}
+.course-link:hover{background:#e8a040;color:#fff}
+@media(max-width:768px){
+  .recipe{padding:30px 20px 50px 20px}
+  .recipe-title{font-size:32px}
+  .logo{width:100px;height:100px}
+  .meta-grid{grid-template-columns:1fr;gap:30px}
+  .controls{grid-template-columns:1fr}
+}
+@media print{
+  body{background:#fff;margin:0;padding:0}
+  .page{margin:0;box-shadow:none}
+  .controls{display:none}
+  .back-link{display:none}
+  .recipe{padding:40px;margin:0}
+  .nav-bar{display:none}
+  .nav-drawer{display:none}
+}
+.nav-bar{position:fixed;top:0;left:0;right:0;z-index:9999;display:flex;justify-content:flex-end;padding:10px 16px;background:rgba(255,255,255,0.95);backdrop-filter:blur(6px);border-bottom:1px solid #eee;}
+.hamburger{background:none;border:none;cursor:pointer;padding:6px;display:flex;flex-direction:column;gap:5px;z-index:9999;}
+.hamburger span{display:block;width:26px;height:3px;background:#17587E;border-radius:2px;}
+.nav-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;z-index:9998;background:rgba(0,0,0,0.4);}
+.nav-overlay.open{display:block;}
+.nav-drawer{position:fixed;top:0;right:-280px;width:260px;height:100%;background:#fff;z-index:9999;box-shadow:-4px 0 20px rgba(0,0,0,0.15);transition:right 0.3s ease;}
+.nav-drawer.open{right:0;}
+.nav-header{background:#17587E;padding:20px;display:flex;justify-content:space-between;align-items:center;}
+.nav-header img{width:48px;height:48px;border-radius:50%;object-fit:cover;}
+.nav-close{background:none;border:none;color:#fff;font-size:24px;cursor:pointer;line-height:1;}
+.nav-menu{padding:10px 0;}
+.nav-item{display:flex;align-items:center;gap:12px;padding:16px 24px;font-size:14px;font-weight:600;color:#17587E;text-decoration:none;border-bottom:1px solid #f0f0f0;letter-spacing:0.5px;}
+.nav-item:hover{background:#f0f7f9;}
+.nav-item .nav-icon{font-size:20px;width:28px;text-align:center;}
+body{padding-top:52px;}
+</style>
+</head>
+<body>
+
+<!-- HAMBURGER NAV -->
+<div class="nav-bar">
+  <button class="hamburger" onclick="openNav()">
+    <span></span><span></span><span></span>
+  </button>
+</div>
+
+<div class="nav-overlay" id="navOverlay" onclick="closeNav()"></div>
+
+<div class="nav-drawer" id="navDrawer">
+  <div class="nav-header">
+    <img src="https://cdn.jsdelivr.net/gh/MAN-cloud/fft-recipe-creator@main/FFT_NEW_LOGO_TRANSPARENT.png" alt="FFT">
+    <button class="nav-close" onclick="closeNav()">✕</button>
+  </div>
+  <div class="nav-menu">
+    <a href="https://freefromthat.com/products/" target="_blank" class="nav-item">
+      <span class="nav-icon">🛒</span> PRODUCTS
+    </a>
+    <a href="https://freefromthat.com/TRAINING" target="_blank" class="nav-item">
+      <span class="nav-icon">🎓</span> TRAINING
+    </a>
+    <a href="https://freefromthat.com/books" target="_blank" class="nav-item">
+      <span class="nav-icon">📚</span> BOOKS
+    </a>
+    <a href="index.html" class="nav-item">
+      <span class="nav-icon">✨</span> MAKE A RECIPE
+    </a>
+    <a href="https://freefromthat.com" target="_blank" class="nav-item">
+      <span class="nav-icon">🌿</span> FREEFROMTHAT.COM
+    </a>
+  </div>
+</div>
+<div class="page">
+  <div class="recipe" id="recipePDF">
+    <div class="recipe-by" id="recipeBy">RECIPE BY: Chef Jessica McKenzie</div>
+    
+    <div class="title-row">
+      <div class="title-left">
+        <h1 class="recipe-title" id="recipeTitle">Vegan Recipe</h1>
+      </div>
+      <div class="logo">
+        <img src="https://cdn.jsdelivr.net/gh/MAN-cloud/fft-recipe-creator@main/FFT_NEW_LOGO_TRANSPARENT.png" alt="FFT" />
+      </div>
+    </div>
+
+    <p class="recipe-subtitle" id="recipeSubtitle">A delicious vegan recipe using Free From That products</p>
+    
+    <div class="divider"></div>
+    
+    <div class="meta-grid">
+      <div class="meta-item">
+        <span class="meta-label">WHY</span>
+        <div class="meta-value" id="metaWhy">Vegan Technique</div>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">ABOUT</span>
+        <div class="meta-value" id="metaAbout">Recipe description</div>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">TECHNIQUE</span>
+        <div class="meta-value" id="metaTechnique">Flavor/Texture</div>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">MAKES</span>
+        <div class="meta-value" id="metaMakes">Servings</div>
+      </div>
+    </div>
+    
+    <div class="special-box" id="specialBox" style="display:none">
+      <div class="special-label">SPECIAL INGREDIENT</div>
+      <div class="special-value" id="specialValue">FFT Product</div>
+    </div>
+    
+    <h2 class="section-title">RECIPE</h2>
+    <table>
+      <thead>
+        <tr>
+          <th style="width:32%">INGREDIENT</th>
+          <th style="width:18%">QTY</th>
+          <th style="width:50%">METHOD</th>
+        </tr>
+      </thead>
+      <tbody id="recipeTable">
+        <tr><td colspan="3" style="text-align:center;color:#999">Recipe loading...</td></tr>
+      </tbody>
+    </table>
+    
+    <div class="text-section" id="whySection" style="display:none">
+      <h3>WHY IT WORKS</h3>
+      <p id="whyText"></p>
+    </div>
+    
+    <div class="text-section" id="tipSection" style="display:none">
+      <h3>CHEF TIP</h3>
+      <p id="tipText"></p>
+    </div>
+
+    <!-- SHOP SECTION -->
+    <div id="shopSection" style="display:none;margin:40px 0;">
+      <h2 class="section-title">🛒 SHOP THE INGREDIENTS</h2>
+      <div id="shopLinks"></div>
+    </div>
+
+    <!-- COURSES SECTION -->
+    <div id="coursesSection" style="display:none;margin:40px 0;">
+      <h2 class="section-title">🎓 COURSES YOU MIGHT LIKE</h2>
+      <div id="courseLinks"></div>
+    </div>
+  </div>
+  
+  <div class="controls">
+    <button class="btn btn-primary" onclick="location.href='page-3.html'">Sign Up / Login →</button>
+    <button class="btn btn-back" onclick="location.href='index.html'">← Make Another Recipe</button>
+  </div>
+  
+  <a href="index.html" class="back-link">← Make Another Recipe</a>
+  <a href="https://wa.me/306983287020" target="_blank" class="whatsapp-btn">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+    Chat with us on WhatsApp
+  </a>
+</div>
+
+<script>
+function openNav() {
+  document.getElementById('navDrawer').classList.add('open');
+  document.getElementById('navOverlay').classList.add('open');
+}
+function closeNav() {
+  document.getElementById('navDrawer').classList.remove('open');
+  document.getElementById('navOverlay').classList.remove('open');
+}
+
+
+// ── PARSE RECIPE FROM sessionStorage ──────────────────────────────────────
+const recipe = JSON.parse(sessionStorage.getItem('recipeData') || '{}');
+
+if (!recipe.title) {
+  document.body.innerHTML = '<div style="padding:60px;text-align:center"><h2 style="font-size:24px;margin-bottom:20px">No Recipe Found</h2><a href="index.html" style="color:#1565C0;text-decoration:none;font-weight:600;font-size:16px">← Go back</a></div>';
+} else {
+
+  // Title & subtitle
+  document.getElementById('recipeTitle').textContent = recipe.title;
+  document.getElementById('recipeSubtitle').textContent = recipe.tagline || '';
+  if (recipe.customerName) {
+    document.getElementById('recipeBy').textContent = 'RECIPE FOR: ' + recipe.customerName + ' — By Chef Jessica McKenzie';
+  }
+
+  // Meta grid
+  document.getElementById('metaWhy').textContent = recipe.why || 'Vegan Baking';
+  document.getElementById('metaAbout').textContent = recipe.about || recipe.tagline || '';
+  document.getElementById('metaTechnique').textContent = recipe.technique || 'Flavor/Texture';
+  document.getElementById('metaMakes').textContent = recipe.servings || '';
+
+  // SVG illustration removed
+
+  // FFT Special Ingredient box
+  if (recipe.fftProduct) {
+    document.getElementById('specialBox').style.display = 'block';
+    document.getElementById('specialValue').textContent = recipe.fftProduct + ' - Free From That';
+  }
+
+  // ── RECIPE TABLE: supports both {name,qty} objects AND legacy flat strings ──
+  const table = document.getElementById('recipeTable');
+  table.innerHTML = '';
+
+  if (Array.isArray(recipe.ingredients) && recipe.ingredients.length > 0) {
+    recipe.ingredients.forEach((ing, idx) => {
+      const row = document.createElement('tr');
+      const step = (Array.isArray(recipe.steps) && recipe.steps[idx]) ? recipe.steps[idx] : '';
+
+      let ingName = '';
+      let ingQty  = '';
+
+      if (typeof ing === 'object' && ing !== null) {
+        // New format: { name: "...", qty: "..." }
+        ingName = ing.name || '';
+        ingQty  = ing.qty  || '';
+      } else if (typeof ing === 'string') {
+        // Legacy format: "250g ingredient" — split on first space run after leading digits/units
+        const match = ing.match(/^(\d[\d.,]*\s*(?:g|kg|ml|l|tsp|tbsp|cup|fl oz|oz|lb|pinch|x|pcs?|pieces?)?)\s+(.+)$/i);
+        if (match) {
+          ingQty  = match[1].trim();
+          ingName = match[2].trim();
+        } else {
+          ingName = ing;
+          ingQty  = '';
+        }
+      }
+
+      row.innerHTML = `<td>${ingName}</td><td>${ingQty}</td><td>${step}</td>`;
+      table.appendChild(row);
+    });
+  }
+
+  // Why It Works
+  if (recipe.whyItWorks) {
+    document.getElementById('whySection').style.display = 'block';
+    document.getElementById('whyText').textContent = recipe.whyItWorks;
+  }
+
+  // Chef Tip
+  if (recipe.tip) {
+    document.getElementById('tipSection').style.display = 'block';
+    document.getElementById('tipText').textContent = recipe.tip;
+  }
+
+  // ── SHOP THE INGREDIENTS ──────────────────────────────────────────────────
+  const fftProduct = (recipe.fftProduct || '').toUpperCase();
+  const shopLinks = document.getElementById('shopLinks');
+  const products = [
+    { key: 'PANACEGG', label: 'Buy PANACEGG V2 — Egg Replacer for Baking & Pastry', url: 'https://freefromthat.com/PANACEGG250GR' },
+    { key: 'POTATO PROTEIN', label: 'Buy POTATO PROTEIN 300CW — Foaming Agent for Mousses & Meringues', url: 'https://freefromthat.com/PP300-250G' },
+    { key: 'GERBET', label: 'Buy GERBET — Professional Macaron Egg Replacer', url: 'https://freefromthat.com/gerbet250gr' }
+  ];
+  let shopHTML = '';
+  products.forEach(p => {
+    if (fftProduct.includes(p.key)) {
+      shopHTML += `<a href="${p.url}" target="_blank" class="shop-link">🛒 ${p.label}</a>`;
+    }
+  });
+  if (!shopHTML) {
+    shopHTML = `<a href="https://freefromthat.com/products/" target="_blank" class="shop-link">🛒 Shop all Free From That products</a>`;
+  }
+  shopLinks.innerHTML = shopHTML;
+  document.getElementById('shopSection').style.display = 'block';
+
+  // ── COURSES ───────────────────────────────────────────────────────────────
+  const title = (recipe.title || '').toLowerCase();
+  const courseLinks = document.getElementById('courseLinks');
+
+  const allCourses = [
+    { keys: ['eclair','choux','cream puff','profiterole'], label: 'Eclairs & Choux', url: 'https://freefromthat.com/TRAINING-ECLAIRS', price: '€25' },
+    { keys: ['macaron'], label: 'Macarons', url: 'https://freefromthat.com/TRAINING-MACARONS', price: '€25' },
+    { keys: ['fancy macaron','decorat'], label: 'Fancy Macarons', url: 'https://freefromthat.com/online-fancymacarons', price: '€5' },
+    { keys: ['cheesecake'], label: 'Cheesecakes', url: 'https://freefromthat.com/TRAINING-CHEESECAKES', price: '€25' },
+    { keys: ['mousse','entremet','mousse cake'], label: 'Mousse Cakes (Entremet)', url: 'https://freefromthat.com/TRAINING-MOUSSE/', price: '€25' },
+    { keys: ['tiramisu'], label: 'Tiramisu', url: 'https://freefromthat.com/TRAINING-TIRAMISU', price: '€15' },
+    { keys: ['dessert','tart','pudding','panna','bar'], label: 'Dessert Bar', url: 'https://freefromthat.com/TRAINING-DESSERTBAR', price: '€25' },
+    { keys: ['burger','sandwich'], label: 'Vegan Burgers', url: 'https://freefromthat.com/TRAINING-BURGERS', price: '€25' },
+    { keys: ['chicken','fried','nugget'], label: 'Vegan Chicken', url: 'https://freefromthat.com/TRAINING-CHICKEN', price: '€25' },
+    { keys: ['brioche','bread','dough','bun'], label: 'Brioche', url: 'https://freefromthat.com/TRAINING-BRIOCHE/', price: '€15' },
+    { keys: ['gluten free','gf '], label: 'Gluten Free Elegant Comfort Desserts', url: 'https://freefromthat.com/GF-ELEGANT', price: '€10' },
+    { keys: ['cuisine','savoury','savory','soup','sauce'], label: 'Vegan Cuisine', url: 'https://freefromthat.com/TRAINING-CUISINE', price: '€25' }
+  ];
+
+  // Find matching courses first
+  let matched = allCourses.filter(c => c.keys.some(k => title.includes(k)));
+  
+  // Fill up to 3 with popular courses if not enough matches
+  const popular = [
+    { label: 'Macarons', url: 'https://freefromthat.com/TRAINING-MACARONS', price: '€25' },
+    { label: 'Eclairs & Choux', url: 'https://freefromthat.com/TRAINING-ECLAIRS', price: '€25' },
+    { label: 'Mousse Cakes (Entremet)', url: 'https://freefromthat.com/TRAINING-MOUSSE/', price: '€25' },
+    { label: 'Cheesecakes', url: 'https://freefromthat.com/TRAINING-CHEESECAKES', price: '€25' },
+    { label: 'Dessert Bar', url: 'https://freefromthat.com/TRAINING-DESSERTBAR', price: '€25' }
+  ];
+  
+  popular.forEach(p => {
+    if (matched.length < 3 && !matched.find(m => m.url === p.url)) {
+      matched.push(p);
+    }
+  });
+
+  // Show exactly 3
+  let coursesHTML = '';
+  matched.slice(0, 3).forEach(c => {
+    coursesHTML += `<a href="${c.url}" target="_blank" class="course-link">🎓 ${c.label} <span style="float:right;opacity:0.7">${c.price}</span></a>`;
+  });
+  courseLinks.innerHTML = coursesHTML;
+  courseLinks.innerHTML = coursesHTML;
+  document.getElementById('coursesSection').style.display = 'block';
+}
+</script>
+</body>
+</html>
