@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FFT Admin Console</title>
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:        #0c1219;
+      --surface:   #131c27;
+      --surface2:  #1a2636;
+      --border:    #1e3048;
+      --blue:      #17587E;
+      --blue-lt:   #2178a8;
+      --yellow:    #f5c842;
+      --yellow-dk: #c9a325;
+      --text:      #dde7f0;
+      --muted:     #6b8099;
+      --green:     #3fb68b;
+      --red:       #e05c5c;
+      --purple:    #9b7fd4;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; font-size: 14px; min-height: 100vh; }
+
+    /* ── LOCK ── */
+    #lock-screen { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background: var(--bg); z-index: 999; }
+    .lock-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 52px 48px; width: 380px; text-align: center; box-shadow: 0 32px 80px rgba(0,0,0,0.6); }
+    .lock-logo { font-family: 'Lora', serif; font-size: 13px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--yellow); margin-bottom: 6px; }
+    .lock-title { font-family: 'Lora', serif; font-size: 26px; font-weight: 700; color: var(--text); margin-bottom: 32px; }
+    .lock-title span { color: var(--yellow); }
+    .lock-label { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); text-align: left; display: block; margin-bottom: 8px; }
+    .lock-input { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 15px; letter-spacing: 0.12em; outline: none; transition: border-color 0.2s; }
+    .lock-input:focus { border-color: var(--blue-lt); }
+    .lock-input.error { border-color: var(--red); animation: shake 0.35s ease; }
+    @keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-6px)} 40%{transform:translateX(6px)} 60%{transform:translateX(-4px)} 80%{transform:translateX(4px)} }
+    .lock-btn { width: 100%; margin-top: 20px; padding: 13px; background: var(--yellow); color: #0c1219; border: none; border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; }
+    .lock-btn:hover { background: var(--yellow-dk); }
+    .lock-err { font-size: 12px; color: var(--red); margin-top: 12px; min-height: 16px; }
+
+    /* ── DASHBOARD ── */
+    #dashboard { display: none; flex-direction: column; min-height: 100vh; }
+    .topbar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 32px; height: 60px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 10; }
+    .topbar-brand { display: flex; align-items: center; gap: 12px; }
+    .brand-pill { background: var(--yellow); color: #0c1219; font-family: 'Lora', serif; font-size: 12px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; padding: 4px 10px; border-radius: 4px; }
+    .brand-name { font-family: 'Lora', serif; font-size: 15px; font-weight: 600; color: var(--text); }
+    .brand-name em { color: var(--muted); font-style: normal; font-weight: 400; font-size: 13px; margin-left: 4px; }
+    .topbar-right { display: flex; align-items: center; gap: 16px; }
+    .status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); box-shadow: 0 0 6px var(--green); animation: pulse 2s ease-in-out infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+    .status-label { font-size: 12px; color: var(--muted); }
+    .logout-btn { font-size: 12px; color: var(--muted); background: none; border: 1px solid var(--border); border-radius: 6px; padding: 5px 12px; cursor: pointer; }
+    .logout-btn:hover { color: var(--text); border-color: var(--muted); }
+    .main { flex: 1; padding: 36px 32px; max-width: 1100px; width: 100%; margin: 0 auto; }
+
+    /* ── MODE TABS ── */
+    .mode-heading { font-family: 'Lora', serif; font-size: 22px; font-weight: 700; color: var(--text); margin-bottom: 20px; }
+    .mode-tabs { display: flex; gap: 12px; margin-bottom: 28px; }
+    .mode-tab { flex: 1; padding: 18px 20px; border-radius: 12px; cursor: pointer; border: 2px solid var(--border); background: var(--surface); text-align: left; display: flex; align-items: center; gap: 14px; transition: border-color 0.2s; }
+    .mode-tab:hover { border-color: var(--blue); }
+    .mode-tab.active { border-color: var(--yellow); background: rgba(245,200,66,0.06); }
+    .mode-tab-icon { font-size: 24px; }
+    .mode-tab-title { font-weight: 600; font-size: 14px; color: var(--text); margin-bottom: 2px; }
+    .mode-tab-sub { font-size: 12px; color: var(--muted); }
+
+    /* ── RECENT ── */
+    .recent-list { display: flex; flex-direction: column; gap: 8px; }
+    .recent-row { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px 20px; display: flex; align-items: center; gap: 16px; cursor: pointer; transition: border-color 0.15s; }
+    .recent-row:hover { border-color: var(--yellow); background: rgba(245,200,66,0.04); }
+    .recent-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--blue); display: flex; align-items: center; justify-content: center; font-family: 'Lora', serif; font-size: 15px; font-weight: 700; color: #fff; flex-shrink: 0; }
+    .recent-info { flex: 1; }
+    .recent-name { font-weight: 600; font-size: 14px; color: var(--text); }
+    .recent-email { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .recent-badge { font-size: 11px; background: rgba(63,182,139,0.15); color: var(--green); border-radius: 4px; padding: 2px 8px; white-space: nowrap; }
+    .recent-arrow { color: var(--muted); font-size: 18px; }
+
+    /* ── SEARCH ── */
+    .search-row { display: flex; gap: 10px; }
+    .search-input { flex: 1; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 13px 18px; color: var(--text); font-family: 'Inter', sans-serif; font-size: 15px; outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
+    .search-input::placeholder { color: var(--muted); }
+    .search-input:focus { border-color: var(--blue-lt); box-shadow: 0 0 0 3px rgba(33,120,168,0.15); }
+    .search-btn { background: var(--blue); color: #fff; border: none; border-radius: 10px; padding: 13px 28px; font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; }
+    .search-btn:hover { background: var(--blue-lt); }
+    .search-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* ── STATES ── */
+    .state-msg { text-align: center; padding: 60px 0; color: var(--muted); font-size: 14px; }
+    .state-msg .icon { font-size: 36px; margin-bottom: 12px; }
+    .state-msg h3 { font-family: 'Lora', serif; font-size: 18px; color: var(--text); margin-bottom: 6px; }
+    .spinner { width: 28px; height: 28px; border: 3px solid var(--border); border-top-color: var(--yellow); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── BACK ── */
+    .back-btn { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); font-size: 13px; cursor: pointer; margin-bottom: 24px; padding: 6px 0; border: none; background: none; }
+    .back-btn:hover { color: var(--yellow); }
+
+    /* ── PROFILE ── */
+    .profile-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 28px 32px; display: flex; align-items: flex-start; gap: 28px; margin-bottom: 20px; position: relative; overflow: hidden; }
+    .profile-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--yellow); }
+    .avatar { width: 64px; height: 64px; border-radius: 50%; background: var(--blue); display: flex; align-items: center; justify-content: center; font-family: 'Lora', serif; font-size: 24px; font-weight: 700; color: #fff; flex-shrink: 0; }
+    .profile-info { flex: 1; }
+    .profile-name { font-family: 'Lora', serif; font-size: 22px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+    .profile-email { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--yellow); margin-bottom: 14px; }
+    .profile-meta { display: flex; gap: 28px; flex-wrap: wrap; }
+    .meta-item { display: flex; flex-direction: column; gap: 2px; }
+    .meta-label { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+    .meta-value { font-size: 13px; color: var(--text); }
+    .profile-stats { display: flex; gap: 12px; flex-wrap: wrap; }
+    .stat-box { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 14px 18px; text-align: center; min-width: 75px; }
+    .stat-num { font-family: 'Lora', serif; font-size: 22px; font-weight: 700; color: var(--yellow); }
+    .stat-label { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+    /* ── MESSAGE PANEL ── */
+    .message-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 24px 28px;
+      margin-bottom: 28px;
+    }
+    .message-panel-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 18px;
+    }
+    .message-panel-title {
+      font-family: 'Lora', serif;
+      font-size: 15px; font-weight: 600; color: var(--text);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .msg-tabs { display: flex; gap: 8px; margin-bottom: 18px; }
+    .msg-tab {
+      padding: 7px 16px; border-radius: 8px; cursor: pointer;
+      font-size: 13px; font-weight: 500;
+      border: 1px solid var(--border); background: var(--surface2); color: var(--muted);
+      transition: all 0.15s;
+    }
+    .msg-tab.active { background: var(--blue); border-color: var(--blue); color: #fff; }
+    .msg-tab:hover:not(.active) { border-color: var(--blue-lt); color: var(--text); }
+
+    .msg-field { margin-bottom: 14px; }
+    .msg-field label { display: block; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+    .msg-input {
+      width: 100%; background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 8px; padding: 10px 14px; color: var(--text);
+      font-family: 'Inter', sans-serif; font-size: 14px; outline: none;
+      transition: border-color 0.2s;
+    }
+    .msg-input:focus { border-color: var(--blue-lt); }
+    .msg-textarea {
+      width: 100%; background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 8px; padding: 12px 14px; color: var(--text);
+      font-family: 'Inter', sans-serif; font-size: 14px; outline: none;
+      resize: vertical; min-height: 120px; line-height: 1.6;
+      transition: border-color 0.2s;
+    }
+    .msg-textarea:focus { border-color: var(--blue-lt); }
+    .msg-actions { display: flex; align-items: center; gap: 12px; margin-top: 16px; }
+    .msg-send-btn {
+      background: var(--yellow); color: #0c1219; border: none;
+      border-radius: 8px; padding: 10px 24px;
+      font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600;
+      cursor: pointer; transition: background 0.15s;
+    }
+    .msg-send-btn:hover { background: var(--yellow-dk); }
+    .msg-send-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .gmail-btn {
+      background: none; color: var(--muted); border: 1px solid var(--border);
+      border-radius: 8px; padding: 10px 20px;
+      font-family: 'Inter', sans-serif; font-size: 13px;
+      cursor: pointer; transition: all 0.15s; text-decoration: none;
+      display: inline-flex; align-items: center; gap: 6px;
+    }
+    .gmail-btn:hover { border-color: var(--muted); color: var(--text); }
+    .msg-status { font-size: 13px; margin-left: auto; }
+    .msg-status.success { color: var(--green); }
+    .msg-status.error   { color: var(--red); }
+
+    /* ── SECTIONS ── */
+    .section { margin-bottom: 28px; }
+    .section-header { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+    .section-icon { font-size: 17px; }
+    .section-title { font-family: 'Lora', serif; font-size: 16px; font-weight: 600; color: var(--text); }
+    .section-count { margin-left: auto; background: var(--surface2); border: 1px solid var(--border); color: var(--muted); font-size: 11px; font-weight: 600; padding: 2px 9px; border-radius: 20px; }
+    .data-table { width: 100%; border-collapse: collapse; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; font-size: 13px; }
+    .data-table th { background: var(--surface2); text-align: left; padding: 11px 16px; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); font-weight: 600; border-bottom: 1px solid var(--border); }
+    .data-table td { padding: 12px 16px; border-bottom: 1px solid var(--border); vertical-align: top; color: var(--text); }
+    .data-table tr:last-child td { border-bottom: none; }
+    .data-table tr:hover td { background: rgba(23,88,126,0.08); }
+    .mono { font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+    .amount { color: var(--green); font-weight: 600; font-family: 'JetBrains Mono', monospace; }
+    .tag         { display: inline-block; background: rgba(23,88,126,0.25); color: #7ab8d4; font-size: 11px; padding: 2px 8px; border-radius: 4px; margin: 2px 2px 2px 0; }
+    .tag.course  { background: rgba(245,200,66,0.15); color: var(--yellow); }
+    .tag.book    { background: rgba(155,127,212,0.2);  color: var(--purple); }
+    .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; }
+    .mini-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; }
+    .mini-card:hover { border-color: var(--blue); }
+    .mini-card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+    .mini-card-title { font-weight: 600; font-size: 14px; color: var(--text); line-height: 1.3; }
+    .mini-card-date { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); white-space: nowrap; margin-left: 10px; }
+    .mini-card-body { font-size: 12px; color: var(--muted); line-height: 1.5; }
+    .stars { color: var(--yellow); font-size: 14px; margin-bottom: 6px; }
+    .review-text { font-size: 13px; color: var(--text); font-style: italic; line-height: 1.5; }
+    .empty-state { text-align: center; padding: 32px; color: var(--muted); font-size: 13px; background: var(--surface); border: 1px dashed var(--border); border-radius: 12px; }
+    .not-found { text-align: center; padding: 60px; color: var(--muted); }
+    .not-found .icon { font-size: 40px; margin-bottom: 14px; }
+    .not-found h3 { font-family: 'Lora', serif; font-size: 18px; color: var(--text); margin-bottom: 6px; }
+    .id-badge { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); background: var(--surface2); border: 1px solid var(--border); border-radius: 4px; padding: 2px 7px; }
+
+    @media (max-width: 700px) {
+      .main { padding: 24px 16px; }
+      .topbar { padding: 0 16px; }
+      .profile-card { flex-direction: column; }
+      .profile-stats { flex-wrap: wrap; }
+      .mode-tabs { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- LOCK -->
+<div id="lock-screen">
+  <div class="lock-card">
+    <div class="lock-logo">Free From That</div>
+    <div class="lock-title">Admin <span>Console</span></div>
+    <label class="lock-label" for="pw-input">Password</label>
+    <input type="password" id="pw-input" class="lock-input" placeholder="••••••••••••••" autocomplete="current-password">
+    <button class="lock-btn" onclick="checkPassword()">Unlock →</button>
+    <div class="lock-err" id="lock-err"></div>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard">
+  <header class="topbar">
+    <div class="topbar-brand">
+      <span class="brand-pill">FFT</span>
+      <span class="brand-name">Admin Console <em>— Internal Use Only</em></span>
+    </div>
+    <div class="topbar-right">
+      <a href="https://man-cloud.github.io/fft-recipe-creator/admin.html" title="Back to Admin Console" style="font-size:20px;text-decoration:none;opacity:0.6;transition:opacity 0.15s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.6'">🏠</a>
+      <span class="status-dot"></span>
+      <span class="status-label">Connected</span>
+      <button class="logout-btn" onclick="logout()">Lock</button>
+    </div>
+  </header>
+
+  <main class="main">
+
+    <!-- MODE PANEL -->
+    <div id="mode-panel">
+      <h1 class="mode-heading">Customer Lookup</h1>
+      <div class="mode-tabs">
+        <button class="mode-tab active" id="tab-recent" onclick="switchMode('recent')">
+          <span class="mode-tab-icon">⚡</span>
+          <div><div class="mode-tab-title">Last 10 Active</div><div class="mode-tab-sub">Customers with recent orders</div></div>
+        </button>
+        <button class="mode-tab" id="tab-search" onclick="switchMode('search')">
+          <span class="mode-tab-icon">🔍</span>
+          <div><div class="mode-tab-title">Search by Name / Email</div><div class="mode-tab-sub">Find any specific customer</div></div>
+        </button>
+      </div>
+      <div id="panel-recent">
+        <div id="recent-list-wrap"><div class="state-msg"><div class="spinner"></div><p>Loading recent customers…</p></div></div>
+      </div>
+      <div id="panel-search" style="display:none">
+        <div class="search-row">
+          <input type="text" class="search-input" id="search-input" placeholder="jane@example.com  or  Jane Smith" onkeydown="if(event.key==='Enter') doSearch()">
+          <button class="search-btn" id="search-btn" onclick="doSearch()">Search</button>
+        </div>
+        <div id="search-state" style="margin-top:20px"></div>
+      </div>
+    </div>
+
+    <!-- PROFILE PANEL -->
+    <div id="profile-panel" style="display:none">
+      <button class="back-btn" onclick="goBack()">← Back to list</button>
+      <div id="results"></div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+  const WORKER_URL = 'https://fft-recipe.man-4bb.workers.dev';
+  const PW_HASH    = 'd7b73124c176310ef8623c336f0042152e928984ce2addd49520434c8477eb09';
+
+  let currentCustomer = null; // store current customer for messaging
+
+  // ── PASSWORD ──
+  async function sha256(str) {
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+  }
+  async function checkPassword() {
+    const input = document.getElementById('pw-input').value;
+    const hash  = await sha256(input);
+    if (hash === PW_HASH) {
+      document.getElementById('lock-screen').style.display = 'none';
+      document.getElementById('dashboard').style.display   = 'flex';
+      sessionStorage.setItem('fft_admin', '1');
+      loadRecent();
+    } else {
+      const inp = document.getElementById('pw-input');
+      inp.classList.add('error');
+      document.getElementById('lock-err').textContent = 'Incorrect password. Try again.';
+      inp.value = '';
+      setTimeout(() => inp.classList.remove('error'), 400);
+    }
+  }
+  document.getElementById('pw-input').addEventListener('keydown', e => { if (e.key === 'Enter') checkPassword(); });
+  if (sessionStorage.getItem('fft_admin') === '1') {
+    document.getElementById('lock-screen').style.display = 'none';
+    document.getElementById('dashboard').style.display   = 'flex';
+    loadRecent();
+  }
+  function logout() {
+    sessionStorage.removeItem('fft_admin');
+    document.getElementById('lock-screen').style.display = 'flex';
+    document.getElementById('dashboard').style.display   = 'none';
+    document.getElementById('pw-input').value = '';
+  }
+
+  // ── MODE ──
+  function switchMode(mode) {
+    document.getElementById('tab-recent').classList.toggle('active', mode === 'recent');
+    document.getElementById('tab-search').classList.toggle('active', mode === 'search');
+    document.getElementById('panel-recent').style.display = mode === 'recent' ? '' : 'none';
+    document.getElementById('panel-search').style.display = mode === 'search' ? '' : 'none';
+  }
+
+  // ── RECENT ──
+  async function loadRecent() {
+    const wrap = document.getElementById('recent-list-wrap');
+    wrap.innerHTML = `<div class="state-msg"><div class="spinner"></div><p>Loading recent customers…</p></div>`;
+    try {
+      const res  = await fetch(`${WORKER_URL}/admin/recent`);
+      const data = await res.json();
+      renderRecentList(data.customers || []);
+    } catch (err) {
+      wrap.innerHTML = `<div class="state-msg"><div class="icon">⚠️</div><h3>Could not load</h3><p>${err.message}</p></div>`;
+    }
+  }
+  function renderRecentList(customers) {
+    const wrap = document.getElementById('recent-list-wrap');
+    if (!customers.length) {
+      wrap.innerHTML = `<div class="state-msg"><div class="icon">📭</div><h3>No recent activity</h3><p>No orders found yet.</p></div>`;
+      return;
+    }
+    wrap.innerHTML = `<div class="recent-list">${customers.map(c => {
+      const name     = esc(c.name || 'Unknown');
+      const email    = esc(c.email || '');
+      const initials = (c.name || 'U').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+      return `<div class="recent-row" onclick="loadCustomer('${c.email}')">
+        <div class="recent-avatar">${initials}</div>
+        <div class="recent-info"><div class="recent-name">${name}</div><div class="recent-email">${email}</div></div>
+        <span class="recent-badge">Recent order</span>
+        <span class="recent-arrow">›</span>
+      </div>`;
+    }).join('')}</div>`;
+  }
+
+  // ── SEARCH ──
+  async function doSearch() {
+    const q = document.getElementById('search-input').value.trim();
+    if (!q) return;
+    const btn = document.getElementById('search-btn');
+    btn.disabled = true; btn.textContent = 'Searching…';
+    document.getElementById('search-state').innerHTML = `<div class="state-msg"><div class="spinner"></div><p>Fetching customer…</p></div>`;
+    try {
+      const res  = await fetch(`${WORKER_URL}/admin?q=${encodeURIComponent(q)}`);
+      const data = await res.json();
+      showProfile(data, q);
+    } catch (err) {
+      document.getElementById('search-state').innerHTML = `<div class="state-msg"><div class="icon">⚠️</div><h3>Error</h3><p>${err.message}</p></div>`;
+    }
+    btn.disabled = false; btn.textContent = 'Search';
+  }
+
+  async function loadCustomer(email) {
+    document.getElementById('mode-panel').style.display    = 'none';
+    document.getElementById('profile-panel').style.display = '';
+    document.getElementById('results').innerHTML = `<div class="state-msg"><div class="spinner"></div><p>Loading profile…</p></div>`;
+    try {
+      const res  = await fetch(`${WORKER_URL}/admin?q=${encodeURIComponent(email)}`);
+      const data = await res.json();
+      renderResults(data, email);
+    } catch (err) {
+      document.getElementById('results').innerHTML = `<div class="state-msg"><div class="icon">⚠️</div><h3>Error</h3><p>${err.message}</p></div>`;
+    }
+  }
+  function showProfile(data, query) {
+    document.getElementById('mode-panel').style.display    = 'none';
+    document.getElementById('profile-panel').style.display = '';
+    renderResults(data, query);
+  }
+  function goBack() {
+    document.getElementById('profile-panel').style.display = 'none';
+    document.getElementById('mode-panel').style.display    = '';
+    document.getElementById('search-state').innerHTML      = '';
+    document.getElementById('search-input').value          = '';
+    currentCustomer = null;
+  }
+
+  // ── MESSAGING ──
+  let msgMode = 'customer'; // 'customer' or 'custom'
+
+  function switchMsgTab(mode) {
+    msgMode = mode;
+    document.getElementById('msg-tab-customer').classList.toggle('active', mode === 'customer');
+    document.getElementById('msg-tab-custom').classList.toggle('active',   mode === 'custom');
+    document.getElementById('msg-to-customer').style.display = mode === 'customer' ? '' : 'none';
+    document.getElementById('msg-to-custom').style.display   = mode === 'custom'   ? '' : 'none';
+  }
+
+  async function openGmail() {
+    const to      = msgMode === 'customer' ? (currentCustomer?.email || '') : (document.getElementById('msg-custom-to')?.value || '');
+    const subject = 'Message from Free From That';
+    const message = document.getElementById('msg-body')?.value || '';
+
+    // Open Gmail immediately
+    window.open(`https://mail.google.com/mail/?view=cm&to=${encodeURIComponent(to)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(message)}`, '_blank');
+
+    // Log the message
+    try {
+      await fetch(`${WORKER_URL}/admin/log-message`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ to, subject, message, sentBy: 'Admin (Gmail)' })
+      });
+    } catch(e) {}
+
+    // Clear message field
+    if (document.getElementById('msg-body')) {
+      document.getElementById('msg-body').value = '';
+    }
+
+    // Reload customer profile to show message in history
+    const reloadEmail = currentCustomer?.email || to;
+    if (reloadEmail) {
+      setTimeout(() => loadCustomer(reloadEmail), 1200);
+    }
+  }
+
+  async function sendEmail() {
+    const to      = msgMode === 'customer' ? (currentCustomer?.email || '') : document.getElementById('msg-custom-to').value.trim();
+    const subject = document.getElementById('msg-subject').value.trim();
+    const message = document.getElementById('msg-body').value.trim();
+    const status  = document.getElementById('msg-status');
+
+    if (!to)      { status.textContent = 'Please enter a recipient.'; status.className = 'msg-status error'; return; }
+    if (!subject) { status.textContent = 'Please enter a subject.';   status.className = 'msg-status error'; return; }
+    if (!message) { status.textContent = 'Please write a message.';   status.className = 'msg-status error'; return; }
+
+    const btn = document.getElementById('msg-send-btn');
+    btn.disabled = true; btn.textContent = 'Sending…';
+    status.textContent = ''; status.className = 'msg-status';
+
+    try {
+      const res  = await fetch(`${WORKER_URL}/admin/send-email`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ to, subject, message, replyTo: 'man@freefromthat.com' })
+      });
+      const data = await res.json();
+      if (data.ok) {
+        status.textContent = '✓ Email sent successfully!';
+        status.className   = 'msg-status success';
+        document.getElementById('msg-subject').value = '';
+        document.getElementById('msg-body').value    = '';
+      } else {
+        status.textContent = `Error: ${data.error}`;
+        status.className   = 'msg-status error';
+      }
+    } catch (err) {
+      status.textContent = `Error: ${err.message}`;
+      status.className   = 'msg-status error';
+    }
+
+    btn.disabled = false; btn.textContent = 'Send Email';
+  }
+
+  // ── RENDER PROFILE ──
+  function renderResults(data, query) {
+    const r = document.getElementById('results');
+    if (!data.customer && (!data.recipes || !data.recipes.length)) {
+      r.innerHTML = `<div class="not-found"><div class="icon">🚫</div><h3>No customer found</h3><p>No match for "<strong>${esc(query)}</strong>".</p></div>`;
+      return;
+    }
+
+    const c       = data.customer || {};
+    const orders  = data.orders   || [];
+    const courses = data.courses  || [];
+    const books   = data.books    || [];
+    const recipes = data.recipes  || [];
+    const ratings = data.ratings  || [];
+    const messages = data.messages  || [];
+
+    currentCustomer = c;
+
+    const name       = c.first_name ? `${c.first_name} ${c.last_name}` : query;
+    const initials   = name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+    const email      = c.email || query;
+    const address    = c.addresses?.[0];
+    const location   = address ? `${address.city||''}${address.state_or_province?', '+address.state_or_province:''}${address.country?', '+address.country:''}`.replace(/^, /,'') : '—';
+    const joined     = c.date_created ? fmtDate(c.date_created) : '—';
+    const bcId       = c.id ? `BC-${c.id}` : '—';
+    const totalSpent = orders.reduce((s,o) => s + parseFloat(o.total_inc_tax||0), 0);
+
+    r.innerHTML = `
+      <!-- Profile -->
+      <div class="profile-card">
+        <div class="avatar">${initials}</div>
+        <div class="profile-info">
+          <div class="profile-name">${esc(name)}</div>
+          <div class="profile-email">${esc(email)}</div>
+          <div class="profile-meta">
+            <div class="meta-item"><span class="meta-label">BC ID</span><span class="meta-value"><span class="id-badge">${esc(bcId)}</span></span></div>
+            <div class="meta-item"><span class="meta-label">Location</span><span class="meta-value">${esc(location)}</span></div>
+            <div class="meta-item"><span class="meta-label">Customer Since</span><span class="meta-value">${joined}</span></div>
+            <div class="meta-item"><span class="meta-label">Phone</span><span class="meta-value">${esc(c.phone||'—')}</span></div>
+          </div>
+        </div>
+        <div class="profile-stats">
+          <div class="stat-box"><div class="stat-num">${orders.length}</div><div class="stat-label">Orders</div></div>
+          <div class="stat-box"><div class="stat-num">${courses.length}</div><div class="stat-label">Courses</div></div>
+          <div class="stat-box"><div class="stat-num">${books.length}</div><div class="stat-label">Books</div></div>
+          <div class="stat-box"><div class="stat-num">${recipes.length}</div><div class="stat-label">Recipes</div></div>
+          <div class="stat-box"><div class="stat-num">${messages.length}</div><div class="stat-label">Messages</div></div>
+          <div class="stat-box"><div class="stat-num">$${totalSpent.toFixed(0)}</div><div class="stat-label">Spent</div></div>
+        </div>
+      </div>
+
+      <!-- Messaging Panel -->
+      <div class="message-panel">
+        <div class="message-panel-header">
+          <div class="message-panel-title">✉️ Send Message</div>
+        </div>
+        <div class="msg-tabs">
+          <button class="msg-tab active" id="msg-tab-customer" onclick="switchMsgTab('customer')">To ${esc(name.split(' ')[0])}</button>
+          <button class="msg-tab" id="msg-tab-custom" onclick="switchMsgTab('custom')">To Someone Else</button>
+        </div>
+        <div id="msg-to-customer" style="margin-bottom:14px;">
+          <div style="font-size:12px;color:var(--muted);">Sending to: <span style="color:var(--yellow);font-family:'JetBrains Mono',monospace;">${esc(email)}</span></div>
+        </div>
+        <div id="msg-to-custom" style="display:none">
+          <div class="msg-field">
+            <label>To (email address)</label>
+            <input type="email" class="msg-input" id="msg-custom-to" placeholder="jessica@freefromthat.com">
+          </div>
+        </div>
+        <div class="msg-field">
+          <label>Message</label>
+          <textarea class="msg-textarea" id="msg-body" placeholder="Write your message here — it will open in Gmail and be saved to records…"></textarea>
+        </div>
+        <div class="msg-actions">
+          <button class="gmail-btn" id="gmail-open-btn" onclick="openGmail()" style="background:var(--yellow);color:#0c1219;border:none;border-radius:8px;padding:12px 28px;font-size:14px;font-weight:600;cursor:pointer;">📧 Open in Gmail</button>
+          <span class="msg-status" id="msg-status"></span>
+        </div>
+      </div>
+
+      <!-- Orders -->
+      <div class="section">
+        <div class="section-header"><span class="section-icon">🛒</span><span class="section-title">All Orders</span><span class="section-count">${orders.length}</span></div>
+        ${renderOrders(orders)}
+      </div>
+      <div class="section">
+        <div class="section-header"><span class="section-icon">🎓</span><span class="section-title">Courses & Training</span><span class="section-count">${courses.length}</span></div>
+        ${renderGrouped(courses, 'course')}
+      </div>
+      <div class="section">
+        <div class="section-header"><span class="section-icon">📚</span><span class="section-title">Books</span><span class="section-count">${books.length}</span></div>
+        ${renderGrouped(books, 'book')}
+      </div>
+      <div class="section">
+        <div class="section-header"><span class="section-icon">🍽️</span><span class="section-title">Recipes Generated</span><span class="section-count">${recipes.length}</span></div>
+        ${renderRecipes(recipes)}
+      </div>
+      <div class="section">
+        <div class="section-header"><span class="section-icon">⭐</span><span class="section-title">Ratings & Reviews</span><span class="section-count">${ratings.length}</span></div>
+        ${renderRatings(ratings)}
+      </div>
+      <div class="section">
+        <div class="section-header"><span class="section-icon">💬</span><span class="section-title">Conversation</span><span class="section-count">${messages.length + (data.replies||[]).length}</span></div>
+        ${renderConversation(messages, data.replies||[])}
+      </div>`;
+
+    // Attach event listeners after DOM is updated
+    setTimeout(attachMessageClicks, 50);
+  }
+
+  function renderOrders(orders) {
+    if (!orders.length) return `<div class="empty-state">No orders on record</div>`;
+    return `<table class="data-table"><thead><tr><th>Order ID</th><th>Date</th><th>Products</th><th>Status</th><th>Total</th></tr></thead><tbody>
+      ${orders.map(o=>`<tr>
+        <td class="mono">#${o.id}</td><td class="mono">${fmtDate(o.date_created)}</td>
+        <td>${(o.products||[]).map(p=>`<span class="tag">${esc(p.name)}</span>`).join('')||'—'}</td>
+        <td>${esc(o.status||'—')}</td><td class="amount">$${parseFloat(o.total_inc_tax||0).toFixed(2)}</td>
+      </tr>`).join('')}</tbody></table>`;
+  }
+  function renderGrouped(items, tagClass) {
+    const label = tagClass === 'course' ? 'No courses purchased' : 'No books purchased';
+    if (!items.length) return `<div class="empty-state">${label}</div>`;
+    return `<table class="data-table"><thead><tr><th>Item</th><th>Order #</th><th>Date</th><th>Amount</th></tr></thead><tbody>
+      ${items.map(c=>`<tr>
+        <td>${c.products.map(p=>`<span class="tag ${tagClass}">${esc(p.name)}</span>`).join('')}</td>
+        <td class="mono">#${c.order.id}</td><td class="mono">${fmtDate(c.order.date_created)}</td>
+        <td class="amount">$${parseFloat(c.order.total_inc_tax||0).toFixed(2)}</td>
+      </tr>`).join('')}</tbody></table>`;
+  }
+  function renderRecipes(recipes) {
+    if (!recipes.length) return `<div class="empty-state">No recipes generated yet</div>`;
+    return `<div class="card-grid">${recipes.map(r=>`<div class="mini-card">
+      <div class="mini-card-top"><div class="mini-card-title">${esc(r.title||r.recipe_name||'Recipe')}</div><div class="mini-card-date">${r.date?fmtDate(r.date):''}</div></div>
+      <div class="mini-card-body">${esc(r.summary||r.description||'')}</div>
+    </div>`).join('')}</div>`;
+  }
+  function renderConversation(sent, replies) {
+    // Merge sent messages and replies into one timeline
+    const all = [
+      ...sent.map(m => ({ ...m, type: 'sent' })),
+      ...replies.map(r => ({ ...r, type: 'reply' }))
+    ];
+
+    if (!all.length) return `<div class="empty-state">No messages yet</div>`;
+
+    // Sort by date oldest first
+    all.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    return `<div style="display:flex;flex-direction:column;gap:10px;">
+      ${all.map((m, i) => {
+        const isSent  = m.type === 'sent';
+        const accent  = isSent ? 'var(--blue)' : 'var(--green)';
+        const label   = isSent ? '📤 You' : '📥 Customer';
+        const preview = isSent ? (m.message||'') : (m.body||'');
+        return `<div style="background:var(--surface);border:1px solid var(--border);border-left:3px solid ${accent};border-radius:10px;overflow:hidden;">
+          <div class="msg-row" data-index="conv-${i}" style="padding:14px 18px;display:flex;align-items:center;gap:16px;cursor:pointer;">
+            <div style="font-size:11px;color:var(--muted);white-space:nowrap;font-family:'JetBrains Mono',monospace;">${fmtDate(m.date)}</div>
+            <div style="flex:1;">
+              <div style="font-weight:600;font-size:13px;margin-bottom:2px;">
+                <span style="color:${accent};">${label}</span>
+                ${m.subject ? `<span style="color:var(--muted);font-weight:400;"> — ${esc(m.subject)}</span>` : ''}
+              </div>
+              <div style="font-size:12px;color:var(--muted);">${esc(preview.substring(0,80))}${preview.length>80?'…':''}</div>
+            </div>
+            <div id="msg-arrow-conv-${i}" style="color:var(--muted);font-size:16px;transition:transform 0.2s;">›</div>
+          </div>
+          <div id="msg-expand-conv-${i}" style="display:none;padding:0 18px 18px;border-top:1px solid var(--border);">
+            <div style="padding-top:14px;font-size:14px;color:var(--text);line-height:1.7;white-space:pre-wrap;">${esc(preview||'(empty)')}</div>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>`;
+  }
+
+  function renderMessages(messages) {
+    return renderConversation(messages, []);
+  }
+
+  function renderRatings(ratings) {
+    if (!ratings.length) return `<div class="empty-state">No ratings or reviews left</div>`;
+    return `<div class="card-grid">${ratings.map(r=>`<div class="mini-card">
+      <div class="stars">${'★'.repeat(parseInt(r.stars||r.rating||0))}${'☆'.repeat(5-parseInt(r.stars||r.rating||0))}</div>
+      <div class="mini-card-top"><div class="mini-card-title">${esc(r.recipe_name||r.title||'Recipe')}</div><div class="mini-card-date">${r.date?fmtDate(r.date):''}</div></div>
+      ${r.review||r.comment?`<div class="review-text">"${esc(r.review||r.comment)}"</div>`:''}
+    </div>`).join('')}</div>`;
+  }
+
+  function esc(str) { return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+  function fmtDate(str) {
+    if (!str) return '—';
+    try { return new Date(str).toLocaleDateString('en-GB', {day:'2-digit',month:'short',year:'numeric'}); }
+    catch { return str; }
+  }
+
+  function attachMessageClicks() {
+    document.querySelectorAll('.msg-row').forEach(row => {
+      row.addEventListener('click', () => {
+        const idx   = row.dataset.index;
+        const body  = document.getElementById(`msg-expand-${idx}`);
+        const arrow = document.getElementById(`msg-arrow-${idx}`);
+        if (!body) return;
+        const open = body.style.display === 'none';
+        body.style.display    = open ? '' : 'none';
+        if (arrow) arrow.style.transform = open ? 'rotate(90deg)' : 'rotate(0deg)';
+      });
+      row.addEventListener('mouseover', () => row.style.background = 'rgba(23,88,126,0.1)');
+      row.addEventListener('mouseout',  () => row.style.background = 'transparent');
+    });
+  }
+</script>
+</body>
+</html>
