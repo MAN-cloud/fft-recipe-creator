@@ -1,1 +1,19 @@
+ name: Deploy Cloudflare Worker
 
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    name: Deploy worker.js to Cloudflare
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy to Cloudflare Workers
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: 4bb926ba8f875c2e92fbdcc456f346c3
+          command: deploy --name fft-recipe --compatibility-date 2024-01-01 --main worker.js
