@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <title>FFT Admin Console v20260527</title>
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:        #0c1219;
+      --surface:   #131c27;
+      --surface2:  #1a2636;
+      --border:    #1e3048;
+      --blue:      #17587E;
+      --blue-lt:   #2178a8;
+      --yellow:    #f5c842;
+      --yellow-dk: #c9a325;
+      --text:      #dde7f0;
+      --muted:     #6b8099;
+      --green:     #3fb68b;
+      --red:       #e05c5c;
+      --purple:    #9b7fd4;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; font-size: 14px; min-height: 100vh; }
+    #lock-screen { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background: var(--bg); z-index: 999; }
+    .lock-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 52px 48px; width: 380px; text-align: center; box-shadow: 0 32px 80px rgba(0,0,0,0.6); }
+    .lock-logo { font-family: 'Lora', serif; font-size: 13px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--yellow); margin-bottom: 6px; }
+    .lock-title { font-family: 'Lora', serif; font-size: 26px; font-weight: 700; color: var(--text); margin-bottom: 32px; }
+    .lock-title span { color: var(--yellow); }
+    .lock-label { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); text-align: left; display: block; margin-bottom: 8px; }
+    .lock-input { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 15px; letter-spacing: 0.12em; outline: none; transition: border-color 0.2s; }
+    .lock-input:focus { border-color: var(--blue-lt); }
+    .lock-input.error { border-color: var(--red); animation: shake 0.35s ease; }
+    @keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-6px)} 40%{transform:translateX(6px)} 60%{transform:translateX(-4px)} 80%{transform:translateX(4px)} }
+    .lock-btn { width: 100%; margin-top: 20px; padding: 13px; background: var(--yellow); color: #0c1219; border: none; border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; }
+    .lock-btn:hover { background: var(--yellow-dk); }
+    .lock-err { font-size: 12px; color: var(--red); margin-top: 12px; min-height: 16px; }
+    #dashboard { display: none; flex-direction: column; min-height: 100vh; }
+    .topbar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 32px; height: 60px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 10; }
+    .topbar-brand { display: flex; align-items: center; gap: 12px; }
+    .brand-pill { background: var(--yellow); color: #0c1219; font-family: 'Lora', serif; font-size: 12px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; padding: 4px 10px; border-radius: 4px; }
+    .brand-name { font-family: 'Lora', serif; font-size: 15px; font-weight: 600; color: var(--text); }
+    .brand-name em { color: var(--muted); font-style: normal; font-weight: 400; font-size: 13px; margin-left: 4px; }
+    .topbar-right { display: flex; align-items: center; gap: 16px; }
+    .status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); box-shadow: 0 0 6px var(--green); animation: pulse 2s ease-in-out infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+    .status-label { font-size: 12px; color: var(--muted); }
+    .logout-btn { font-size: 12px; color: var(--muted); background: none; border: 1px solid var(--border); border-radius: 6px; padding: 5px 12px; cursor: pointer; }
+    .logout-btn:hover { color: var(--text); border-color: var(--muted); }
+    .main { flex: 1; padding: 36px 32px; max-width: 1100px; width: 100%; margin: 0 auto; }
+    .mode-heading { font-family: 'Lora', serif; font-size: 22px; font-weight: 700; color: var(--text); margin-bottom: 20px; }
+    .mode-tabs { display: flex; gap: 10px; margin-bottom: 28px; flex-wrap: wrap; }
+    .mode-tab { flex: 1; min-width: 180px; padding: 14px 16px; border-radius: 12px; cursor: pointer; border: 2px solid var(--border); background: var(--surface); text-align: left; display: flex; align-items: center; gap: 12px; transition: border-color 0.2s; }
+    .mode-tab:hover { border-color: var(--blue); }
+    .mode-tab.active { border-color: var(--yellow); background: rgba(245,200,66,0.06); }
+    .mode-tab-icon { font-size: 24px; }
+    .mode-tab-title { font-weight: 600; font-size: 14px; color: var(--text); margin-bottom: 2px; }
+    .mode-tab-sub { font-size: 12px; color: var(--muted); }
+    .recent-list { display: flex; flex-direction: column; gap: 8px; }
+    .recent-row { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px 20px; display: flex; align-items: center; gap: 16px; cursor: pointer; transition: border-color 0.15s; }
+    .recent-row:hover { border-color: var(--yellow); background: rgba(245,200,66,0.04); }
+    .recent-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--blue); display: flex; align-items: center; justify-content: center; font-family: 'Lora', serif; font-size: 15px; font-weight: 700; color: #fff; flex-shrink: 0; }
+    .recent-info { flex: 1; }
+    .recent-name { font-weight: 600; font-size: 14px; color: var(--text); }
+    .recent-email { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .recent-badge { font-size: 11px; background: rgba(63,182,139,0.15); color: var(--green); border-radius: 4px; padding: 2px 8px; white-space: nowrap; }
+    .recent-arrow { color: var(--muted); font-size: 18px; }
+    .search-row { display: flex; gap: 10px; }
+    .search-input { flex: 1; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 13px 18px; color: var(--text); font-family: 'Inter', sans-serif; font-size: 15px; outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
+    .search-input::placeholder { color: var(--muted); }
+    .search-input:focus { border-color: var(--blue-lt); box-shadow: 0 0 0 3px rgba(33,120,168,0.15); }
+    .search-btn { background: var(--blue); color: #fff; border: none; border-radius: 10px; padding: 13px 28px; font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; }
+    .search-btn:hover { background: var(--blue-lt); }
+    .search-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .state-msg { text-align: center; padding: 60px 0; color: var(--muted); font-size: 14px; }
+    .state-msg .icon { font-size: 36px; margin-bottom: 12px; }
+    .state-msg h3 { font-family: 'Lora', serif; font-size: 18px; color: var(--text); margin-bottom: 6px; }
+    .spinner { width: 28px; height: 28px; border: 3px solid var(--border); border-top-color: var(--yellow); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .back-btn { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); font-size: 13px; cursor: pointer; margin-bottom: 24px; padding: 6px 0; border: none; background: none; }
+    .back-btn:hover { color: var(--yellow); }
+    .profile-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 28px 32px; display: flex; align-items: flex-start; gap: 28px; margin-bottom: 20px; position: relative; overflow: hidden; }
+    .profile-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--yellow); }
+    .avatar { width: 64px; height: 64px; border-radius: 50%; background: var(--blue); display: flex; align-items: center; justify-content: center; font-family: 'Lora', serif; font-size: 24px; font-weight: 700; color: #fff; flex-shrink: 0; }
+    .profile-info { flex: 1; }
+    .profile-name { font-family: 'Lora', serif; font-size: 22px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+    .profile-email { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--yellow); margin-bottom: 14px; }
+    .profile-meta { display: flex; gap: 28px; flex-wrap: wrap; }
+    .meta-item { display: flex; flex-direction: column; gap: 2px; }
+    .meta-label { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+    .meta-value { font-size: 13px; color: var(--text); }
+    .profile-stats { display: flex; gap: 12px; flex-wrap: wrap; }
+    .stat-box { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 14px 18px; text-align: center; min-width: 75px; }
+    .stat-num { font-family: 'Lora', serif; font-size: 22px; font-weight: 700; color: var(--yellow); }
+    .stat-label { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .message-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 24px 28px; margin-bottom: 28px; }
+    .message-panel-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+    .message-panel-title { font-family: 'Lora', serif; font-size: 15px; font-weight: 600; color: var(--text); display: flex; align-items: center; gap: 8px; }
+    .msg-tabs { display: flex; gap: 8px; margin-bottom: 18px; }
+    .msg-tab { padding: 7px 16px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 500; border: 1px solid var(--border); background: var(--surface2); color: var(--muted); transition: all 0.15s; }
+    .msg-tab.active { background: var(--blue); border-color: var(--blue); color: #fff; }
+    .msg-tab:hover:not(.active) { border-color: var(--blue-lt); color: var(--text); }
+    .msg-field { margin-bottom: 14px; }
+    .msg-field label { display: block; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+    .msg-input { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; color: var(--text); font-family: 'Inter', sans-serif; font-size: 14px; outline: none; transition: border-color 0.2s; }
+    .msg-input:focus { border-color: var(--blue-lt); }
+    .msg-textarea { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; color: var(--text); font-family: 'Inter', sans-serif; font-size: 14px; outline: none; resize: vertical; min-height: 120px; line-height: 1.6; transition: border-color 0.2s; }
+    .msg-textarea:focus { border-color: var(--blue-lt); }
+    .msg-actions { display: flex; align-items: center; gap: 12px; margin-top: 16px; }
+    .msg-send-btn { background: var(--yellow); color: #0c1219; border: none; border-radius: 8px; padding: 10px 24px; font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; transition: background 0.15s; }
+    .msg-send-btn:hover { background: var(--yellow-dk); }
+    .msg-send-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .gmail-btn { background: none; color: var(--muted); border: 1px solid var(--border); border-radius: 8px; padding: 10px 20px; font-family: 'Inter', sans-serif; font-size: 13px; cursor: pointer; transition: all 0.15s; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+    .gmail-btn:hover { border-color: var(--muted); color: var(--text); }
+    .msg-status { font-size: 13px; margin-left: auto; }
+    .msg-status.success { color: var(--green); }
+    .msg-status.error   { color: var(--red); }
+    .section { margin-bottom: 28px; }
+    .section-header { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+    .section-icon { font-size: 17px; }
+    .section-title { font-family: 'Lora', serif; font-size: 16px; font-weight: 600; color: var(--text); }
+    .section-count { margin-left: auto; background: var(--surface2); border: 1px solid var(--border); color: var(--muted); font-size: 11px; font-weight: 600; padding: 2px 9px; border-radius: 20px; }
+    .data-table { width: 100%; border-collapse: collapse; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; font-size: 13px; }
+    .data-table th { background: var(--surface2); text-align: left; padding: 11px 16px; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); font-weight: 600; border-bottom: 1px solid var(--border); }
+    .data-table td { padding: 12px 16px; border-bottom: 1px solid var(--border); vertical-align: top; color: var(--text); }
+    .data-table tr:last-child td { border-bottom: none; }
+    .data-table tr:hover td { background: rgba(23,88,126,0.08); }
+    .mono { font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+    .amount { color: var(--green); font-weight: 600; font-family: 'JetBrains Mono', monospace; }
+    .tag { display: inline-block; background: rgba(23,88,126,0.25); color: #7ab8d4; font-size: 11px; padding: 2px 8px; border-radius: 4px; margin: 2px 2px 2px 0; }
+    .tag.course { background: rgba(245,200,66,0.15); color: var(--yellow); }
+    .tag.book { background: rgba(155,127,212,0.2); color: var(--purple); }
+    .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; }
+    .mini-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; }
+    .mini-card:hover { border-color: var(--blue); }
+    .mini-card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+    .mini-card-title { font-weight: 600; font-size: 14px; color: var(--text); line-height: 1.3; }
+    .mini-card-date { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); white-space: nowrap; margin-left: 10px; }
+    .mini-card-body { font-size: 12px; color: var(--muted); line-height: 1.5; }
+    .stars { color: var(--yellow); font-size: 14px; margin-bottom: 6px; }
+    .review-text { font-size: 13px; color: var(--text); font-style: italic; line-height: 1.5; }
+    .empty-state { text-align: center; padding: 32px; color: var(--muted); font-size: 13px; background: var(--surface); border: 1px dashed var(--border); border-radius: 12px; }
+    .not-found { text-align: center; padding: 60px; color: var(--muted); }
+    .not-found .icon { font-size: 40px; margin-bottom: 14px; }
+    .not-found h3 { font-family: 'Lora', serif; font-size: 18px; color: var(--text); margin-bottom: 6px; }
+    .id-badge { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); background: var(--surface2); border: 1px solid var(--border); border-radius: 4px; padding: 2px 7px; }
+    .draft-card { background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--yellow); border-radius: 12px; padding: 22px 24px; margin-bottom: 16px; }
+    .draft-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 14px; gap: 16px; }
+    .draft-meta { flex: 1; }
+    .draft-trigger { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--yellow); margin-bottom: 4px; }
+    .draft-to { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--text); margin-bottom: 2px; }
+    .draft-subject { font-size: 15px; font-weight: 600; color: var(--text); font-family: 'Lora', serif; }
+    .draft-body { font-size: 14px; color: var(--muted); line-height: 1.7; white-space: pre-wrap; background: var(--surface2); border-radius: 8px; padding: 16px; margin-bottom: 16px; max-height: 200px; overflow-y: auto; }
+    .draft-actions { display: flex; gap: 10px; align-items: center; }
+    .draft-approve { background: var(--green); color: #fff; border: none; border-radius: 8px; padding: 10px 24px; font-size: 14px; font-weight: 600; cursor: pointer; }
+    .draft-approve:hover { opacity: 0.85; }
+    .draft-approve:disabled { opacity: 0.4; cursor: not-allowed; }
+    .draft-discard { background: none; color: var(--muted); border: 1px solid var(--border); border-radius: 8px; padding: 10px 20px; font-size: 13px; cursor: pointer; }
+    .draft-discard:hover { border-color: var(--red); color: var(--red); }
+    .draft-status { font-size: 12px; margin-left: auto; }
+    .opp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(480px, 1fr)); gap: 20px; }
+    .opp-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
+    .opp-card-header { padding: 16px 20px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--border); }
+    .opp-card-icon { font-size: 22px; }
+    .opp-card-title { font-family: 'Lora', serif; font-size: 15px; font-weight: 600; color: var(--text); flex: 1; }
+    .opp-card-count { background: var(--yellow); color: #0c1219; font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 20px; }
+    .opp-list { max-height: 320px; overflow-y: auto; }
+    .opp-row { padding: 12px 20px; display: flex; align-items: center; gap: 14px; cursor: pointer; border-bottom: 1px solid var(--border); transition: background 0.15s; }
+    .opp-row:last-child { border-bottom: none; }
+    .opp-row:hover { background: rgba(23,88,126,0.1); }
+    .opp-avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--blue); display: flex; align-items: center; justify-content: center; font-family: 'Lora', serif; font-size: 12px; font-weight: 700; color: #fff; flex-shrink: 0; }
+    .opp-info { flex: 1; }
+    .opp-name { font-size: 13px; font-weight: 600; color: var(--text); }
+    .opp-detail { font-size: 11px; color: var(--muted); font-family: 'JetBrains Mono', monospace; margin-top: 1px; }
+    .opp-tag { font-size: 10px; padding: 2px 7px; border-radius: 4px; white-space: nowrap; }
+    .bc-section { margin-bottom: 22px; }
+    .bc-label { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; display: block; }
+    .bc-select { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 11px 14px; color: var(--text); font-family: 'Inter', sans-serif; font-size: 14px; outline: none; cursor: pointer; }
+    .bc-select:focus { border-color: var(--blue-lt); }
+    .bc-textarea { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; color: var(--text); font-family: 'Inter', sans-serif; font-size: 14px; outline: none; resize: vertical; min-height: 90px; line-height: 1.6; }
+    .bc-textarea:focus { border-color: var(--blue-lt); }
+    .bc-input { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 11px 14px; color: var(--text); font-family: 'Inter', sans-serif; font-size: 14px; outline: none; }
+    .bc-input:focus { border-color: var(--blue-lt); }
+    .bc-btn { background: var(--yellow); color: #0c1219; border: none; border-radius: 8px; padding: 12px 28px; font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; }
+    .bc-btn:hover { background: var(--yellow-dk); }
+    .bc-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .bc-btn-outline { background: none; color: var(--muted); border: 1px solid var(--border); border-radius: 8px; padding: 12px 24px; font-family: 'Inter', sans-serif; font-size: 14px; cursor: pointer; }
+    .bc-btn-outline:hover { border-color: var(--text); color: var(--text); }
+    .bc-preview { background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 28px; margin-top: 20px; }
+    .bc-preview-subject { font-family: 'Lora', serif; font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+    .bc-preview-body { font-size: 14px; color: var(--text); line-height: 1.8; white-space: pre-wrap; }
+    .bc-preview-video { margin: 20px 0; border-radius: 10px; overflow: hidden; cursor: pointer; position: relative; display: inline-block; width: 100%; }
+    .bc-preview-video img { width: 100%; border-radius: 10px; display: block; }
+    .bc-play-btn { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 64px; height: 64px; background: rgba(0,0,0,0.7); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+    .bc-segment-count { font-size: 12px; color: var(--green); margin-left: 10px; font-family: 'JetBrains Mono', monospace; }
+    .bc-actions { display: flex; gap: 12px; align-items: center; margin-top: 20px; flex-wrap: wrap; }
+    .bc-status { font-size: 13px; }
+    .bc-status.success { color: var(--green); }
+    .bc-status.error { color: var(--red); }
+    @media (max-width: 700px) {
+      .main { padding: 24px 16px; }
+      .topbar { padding: 0 16px; }
+      .profile-card { flex-direction: column; }
+      .profile-stats { flex-wrap: wrap; }
+      .mode-tabs { flex-direction: column; }
+      .opp-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+<div id="lock-screen">
+  <div class="lock-card">
+    <div class="lock-logo">Free From That</div>
+    <div class="lock-title">Admin <span>Console</span></div>
+    <label class="lock-label" for="pw-input">Password</label>
+    <input type="password" id="pw-input" class="lock-input" placeholder="••••••••••••••" autocomplete="current-password">
+    <button class="lock-btn" onclick="checkPassword()">Unlock →</button>
+    <div class="lock-err" id="lock-err"></div>
+  </div>
+</div>
+
+<div id="dashboard">
+  <header class="topbar">
+    <div class="topbar-brand">
+      <span class="brand-pill">FFT</span>
+      <span class="brand-name">Admin Console <em>— Internal Use Only</em></span>
+    </div>
+    <div class="topbar-right">
+      <a href="https://man-cloud.github.io/fft-recipe-creator/admin.html" title="Back to Admin Console" style="font-size:20px;text-decoration:none;opacity:0.6;transition:opacity 0.15s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.6'">🏠</a>
+      <span class="status-dot"></span>
+      <span class="status-label">Connected</span>
+      <button class="logout-btn" onclick="logout()">Lock</button>
+    </div>
+  </header>
+
+  <main class="main">
+    <div id="mode-panel">
+      <h1 class="mode-heading">Customer Lookup</h1>
+      <div class="mode-tabs">
+        <button class="mode-tab active" id="tab-broadcast" onclick="switchMode('broadcast')">
+          <span class="mode-tab-icon">📢</span>
+          <div><div class="mode-tab-title">Broadcasts</div><div class="mode-tab-sub">Send to a segment</div></div>
+        </button>
+        <button class="mode-tab" id="tab-analytics" onclick="switchMode('analytics')">
+          <span class="mode-tab-icon">📊</span>
+          <div><div class="mode-tab-title">Analytics</div><div class="mode-tab-sub">Opens, clicks, bounces</div></div>
+        </button>
+        <button class="mode-tab" id="tab-recent" onclick="switchMode('recent')">
+          <span class="mode-tab-icon">⚡</span>
+          <div><div class="mode-tab-title">Last 10 Active</div><div class="mode-tab-sub">Customers with recent orders</div></div>
+        </button>
+        <button class="mode-tab" id="tab-search" onclick="switchMode('search')">
+          <span class="mode-tab-icon">🔍</span>
+          <div><div class="mode-tab-title">Search by Name / Email</div><div class="mode-tab-sub">Find any specific customer</div></div>
+        </button>
+        <button class="mode-tab" id="tab-opps" onclick="switchMode('opps')">
+          <span class="mode-tab-icon">🎯</span>
+          <div><div class="mode-tab-title">Opportunities</div><div class="mode-tab-sub">Customers needing attention</div></div>
+        </button>
+        <button class="mode-tab" id="tab-drafts" onclick="switchMode('drafts')">
+          <span class="mode-tab-icon">🤖</span>
+          <div><div class="mode-tab-title">AI Drafts</div><div class="mode-tab-sub" id="drafts-sub">Emails waiting approval</div></div>
+        </button>
+      </div>
+
+      <div id="panel-recent" style="display:none">
+        <div id="recent-list-wrap"><div class="state-msg"><div class="spinner"></div><p>Loading recent customers…</p></div></div>
+      </div>
+      <div id="panel-search" style="display:none">
+        <div class="search-row">
+          <input type="text" class="search-input" id="search-input" placeholder="jane@example.com  or  Jane Smith" onkeydown="if(event.key==='Enter') doSearch()">
+          <button class="search-btn" id="search-btn" onclick="doSearch()">Search</button>
+        </div>
+        <div id="search-state" style="margin-top:20px"></div>
+      </div>
+      <div id="panel-opps" style="display:none">
+        <div id="opps-wrap"><div class="state-msg"><div class="spinner"></div><p>Scanning customers…</p></div></div>
+      </div>
+      <div id="panel-drafts" style="display:none">
+        <div id="drafts-wrap"><div class="state-msg"><div class="spinner"></div><p>Loading AI drafts…</p></div></div>
+      </div>
+      <div id="panel-analytics" style="display:none">
+        <div id="analytics-wrap"><div class="state-msg"><div class="spinner"></div><p>Loading analytics…</p></div></div>
+      </div>
+
+      <div id="panel-broadcast">
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:28px 32px;">
+          <div style="font-family:'Lora',serif;font-size:18px;font-weight:700;color:var(--text);margin-bottom:24px;">📢 New Broadcast</div>
+
+          <div class="bc-section">
+            <label class="bc-label">Brief for Claude — what is this email about?</label>
+            <textarea class="bc-textarea" id="bc-brief" placeholder="e.g. New PANACEGG V2 is back in stock. 10% off this week. Mention the Vegan Baking Masterclass course and the Swiss Rolls e-book."></textarea>
+          </div>
+
+          <div class="bc-section">
+            <label class="bc-label">Select Regions to Send To <span style="color:var(--red);">*</span></label>
+            <div style="display:flex;flex-wrap:wrap;gap:10px;" id="bc-region-checkboxes">
+              <label style="display:flex;align-items:center;gap:8px;padding:8px 14px;background:var(--surface2);border:2px solid var(--green);border-radius:8px;cursor:pointer;">
+                <input type="checkbox" value="test" onchange="updateRegionSelection()"> 🧪 TEST <span style="color:var(--muted);font-size:11px;">3 emails</span>
+              </label>
+              <label style="display:flex;align-items:center;gap:8px;padding:8px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;cursor:pointer;">
+                <input type="checkbox" value="us" onchange="updateRegionSelection()"> 🇺🇸 US <span style="color:var(--muted);font-size:11px;">~800</span>
+              </label>
+              <label style="display:flex;align-items:center;gap:8px;padding:8px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;cursor:pointer;">
+                <input type="checkbox" value="uk" onchange="updateRegionSelection()"> 🇬🇧 UK <span style="color:var(--muted);font-size:11px;">~180</span>
+              </label>
+              <label style="display:flex;align-items:center;gap:8px;padding:8px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;cursor:pointer;">
+                <input type="checkbox" value="au" onchange="updateRegionSelection()"> 🇦🇺 AU/NZ <span style="color:var(--muted);font-size:11px;">~150</span>
+              </label>
+              <label style="display:flex;align-items:center;gap:8px;padding:8px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;cursor:pointer;">
+                <input type="checkbox" value="ca" onchange="updateRegionSelection()"> 🇨🇦 Canada <span style="color:var(--muted);font-size:11px;">~70</span>
+              </label>
+              <label style="display:flex;align-items:center;gap:8px;padding:8px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;cursor:pointer;">
+                <input type="checkbox" value="es" onchange="updateRegionSelection()"> 🇪🇸 Spain+LATAM <span style="color:var(--muted);font-size:11px;">~29</span>
+              </label>
+              <label style="display:flex;align-items:center;gap:8px;padding:8px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;cursor:pointer;">
+                <input type="checkbox" value="fr" onchange="updateRegionSelection()"> 🇫🇷 France <span style="color:var(--muted);font-size:11px;">~45</span>
+              </label>
+              <label style="display:flex;align-items:center;gap:8px;padding:8px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;cursor:pointer;">
+                <input type="checkbox" value="europe" onchange="updateRegionSelection()"> 🇪🇺 Europe <span style="color:var(--muted);font-size:11px;">~231</span>
+              </label>
+              <label style="display:flex;align-items:center;gap:8px;padding:8px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;cursor:pointer;">
+                <input type="checkbox" value="world" onchange="updateRegionSelection()"> 🌍 World <span style="color:var(--muted);font-size:11px;">~214</span>
+              </label>
+              <label style="display:flex;align-items:center;gap:8px;padding:8px 14px;background:var(--surface2);border:2px solid var(--yellow);border-radius:8px;cursor:pointer;">
+                <input type="checkbox" value="all" onchange="toggleAllRegions(this)"> <strong>All Regions</strong> <span style="color:var(--muted);font-size:11px;">~1,800</span>
+              </label>
+            </div>
+            <div id="bc-region-warning" style="display:none;color:var(--red);font-size:12px;margin-top:8px;">⚠️ Please select at least one region before sending.</div>
+            <div id="bc-region-summary" style="font-size:12px;color:var(--muted);margin-top:8px;"></div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;" class="bc-section">
+            <div>
+              <label class="bc-label">Content Focus</label>
+              <select class="bc-select" id="bc-content-type">
+                <option value="products, training and books">All — Products + Training + Books</option>
+                <option value="products only">Products Only</option>
+                <option value="training and courses only">Training Only</option>
+                <option value="books only">Books Only</option>
+                <option value="products and training">Products + Training</option>
+                <option value="products and books">Products + Books</option>
+              </select>
+            </div>
+            <div>
+              <label class="bc-label">Discount Code (optional)</label>
+              <input type="text" class="bc-input" id="bc-discount" placeholder="e.g. WELCOME10">
+            </div>
+          </div>
+
+          <div class="bc-section">
+            <label class="bc-label">Video URL (optional) — YouTube or Vimeo link</label>
+            <input type="url" class="bc-input" id="bc-video" placeholder="https://youtube.com/watch?v=...">
+          </div>
+
+          <div style="display:flex;gap:12px;">
+            <button class="bc-btn" id="bc-draft-btn" onclick="generateBroadcast()">✨ Generate with Claude</button>
+            <button class="bc-btn-outline" onclick="clearBroadcast()">Clear</button>
+            <span id="bc-gen-status" style="font-size:13px;color:var(--muted);align-self:center;margin-left:4px;"></span>
+          </div>
+
+          <div id="bc-preview-wrap" style="display:none">
+            <div class="bc-preview">
+              <div style="font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;">Preview — 8 Regional Versions</div>
+              <div class="bc-preview-subject" id="bc-preview-subject" style="margin-bottom:16px;"></div>
+              <div id="bc-video-preview"></div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;" id="bc-region-tabs"></div>
+              <div id="bc-region-body" contenteditable="true" style="outline:none;border:1px dashed var(--border);border-radius:8px;padding:16px;font-size:14px;color:var(--text);line-height:1.8;white-space:pre-wrap;min-height:120px;"></div>
+              <div style="font-size:11px;color:var(--muted);margin-top:8px;">✏️ Select a region tab above to preview and edit that version</div>
+            </div>
+            <div class="bc-actions">
+              <button class="bc-btn" id="bc-send-btn" onclick="sendBroadcast()">🚀 Send to All Regions</button>
+              <button class="bc-btn-outline" onclick="generateBroadcast()">↺ Regenerate</button>
+              <span id="bc-send-status" class="bc-status"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="profile-panel" style="display:none">
+      <button class="back-btn" onclick="goBack()">← Back to list</button>
+      <div id="results"></div>
+    </div>
+  </main>
+</div>
+
+<script>
+  const WORKER_URL = 'https://fft-recipe.man-4bb.workers.dev';
+  const PW_HASH    = 'd7b73124c176310ef8623c336f0042152e928984ce2addd49520434c8477eb09';
+  let currentCustomer = null;
+
+  async function sha256(str) {
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+  }
+  async function checkPassword() {
+    const input = document.getElementById('pw-input').value;
+    const hash  = await sha256(input);
+    if (hash === PW_HASH) {
+      document.getElementById('lock-screen').style.display = 'none';
+      document.getElementById('dashboard').style.display   = 'flex';
+      sessionStorage.setItem('fft_admin', '1');
+      loadRecent();
+    } else {
+      const inp = document.getElementById('pw-input');
+      inp.classList.add('error');
+      document.getElementById('lock-err').textContent = 'Incorrect password. Try again.';
+      inp.value = '';
+      setTimeout(() => inp.classList.remove('error'), 400);
+    }
+  }
+  document.getElementById('pw-input').addEventListener('keydown', e => { if (e.key === 'Enter') checkPassword(); });
+  if (sessionStorage.getItem('fft_admin') === '1') {
+    document.getElementById('lock-screen').style.display = 'none';
+    document.getElementById('dashboard').style.display   = 'flex';
+    loadRecent();
+  }
+  function logout() {
+    sessionStorage.removeItem('fft_admin');
+    document.getElementById('lock-screen').style.display = 'flex';
+    document.getElementById('dashboard').style.display   = 'none';
+    document.getElementById('pw-input').value = '';
+  }
+
+  function switchMode(mode) {
+    ['recent','search','opps','drafts','broadcast','analytics'].forEach(m => {
+      document.getElementById(`tab-${m}`)?.classList.toggle('active', m === mode);
+      const p = document.getElementById(`panel-${m}`);
+      if (p) p.style.display = m === mode ? '' : 'none';
+    });
+    if (mode === 'opps'      && !oppsLoaded)      loadOpportunities();
+    if (mode === 'drafts'    && !draftsLoaded)     loadDrafts();
+    if (mode === 'analytics' && !analyticsLoaded)  loadAnalytics();
+    if (mode === 'recent'    && !recentLoaded)      loadRecent();
+  }
+
+  let draftsLoaded = false, oppsLoaded = false, analyticsLoaded = false, recentLoaded = false;
+
+  async function loadDrafts() {
+    const wrap = document.getElementById('drafts-wrap');
+    wrap.innerHTML = `<div class="state-msg"><div class="spinner"></div><p>Loading AI drafts…</p></div>`;
+    try {
+      const res  = await fetch(`${WORKER_URL}/admin/drafts`);
+      const data = await res.json();
+      draftsLoaded = true;
+      renderDrafts(data.drafts || []);
+    } catch (err) {
+      wrap.innerHTML = `<div class="state-msg"><div class="icon">⚠️</div><h3>Error</h3><p>${err.message}</p></div>`;
+    }
+  }
+
+  const TRIGGER_LABELS = {
+    abandoned_cart:      '🛒 Abandoned Cart',
+    recipes_no_purchase: '🍽️ Used Recipe Maker — Never Purchased',
+    gone_quiet:          '😴 Gone Quiet 90+ Days',
+    post_purchase:       '📦 Post-Purchase Follow-up'
+  };
+
+  function renderDrafts(drafts) {
+    const wrap = document.getElementById('drafts-wrap');
+    document.getElementById('drafts-sub').textContent = `${drafts.length} waiting approval`;
+    if (!drafts.length) {
+      wrap.innerHTML = `<div class="state-msg"><div class="icon">✅</div><h3>All clear!</h3><p>No AI drafts waiting.</p></div>`;
+      return;
+    }
+    wrap.innerHTML = drafts.map((d, i) => `
+      <div class="draft-card" id="draft-card-${i}">
+        <div class="draft-header">
+          <div class="draft-meta">
+            <div class="draft-trigger">${TRIGGER_LABELS[d.trigger] || d.trigger}</div>
+            <div class="draft-to">To: ${esc(d.to)}</div>
+            <div class="draft-subject">${esc(d.subject)}</div>
+          </div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);">${fmtDate(d.date)}</div>
+        </div>
+        <div class="draft-body">${esc(d.message)}</div>
+        <div class="draft-actions">
+          <button class="draft-approve" onclick="approveDraft(${i})" id="approve-btn-${i}">✓ Approve & Send</button>
+          <button class="draft-discard" onclick="discardDraft(${i})">✗ Discard</button>
+          <span class="draft-status" id="draft-status-${i}"></span>
+        </div>
+      </div>`).join('');
+  }
+
+  async function approveDraft(i) {
+    const card = document.getElementById(`draft-card-${i}`);
+    const btn  = document.getElementById(`approve-btn-${i}`);
+    const status = document.getElementById(`draft-status-${i}`);
+    const to      = card.querySelector('.draft-to').textContent.replace('To: ','');
+    const subject = card.querySelector('.draft-subject').textContent;
+    const message = card.querySelector('.draft-body').textContent;
+    btn.disabled = true; btn.textContent = 'Sending…';
+    try {
+      const res  = await fetch(`${WORKER_URL}/admin/approve-draft`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ to, subject, message }) });
+      const data = await res.json();
+      if (data.ok) { card.style.opacity = '0.4'; card.style.pointerEvents = 'none'; status.textContent = '✓ Sent!'; status.style.color = 'var(--green)'; }
+      else { status.textContent = `Error: ${data.error}`; status.style.color = 'var(--red)'; btn.disabled = false; btn.textContent = '✓ Approve & Send'; }
+    } catch (err) { status.textContent = `Error: ${err.message}`; status.style.color = 'var(--red)'; btn.disabled = false; btn.textContent = '✓ Approve & Send'; }
+  }
+
+  async function discardDraft(i) {
+    const card = document.getElementById(`draft-card-${i}`);
+    const to = card.querySelector('.draft-to').textContent.replace('To: ','');
+    const subject = card.querySelector('.draft-subject').textContent;
+    try { await fetch(`${WORKER_URL}/admin/discard-draft`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ to, subject }) }); } catch(e) {}
+    card.style.opacity = '0.3'; card.style.pointerEvents = 'none';
+    const status = document.getElementById(`draft-status-${i}`);
+    status.textContent = 'Discarded'; status.style.color = 'var(--muted)';
+  }
+
+  async function loadOpportunities() {
+    const wrap = document.getElementById('opps-wrap');
+    wrap.innerHTML = `<div class="state-msg"><div class="spinner"></div><p>Scanning customers…</p></div>`;
+    try {
+      const res  = await fetch(`${WORKER_URL}/admin/opportunities`);
+      const data = await res.json();
+      oppsLoaded = true;
+      renderOpportunities(data);
+    } catch (err) {
+      wrap.innerHTML = `<div class="state-msg"><div class="icon">⚠️</div><h3>Error</h3><p>${err.message}</p></div>`;
+    }
+  }
+
+  function renderOpportunities(data) {
+    const wrap = document.getElementById('opps-wrap');
+    const nr  = data.neverRecipe || [];
+    const tkg = (data.bulkBuyers || []).sort((a,b) => { if(!a.lastBulk) return 1; if(!b.lastBulk) return -1; return new Date(a.lastBulk)-new Date(b.lastBulk); });
+    const us  = data.usCustomers || [];
+    const ab  = data.abandoned   || [];
+    wrap.innerHTML = `<div class="opp-grid">
+      ${oppCard('🍽️', 'Never Used Recipe Maker', nr, c => `<span class="opp-tag" style="background:rgba(155,127,212,0.2);color:var(--purple);">No recipes yet</span>`, c => c.email)}
+      ${oppCard('📦', '10KG & 25KG Buyers', tkg, c => `<span class="opp-tag" style="background:rgba(245,200,66,0.15);color:var(--yellow);">Last bulk: ${c.lastBulk ? new Date(c.lastBulk).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}) : '—'}</span>`, c => c.email)}
+      ${oppCard('🇺🇸', 'US Customers', us, c => `<span class="opp-tag" style="background:rgba(23,88,126,0.25);color:#7ab8d4;">${c.location||'United States'}</span>`, c => c.email)}
+      ${oppCard('🛒', 'Abandoned Cart', ab, c => `<span class="opp-tag" style="background:rgba(224,92,92,0.15);color:var(--red);">Left cart</span>`, c => c.email)}
+    </div>`;
+    document.querySelectorAll('.opp-row').forEach(row => {
+      row.addEventListener('click', () => loadCustomer(row.dataset.email));
+    });
+  }
+
+  function oppCard(icon, title, customers, tagFn, emailFn) {
+    const rows = customers.slice(0, 20).map(c => {
+      const initials = (c.name||'?').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+      return `<div class="opp-row" data-email="${esc(emailFn(c))}">
+        <div class="opp-avatar">${initials}</div>
+        <div class="opp-info"><div class="opp-name">${esc(c.name||'Unknown')}</div><div class="opp-detail">${esc(emailFn(c))}</div></div>
+        ${tagFn(c)}
+      </div>`;
+    }).join('');
+    const empty = `<div class="empty-state" style="margin:20px;">No customers in this segment 🎉</div>`;
+    return `<div class="opp-card">
+      <div class="opp-card-header"><span class="opp-card-icon">${icon}</span><span class="opp-card-title">${title}</span><span class="opp-card-count">${customers.length}</span></div>
+      <div class="opp-list">${customers.length ? rows : empty}</div>
+    </div>`;
+  }
+
+  async function loadRecent() {
+    const wrap = document.getElementById('recent-list-wrap');
+    wrap.innerHTML = `<div class="state-msg"><div class="spinner"></div><p>Loading recent customers…</p></div>`;
+    try {
+      const res  = await fetch(`${WORKER_URL}/admin/recent`);
+      const data = await res.json();
+      recentLoaded = true;
+      renderRecentList(data.customers || []);
+    } catch (err) {
+      wrap.innerHTML = `<div class="state-msg"><div class="icon">⚠️</div><h3>Could not load</h3><p>${err.message}</p></div>`;
+    }
+  }
+
+  function renderRecentList(customers) {
+    const wrap = document.getElementById('recent-list-wrap');
+    if (!customers.length) { wrap.innerHTML = `<div class="state-msg"><div class="icon">📭</div><h3>No recent activity</h3></div>`; return; }
+    wrap.innerHTML = `<div class="recent-list">${customers.map(c => {
+      const name = esc(c.name || 'Unknown'), email = esc(c.email || '');
+      const initials = (c.name || 'U').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+      return `<div class="recent-row" onclick="loadCustomer('${c.email}')">
+        <div class="recent-avatar">${initials}</div>
+        <div class="recent-info"><div class="recent-name">${name}</div><div class="recent-email">${email}</div></div>
+        <span class="recent-badge">Recent order</span><span class="recent-arrow">›</span>
+      </div>`;
+    }).join('')}</div>`;
+  }
+
+  async function doSearch() {
+    const q = document.getElementById('search-input').value.trim();
+    if (!q) return;
+    const btn = document.getElementById('search-btn');
+    btn.disabled = true; btn.textContent = 'Searching…';
+    document.getElementById('search-state').innerHTML = `<div class="state-msg"><div class="spinner"></div><p>Fetching customer…</p></div>`;
+    try {
+      const res  = await fetch(`${WORKER_URL}/admin?q=${encodeURIComponent(q)}`);
+      const data = await res.json();
+      showProfile(data, q);
+    } catch (err) {
+      document.getElementById('search-state').innerHTML = `<div class="state-msg"><div class="icon">⚠️</div><h3>Error</h3><p>${err.message}</p></div>`;
+    }
+    btn.disabled = false; btn.textContent = 'Search';
+  }
+
+  async function loadCustomer(email) {
+    document.getElementById('mode-panel').style.display    = 'none';
+    document.getElementById('profile-panel').style.display = '';
+    document.getElementById('results').innerHTML = `<div class="state-msg"><div class="spinner"></div><p>Loading profile…</p></div>`;
+    window.history.pushState({}, '', `?customer=${encodeURIComponent(email)}`);
+    try {
+      const res  = await fetch(`${WORKER_URL}/admin?q=${encodeURIComponent(email)}`);
+      const data = await res.json();
+      renderResults(data, email);
+    } catch (err) {
+      document.getElementById('results').innerHTML = `<div class="state-msg"><div class="icon">⚠️</div><h3>Error</h3><p>${err.message}</p></div>`;
+    }
+  }
+
+  function showProfile(data, query) {
+    document.getElementById('mode-panel').style.display    = 'none';
+    document.getElementById('profile-panel').style.display = '';
+    window.history.pushState({}, '', `?customer=${encodeURIComponent(query)}`);
+    renderResults(data, query);
+  }
+
+  function goBack() {
+    document.getElementById('profile-panel').style.display = 'none';
+    document.getElementById('mode-panel').style.display    = '';
+    document.getElementById('search-state').innerHTML      = '';
+    document.getElementById('search-input').value          = '';
+    window.history.pushState({}, '', window.location.pathname);
+    currentCustomer = null;
+  }
+
+  let msgMode = 'customer';
+  function switchMsgTab(mode) {
+    msgMode = mode;
+    document.getElementById('msg-tab-customer').classList.toggle('active', mode === 'customer');
+    document.getElementById('msg-tab-custom').classList.toggle('active',   mode === 'custom');
+    document.getElementById('msg-to-customer').style.display = mode === 'customer' ? '' : 'none';
+    document.getElementById('msg-to-custom').style.display   = mode === 'custom'   ? '' : 'none';
+  }
+
+  async function openGmail() {
+    const to      = msgMode === 'customer' ? (currentCustomer?.email || '') : (document.getElementById('msg-custom-to')?.value || '');
+    const subject = 'Message from Free From That';
+    const message = document.getElementById('msg-body')?.value || '';
+    window.open(`https://mail.google.com/mail/?view=cm&to=${encodeURIComponent(to)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(message)}`, '_blank');
+    try { await fetch(`${WORKER_URL}/admin/log-message`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ to, subject, message, sentBy: 'Admin (Gmail)' }) }); } catch(e) {}
+    if (document.getElementById('msg-body')) document.getElementById('msg-body').value = '';
+    const reloadEmail = currentCustomer?.email || to;
+    if (reloadEmail) setTimeout(() => loadCustomer(reloadEmail), 1200);
+  }
+
+  function renderResults(data, query) {
+    const r = document.getElementById('results');
+    if (!data.customer && (!data.recipes || !data.recipes.length)) {
+      r.innerHTML = `<div class="not-found"><div class="icon">🚫</div><h3>No customer found</h3><p>No match for "<strong>${esc(query)}</strong>".</p></div>`;
+      return;
+    }
+    const c = data.customer || {};
+    const orders = data.orders || [], courses = data.courses || [], books = data.books || [];
+    const recipes = data.recipes || [], ratings = data.ratings || [], messages = data.messages || [];
+    const abandoned = data.abandoned || [];
+    currentCustomer = c;
+    const name = c.first_name ? `${c.first_name} ${c.last_name}` : query;
+    document.title = `${name} — FFT Admin`;
+    const initials = name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+    const email = c.email || query;
+    const address = c.addresses?.[0];
+    const location = address ? `${address.city||''}${address.state_or_province?', '+address.state_or_province:''}${address.country?', '+address.country:''}`.replace(/^, /,'') : '—';
+    const joined = c.date_created ? fmtDate(c.date_created) : '—';
+    const bcId = c.id ? `BC-${c.id}` : '—';
+    const totalSpent = orders.reduce((s,o) => s + parseFloat(o.total_inc_tax||0), 0);
+    r.innerHTML = `
+      <div class="profile-card">
+        <div class="avatar">${initials}</div>
+        <div class="profile-info">
+          <div class="profile-name">${esc(name)}</div>
+          <div class="profile-email">${esc(email)}</div>
+          <div class="profile-meta">
+            <div class="meta-item"><span class="meta-label">BC ID</span><span class="meta-value"><span class="id-badge">${esc(bcId)}</span></span></div>
+            <div class="meta-item"><span class="meta-label">Location</span><span class="meta-value">${esc(location)}</span></div>
+            <div class="meta-item"><span class="meta-label">Customer Since</span><span class="meta-value">${joined}</span></div>
+            <div class="meta-item"><span class="meta-label">Phone</span><span class="meta-value">${esc(c.phone||'—')}</span></div>
+          </div>
+        </div>
+        <div class="profile-stats">
+          <div class="stat-box"><div class="stat-num">${orders.length}</div><div class="stat-label">Orders</div></div>
+          <div class="stat-box"><div class="stat-num">${courses.length}</div><div class="stat-label">Courses</div></div>
+          <div class="stat-box"><div class="stat-num">${books.length}</div><div class="stat-label">Books</div></div>
+          <div class="stat-box"><div class="stat-num">${recipes.length}</div><div class="stat-label">Recipes</div></div>
+          <div class="stat-box"><div class="stat-num">${abandoned.length}</div><div class="stat-label">Abandoned</div></div>
+          <div class="stat-box"><div class="stat-num">${messages.length + (data.replies||[]).length}</div><div class="stat-label">Messages</div></div>
+          <div class="stat-box"><div class="stat-num">$${totalSpent.toFixed(0)}</div><div class="stat-label">Spent</div></div>
+        </div>
+      </div>
+      <div class="message-panel">
+        <div class="message-panel-header"><div class="message-panel-title">✉️ Send Message</div></div>
+        <div class="msg-tabs">
+          <button class="msg-tab active" id="msg-tab-customer" onclick="switchMsgTab('customer')">To ${esc(name.split(' ')[0])}</button>
+          <button class="msg-tab" id="msg-tab-custom" onclick="switchMsgTab('custom')">To Someone Else</button>
+        </div>
+        <div id="msg-to-customer" style="margin-bottom:14px;"><div style="font-size:12px;color:var(--muted);">Sending to: <span style="color:var(--yellow);font-family:'JetBrains Mono',monospace;">${esc(email)}</span></div></div>
+        <div id="msg-to-custom" style="display:none"><div class="msg-field"><label>To (email address)</label><input type="email" class="msg-input" id="msg-custom-to" placeholder="jessica@freefromthat.com"></div></div>
+        <div class="msg-field"><label>Message</label><textarea class="msg-textarea" id="msg-body" placeholder="Write your message here…"></textarea></div>
+        <div class="msg-actions"><button class="gmail-btn" onclick="openGmail()" style="background:var(--yellow);color:#0c1219;border:none;border-radius:8px;padding:12px 28px;font-size:14px;font-weight:600;cursor:pointer;">📧 Open in Gmail</button><span class="msg-status" id="msg-status"></span></div>
+      </div>
+      <div class="section"><div class="section-header"><span class="section-icon">🛒</span><span class="section-title">Abandoned Cart</span><span class="section-count">${abandoned.length}</span></div>${renderAbandoned(abandoned)}</div>
+      <div class="section"><div class="section-header"><span class="section-icon">🛒</span><span class="section-title">All Orders</span><span class="section-count">${orders.length}</span></div>${renderOrders(orders)}</div>
+      <div class="section"><div class="section-header"><span class="section-icon">🎓</span><span class="section-title">Courses & Training</span><span class="section-count">${courses.length}</span></div>${renderGrouped(courses, 'course')}</div>
+      <div class="section"><div class="section-header"><span class="section-icon">📚</span><span class="section-title">Books</span><span class="section-count">${books.length}</span></div>${renderGrouped(books, 'book')}</div>
+      <div class="section"><div class="section-header"><span class="section-icon">🍽️</span><span class="section-title">Recipes Generated</span><span class="section-count">${recipes.length}</span></div>${renderRecipes(recipes)}</div>
+      <div class="section"><div class="section-header"><span class="section-icon">⭐</span><span class="section-title">Ratings & Reviews</span><span class="section-count">${ratings.length}</span></div>${renderRatings(ratings)}</div>
+      <div class="section"><div class="section-header"><span class="section-icon">💬</span><span class="section-title">Conversation</span><span class="section-count">${messages.length + (data.replies||[]).length}</span></div>${renderConversation(messages, data.replies||[])}</div>`;
+    setTimeout(attachMessageClicks, 50);
+  }
+
+  function renderAbandoned(abandoned) {
+    if (!abandoned.length) return `<div class="empty-state">No abandoned carts 🎉</div>`;
+    return `<table class="data-table"><thead><tr><th>Date</th><th>Products</th><th>Value</th></tr></thead><tbody>${abandoned.map(o=>`<tr><td class="mono">${fmtDate(o.date_created)}</td><td>${(o.products||[]).map(p=>`<span class="tag" style="background:rgba(224,92,92,0.15);color:#e05c5c;">${esc(p.name)} × ${p.quantity}</span>`).join('')||'—'}</td><td class="amount" style="color:var(--red);">$${parseFloat(o.total_inc_tax||0).toFixed(2)}</td></tr>`).join('')}</tbody></table>`;
+  }
+  function renderOrders(orders) {
+    if (!orders.length) return `<div class="empty-state">No orders on record</div>`;
+    return `<table class="data-table"><thead><tr><th>Order ID</th><th>Date</th><th>Products</th><th>Status</th><th>Total</th></tr></thead><tbody>${orders.map(o=>`<tr><td class="mono">#${o.id}</td><td class="mono">${fmtDate(o.date_created)}</td><td>${(o.products||[]).map(p=>`<span class="tag">${esc(p.name)}</span>`).join('')||'—'}</td><td>${esc(o.status||'—')}</td><td class="amount">$${parseFloat(o.total_inc_tax||0).toFixed(2)}</td></tr>`).join('')}</tbody></table>`;
+  }
+  function renderGrouped(items, tagClass) {
+    const label = tagClass === 'course' ? 'No courses purchased' : 'No books purchased';
+    if (!items.length) return `<div class="empty-state">${label}</div>`;
+    return `<table class="data-table"><thead><tr><th>Item</th><th>Order #</th><th>Date</th><th>Amount</th></tr></thead><tbody>${items.map(c=>`<tr><td>${c.products.map(p=>`<span class="tag ${tagClass}">${esc(p.name)}</span>`).join('')}</td><td class="mono">#${c.order.id}</td><td class="mono">${fmtDate(c.order.date_created)}</td><td class="amount">$${parseFloat(c.order.total_inc_tax||0).toFixed(2)}</td></tr>`).join('')}</tbody></table>`;
+  }
+  function renderRecipes(recipes) {
+    if (!recipes.length) return `<div class="empty-state">No recipes generated yet</div>`;
+    return `<div class="card-grid">${recipes.map(r=>`<div class="mini-card"><div class="mini-card-top"><div class="mini-card-title">${esc(r.title||r.recipe_name||'Recipe')}</div><div class="mini-card-date">${r.date?fmtDate(r.date):''}</div></div><div class="mini-card-body">${esc(r.summary||r.description||'')}</div></div>`).join('')}</div>`;
+  }
+  function renderRatings(ratings) {
+    if (!ratings.length) return `<div class="empty-state">No ratings or reviews left</div>`;
+    return `<div class="card-grid">${ratings.map(r=>`<div class="mini-card"><div class="stars">${'★'.repeat(parseInt(r.stars||r.rating||0))}${'☆'.repeat(5-parseInt(r.stars||r.rating||0))}</div><div class="mini-card-top"><div class="mini-card-title">${esc(r.recipe_name||r.title||'Recipe')}</div><div class="mini-card-date">${r.date?fmtDate(r.date):''}</div></div>${r.review||r.comment?`<div class="review-text">"${esc(r.review||r.comment)}"</div>`:''}</div>`).join('')}</div>`;
+  }
+  function renderConversation(sent, replies) {
+    const all = [...sent.map(m=>({...m,type:'sent'})),...replies.map(r=>({...r,type:'reply'}))];
+    if (!all.length) return `<div class="empty-state">No messages yet</div>`;
+    all.sort((a,b)=>new Date(b.date)-new Date(a.date));
+    return `<div style="display:flex;flex-direction:column;gap:10px;">${all.map((m,i)=>{
+      const isSent=m.type==='sent', accent=isSent?'var(--blue)':'var(--green)', label=isSent?'📤 You':'📥 Customer';
+      const preview=isSent?(m.message||''):(m.body||'');
+      return `<div style="background:var(--surface);border:1px solid var(--border);border-left:3px solid ${accent};border-radius:10px;overflow:hidden;">
+        <div class="msg-row" data-index="conv-${i}" style="padding:14px 18px;display:flex;align-items:center;gap:16px;cursor:pointer;">
+          <div style="font-size:11px;color:var(--muted);white-space:nowrap;font-family:'JetBrains Mono',monospace;">${fmtDate(m.date)}</div>
+          <div style="flex:1;"><div style="font-weight:600;font-size:13px;margin-bottom:2px;"><span style="color:${accent};">${label}</span>${m.subject?`<span style="color:var(--muted);font-weight:400;"> — ${esc(m.subject)}</span>`:''}</div><div style="font-size:12px;color:var(--muted);">${esc(preview.substring(0,80))}${preview.length>80?'…':''}</div></div>
+          <div id="msg-arrow-conv-${i}" style="color:var(--muted);font-size:16px;transition:transform 0.2s;">›</div>
+        </div>
+        <div id="msg-expand-conv-${i}" style="display:none;padding:0 18px 18px;border-top:1px solid var(--border);"><div style="padding-top:14px;font-size:14px;color:var(--text);line-height:1.7;white-space:pre-wrap;">${esc(preview||'(empty)')}</div></div>
+      </div>`;
+    }).join('')}</div>`;
+  }
+
+  function esc(str) { return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+  function fmtDate(str) {
+    if (!str) return '—';
+    try { return new Date(str).toLocaleDateString('en-GB', {day:'2-digit',month:'short',year:'numeric'}); } catch { return str; }
+  }
+
+  // ── BROADCASTS ──────────────────────────────────────────────────────────
+  let broadcastDraft = null, activeRegion = 'us', regionVersions = {};
+
+  const REGION_META = {
+    test:   { label: '🧪 TEST',      count: '3 emails' },
+    us:     { label: '🇺🇸 US',       count: '~800' },
+    uk:     { label: '🇬🇧 UK',       count: '~180' },
+    au:     { label: '🇦🇺 AU/NZ',    count: '~150' },
+    ca:     { label: '🇨🇦 Canada',   count: '~70' },
+    es:     { label: '🇪🇸 Spain+LATAM', count: '~29' },
+    fr:     { label: '🇫🇷 France',   count: '~45' },
+    europe: { label: '🇪🇺 Europe',   count: '~231' },
+    world:  { label: '🌍 World',     count: '~214' },
+  };
+
+  function getYouTubeId(url) {
+    if (!url) return null;
+    const m = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\s]+)/);
+    return m ? m[1] : null;
+  }
+  function renderVideoPreview(url) {
+    if (!url) return '';
+    const ytId = getYouTubeId(url);
+    if (ytId) return `<a href="${url}" target="_blank" class="bc-preview-video"><img src="https://img.youtube.com/vi/${ytId}/maxresdefault.jpg" alt="Video thumbnail"><div class="bc-play-btn">▶</div></a>`;
+    return `<a href="${url}" target="_blank" style="color:var(--yellow);font-size:13px;">▶ Watch Video</a>`;
+  }
+  function renderRegionTabs() {
+    const tabs = document.getElementById('bc-region-tabs');
+    const selected = getSelectedRegions();
+    const toShow = selected.length ? selected : Object.keys(REGION_META);
+    tabs.innerHTML = toShow.map(key => {
+      const meta = REGION_META[key];
+      if (!meta) return '';
+      return `<button onclick="selectRegion('${key}')" id="bc-rtab-${key}" style="padding:6px 14px;border-radius:8px;border:1px solid var(--border);background:${key===activeRegion?'var(--blue)':'var(--surface2)'};color:${key===activeRegion?'#fff':'var(--muted)'};font-size:12px;cursor:pointer;">
+        ${meta.label} <span style="opacity:0.7;font-size:11px;">${meta.count}</span>
+      </button>`;
+    }).join('');
+    // Also update preview label
+    const previewLabel = document.querySelector('#bc-preview-wrap .bc-preview > div:first-child');
+    if (previewLabel) previewLabel.textContent = `Preview — ${toShow.length} Regional Version${toShow.length===1?'':'s'}`;
+  }
+  function selectRegion(key) {
+    if (regionVersions[activeRegion] !== undefined) regionVersions[activeRegion] = document.getElementById('bc-region-body').innerText;
+    activeRegion = key;
+    document.getElementById('bc-region-body').innerText = regionVersions[key] || '(no content for this region)';
+    renderRegionTabs();
+  }
+
+  async function generateBroadcast() {
+    const brief = document.getElementById('bc-brief').value.trim();
+    const videoUrl = document.getElementById('bc-video').value.trim();
+    const discountCode = document.getElementById('bc-discount').value.trim();
+    const contentType = document.getElementById('bc-content-type').value;
+    const btn = document.getElementById('bc-draft-btn');
+    const status = document.getElementById('bc-gen-status');
+    if (!brief) { status.textContent = 'Please write a brief first.'; return; }
+    btn.disabled = true; btn.textContent = '✨ Generating 8 versions…';
+    status.textContent = 'Claude is writing regional versions — takes about 20 seconds…';
+    document.getElementById('bc-preview-wrap').style.display = 'none';
+    try {
+      const res  = await fetch(`${WORKER_URL}/admin/broadcast-draft`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ brief, videoUrl, discountCode, contentType }) });
+      const data = await res.json();
+      if (!data.ok) throw new Error(data.error || 'Generation failed');
+      regionVersions = data.regionVersions || {};
+      broadcastDraft = { subject: data.subject, videoUrl, discountCode };
+      activeRegion = getSelectedRegions()[0] || 'us';
+      document.getElementById('bc-preview-subject').textContent = data.subject;
+      document.getElementById('bc-video-preview').innerHTML = renderVideoPreview(videoUrl);
+      document.getElementById('bc-region-body').innerText = regionVersions['us'] || '(no content)';
+      document.getElementById('bc-preview-wrap').style.display = '';
+      renderRegionTabs();
+      status.textContent = '✓ 8 regional versions ready — review each tab before sending';
+      status.style.color = 'var(--green)';
+    } catch(err) {
+      status.textContent = `Error: ${err.message}`; status.style.color = 'var(--red)';
+    }
+    btn.disabled = false; btn.textContent = '✨ Generate with Claude';
+  }
+
+  function getSelectedRegions() {
+    const boxes = document.querySelectorAll('#bc-region-checkboxes input[type=checkbox]:checked');
+    const vals  = Array.from(boxes).map(b => b.value);
+    if (vals.includes('all')) return ['us','uk','au','ca','es','fr','europe','world'];
+    return vals;
+  }
+  function getSelectedCount() {
+    const counts = { us:457, uk:126, au:107, ca:51, es:29, fr:45, europe:231, world:214 };
+    return getSelectedRegions().reduce((sum,r) => sum + (counts[r]||0), 0);
+  }
+  function updateRegionSelection() {
+    const selected = getSelectedRegions();
+    const counts   = { test:3, us:800, uk:180, au:150, ca:70, es:29, fr:45, europe:231, world:214 };
+    const total    = selected.reduce((sum,r) => sum + (counts[r]||0), 0);
+    document.getElementById('bc-region-summary').textContent = selected.length ? `~${total} recipients selected` : '';
+    document.getElementById('bc-region-warning').style.display = 'none';
+    const btn = document.getElementById('bc-send-btn');
+    if (btn) btn.textContent = selected.length ? `🚀 Send to Selected Regions` : '🚀 Send to All Regions';
+  }
+  function toggleAllRegions(checkbox) {
+    document.querySelectorAll('#bc-region-checkboxes input[type=checkbox]').forEach(b => { if (b.value !== 'all') b.checked = checkbox.checked; });
+    updateRegionSelection();
+  }
+
+  async function sendBroadcast() {
+    if (!broadcastDraft) return;
+    regionVersions[activeRegion] = document.getElementById('bc-region-body').innerText;
+    const selectedRegions = getSelectedRegions();
+    if (selectedRegions.length === 0) { document.getElementById('bc-region-warning').style.display = 'block'; return; }
+    document.getElementById('bc-region-warning').style.display = 'none';
+    const btn = document.getElementById('bc-send-btn');
+    const status = document.getElementById('bc-send-status');
+    const subject = document.getElementById('bc-preview-subject').textContent;
+    const totalEst = getSelectedCount();
+    if (!confirm(`Send to ~${totalEst} customers in selected regions? This cannot be undone.`)) return;
+    btn.disabled = true; btn.textContent = '🚀 Sending…';
+    status.textContent = 'Sending…'; status.className = 'bc-status';
+    try {
+      const res  = await fetch(`${WORKER_URL}/admin/broadcast-send`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ subject, message: regionVersions['world'] || '', videoUrl: broadcastDraft.videoUrl || '', discountCode: broadcastDraft.discountCode || '', regionVersions, selectedRegions }) });
+      const data = await res.json();
+      if (data.ok) { status.textContent = `✓ Sent to ${data.sent} recipients!`; status.className = 'bc-status success'; btn.disabled = true; btn.textContent = '✓ Sent'; }
+      else throw new Error(data.error || 'Send failed');
+    } catch(err) {
+      status.textContent = `Error: ${err.message}`; status.className = 'bc-status error';
+      btn.disabled = false; btn.textContent = '🚀 Send to Selected Regions';
+    }
+  }
+
+  function clearBroadcast() {
+    document.getElementById('bc-brief').value = '';
+    document.getElementById('bc-video').value = '';
+    document.getElementById('bc-discount').value = '';
+    document.getElementById('bc-preview-wrap').style.display = 'none';
+    document.getElementById('bc-gen-status').textContent = '';
+    document.getElementById('bc-gen-status').style.color = '';
+    broadcastDraft = null; regionVersions = {};
+  }
+
+  async function loadAnalytics() {
+    const wrap = document.getElementById('analytics-wrap');
+    wrap.innerHTML = `<div class="state-msg"><div class="spinner"></div><p>Loading analytics…</p></div>`;
+    try {
+      const res  = await fetch(`${WORKER_URL}/admin/analytics`);
+      const data = await res.json();
+      analyticsLoaded = true;
+      renderAnalytics(data.campaigns || []);
+    } catch(err) {
+      wrap.innerHTML = `<div class="state-msg"><div class="icon">⚠️</div><h3>Error</h3><p>${err.message}</p></div>`;
+    }
+  }
+
+  function renderAnalytics(campaigns) {
+    const wrap = document.getElementById('analytics-wrap');
+    if (!campaigns.length) { wrap.innerHTML = `<div class="state-msg"><div class="icon">📊</div><h3>No campaigns yet</h3><p>Send your first broadcast and analytics will appear here.</p></div>`; return; }
+    wrap.innerHTML = `
+      <div style="margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;">
+        <div style="font-family:'Lora',serif;font-size:18px;font-weight:700;color:var(--text);">📊 Campaign Analytics</div>
+        <button onclick="analyticsLoaded=false;loadAnalytics()" style="background:none;border:1px solid var(--border);color:var(--muted);padding:6px 14px;border-radius:8px;cursor:pointer;font-size:12px;">↺ Refresh</button>
+      </div>
+      <table class="data-table">
+        <thead><tr><th>Date</th><th>Subject</th><th>Sent</th><th>Opens</th><th>Open Rate</th><th>Clicks</th><th>Click Rate</th><th>Bounces</th></tr></thead>
+        <tbody>${campaigns.map(c=>`<tr>
+          <td class="mono">${fmtDate(c.date)}</td>
+          <td style="max-width:260px;font-weight:500;">${esc(c.subject)}</td>
+          <td class="mono">${c.sent}</td>
+          <td class="mono">${c.opens}</td>
+          <td><span style="color:${c.openRate>20?'var(--green)':'var(--muted)'};font-weight:600;">${c.openRate}%</span></td>
+          <td class="mono">${c.clicks}</td>
+          <td><span style="color:${c.clickRate>3?'var(--green)':'var(--muted)'};font-weight:600;">${c.clickRate}%</span></td>
+          <td class="mono" style="color:${c.bounces>0?'var(--red)':'var(--muted)'};">${c.bounces}</td>
+        </tr>`).join('')}</tbody>
+      </table>`;
+  }
+
+  function attachMessageClicks() {
+    document.querySelectorAll('.msg-row').forEach(row => {
+      row.addEventListener('click', () => {
+        const idx = row.dataset.index;
+        const body = document.getElementById(`msg-expand-${idx}`);
+        const arrow = document.getElementById(`msg-arrow-${idx}`);
+        if (!body) return;
+        const open = body.style.display === 'none';
+        body.style.display = open ? '' : 'none';
+        if (arrow) arrow.style.transform = open ? 'rotate(90deg)' : 'rotate(0deg)';
+      });
+    });
+  }
+</script>
+</body>
+</html>
