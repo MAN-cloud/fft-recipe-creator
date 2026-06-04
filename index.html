@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>My Recipe Maker 25052026</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:#FAF8F4;color:#1A1A18}
+
+/* ── TOP HEADER ── */
+.top-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;margin-top:10px}
+.top-header-title{font-family:'Lora',serif;font-size:33px;font-weight:700;color:#000;letter-spacing:0.3px;text-align:left}
+
+.form-group{margin-bottom:20px}
+.label{font-size:11px;font-weight:600;color:#888;text-transform:uppercase;margin-bottom:8px;display:block;letter-spacing:0.5px}
+textarea,input,select{width:100%;padding:12px;border:1px solid #ddd;border-radius:8px;font-size:14px;font-family:Arial}
+textarea{min-height:100px;resize:vertical}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:15px}
+.chip{padding:7px 14px;border:1px solid #ddd;border-radius:18px;background:#fff;cursor:pointer;font-size:12px}
+.chip:hover{border-color:#17587E}
+.chip.selected{background:#17587E;color:#fff;border-color:#17587E}
+.prompt-heading{font-size:20px;margin-bottom:8px;font-family:'Lora',serif;font-weight:700;text-align:left;color:#17587E}
+.tap-hint{font-size:11px;font-weight:500;color:#888;text-transform:none;font-family:'Inter',sans-serif}
+.btn{width:100%;padding:12px;background:#17587E;color:#fff;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-size:15px;margin-top:20px}
+.btn:hover{background:#0e3f5c}
+.error-box{background:#FAEAEA;border:1px solid #D85A5A;border-radius:8px;padding:12px;margin-bottom:15px;color:#A32D2D;display:none;font-size:13px}
+.error-box.show{display:block}
+.description{font-size:12px;color:rgba(0,0,0,0.7);line-height:1.6;margin-top:12px;margin-bottom:0}
+.page-wrapper{max-width:700px;margin:0 auto;padding:20px}
+.spinner-container{display:none;text-align:center;padding:40px 20px;margin:30px 0}
+.spinner-container.show{display:block}
+.spinner-logo{width:80px;height:80px;margin:0 auto 20px;animation:spin 2s linear infinite;font-size:60px}
+.spinner-text{font-size:16px;color:#17587E;font-weight:600;margin-top:15px}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+.recent-section{margin-top:28px;margin-bottom:8px}
+.recent-title{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#888;margin-bottom:10px}
+.recent-scroll{display:flex;gap:10px;overflow-x:auto;padding-bottom:8px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.recent-scroll::-webkit-scrollbar{display:none}
+.recent-card{flex-shrink:0;background:#fff;border:1px solid #e8e8e8;border-radius:10px;padding:12px 14px;min-width:160px;max-width:180px;cursor:pointer;transition:all 0.2s;border-left:3px solid #17587E}
+.recent-card:hover{box-shadow:0 2px 8px rgba(23,88,126,0.15);transform:translateY(-1px)}
+.recent-card-name{font-size:12px;font-weight:600;color:#1A1A18;line-height:1.3;margin-bottom:4px}
+.recent-card-meta{font-size:10px;color:#999;}
+</style>
+</head>
+<body>
+<div class="page-wrapper">
+
+  <!-- TOP HEADER: title left, logo right -->
+  <div class="top-header">
+    <div class="top-header-title">My Recipe Maker</div>
+    <img src="https://cdn.jsdelivr.net/gh/MAN-cloud/fft-recipe-creator@main/FFT_NEW_LOGO_TRANSPARENT.png"
+         alt="Free From That"
+         style="width:120px;height:120px;border-radius:50%;object-fit:cover;display:inline-block">
+  </div>
+  <hr style="border:none;border-top:1px solid #ddd;margin:4px 0 14px 0">
+
+  <div id="errorBox" class="error-box"></div>
+
+  <form id="recipeForm">
+
+    <!-- WHAT WOULD YOU LIKE TO MAKE -->
+    <div class="form-group">
+      <h2 class="prompt-heading">NEED AN IDEA? <span class="tap-hint">tap one</span></h2>
+      <div class="chips" id="dishChips"></div>
+      <h2 class="prompt-heading">WHAT WOULD YOU LIKE TO MAKE?</h2>
+      <textarea id="dish" placeholder="e.g. Eclairs without eggs, vegan macarons, chocolate cake..." required></textarea>
+      <p class="description">Tell me what you want to make. I'll engineer a plant-based vegan recipe using our Free From That products — built on 10 years of food science and culinary testing, so the technique is already perfected and you can make it your own.</p>
+    </div>
+
+    <!-- ALLERGIES -->
+    <div class="form-group">
+      <label class="label">Allergies & Intolerances</label>
+      <div class="chips" id="allergies"></div>
+    </div>
+
+    <button type="submit" class="btn">✨ Generate Recipe</button>
+
+  </form>
+
+  <!-- RECENTLY MADE — below button -->
+  <div class="recent-section" id="recentSection">
+    <div class="recent-title">🍽️ Recently Made by Others</div>
+    <div class="recent-scroll" id="recentScroll"><span style="font-size:12px;color:#bbb;padding:8px">Loading...</span></div>
+  </div>
+
+  <div class="spinner-container" id="spinner">
+    <div class="spinner-logo">🌟</div>
+    <div class="spinner-text">Chef is cooking...</div>
+  </div>
+</div>
+
+<script>
+const allergies = ['Gluten', 'Nuts', 'Peanuts', 'Dairy', 'Eggs', 'Soy', 'Seafood'];
+
+// ── ON/OFF SWITCH — change to false to skip map transition ────────────────
+const SHOW_MAP_TRANSITION = true;
+
+// ── LOAD RECENT RECIPES ────────────────────────────────────────────────────
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxiBmw7MH9--VlC3VDcwmPuRP27KPzGKETt3uIqOr0qMe1OuBo9CY6Z4A8hEXsr3IQT4A/exec';
+
+async function loadRecentRecipes() {
+  try {
+    const res = await fetch(APPS_SCRIPT_URL + '?type=getRecipes');
+    const data = await res.json();
+    if (data.recipes && data.recipes.length > 0) {
+      const scroll = document.getElementById('recentScroll');
+      scroll.innerHTML = '';
+      data.recipes.slice(-8).reverse().forEach(r => {
+        if (!r.name) return;
+        const card = document.createElement('div');
+        card.className = 'recent-card';
+        card.innerHTML = `<div class="recent-card-name">${r.name}</div><div class="recent-card-meta">${r.fftProduct || 'Vegan Recipe'}</div>`;
+        card.addEventListener('click', () => {
+          document.getElementById('dish').value = r.name;
+          document.getElementById('dish').scrollIntoView({behavior:'smooth'});
+        });
+        scroll.appendChild(card);
+      });
+      // section already visible
+    }
+  } catch(e) {}
+}
+loadRecentRecipes();
+
+function setupChips(containerId, items) {
+  const container = document.getElementById(containerId);
+  items.forEach(item => {
+    const chip = document.createElement('button');
+    chip.type = 'button';
+    chip.className = 'chip';
+    chip.textContent = item;
+    chip.addEventListener('click', (e) => {
+      e.preventDefault();
+      chip.classList.toggle('selected');
+    });
+    container.appendChild(chip);
+  });
+}
+
+function getSelectedChips(containerId) {
+  return Array.from(document.getElementById(containerId).querySelectorAll('.chip.selected'))
+    .map(c => c.textContent);
+}
+
+function showError(msg) {
+  document.getElementById('errorBox').textContent = msg;
+  document.getElementById('errorBox').classList.add('show');
+}
+
+function hideError() {
+  document.getElementById('errorBox').classList.remove('show');
+}
+
+document.getElementById('recipeForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  hideError();
+
+  const dish = document.getElementById('dish').value;
+  const allergiesList = getSelectedChips('allergies');
+
+  document.getElementById('recipeForm').style.display = 'none';
+  document.getElementById('spinner').classList.add('show');
+
+  try {
+    const recipeId = 'RCP-' + Date.now();
+    const now = new Date();
+    const date = now.toLocaleDateString('en-GB');
+    const time = now.toLocaleTimeString('en-GB');
+
+    // Get country + city from IP (non-blocking)
+    let country = 'Unknown';
+    let city = 'Unknown';
+    try {
+      const ipRes = await Promise.race([
+        fetch('https://ipapi.co/json/'),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 3000))
+      ]);
+      const ipData = await ipRes.json();
+      country = ipData.country_name || 'Unknown';
+      city = ipData.city || 'Unknown';
+    } catch(e) {}
+
+    // Save customer (no name/email at this stage)
+    fetch('https://fft-recipe.man-4bb.workers.dev/sheet', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'customer', recipeId, date, time, email: '', phone: '', country, city })
+    }).catch(() => {});
+
+    sessionStorage.setItem('recipeId', recipeId);
+    sessionStorage.setItem('recipeDate', date);
+    sessionStorage.setItem('recipeTime', time);
+    sessionStorage.setItem('recipeDish', dish);
+    sessionStorage.setItem('recipeAllergies', allergiesList.join(', ') || 'None');
+    sessionStorage.setItem('customerName', '');
+
+    if (SHOW_MAP_TRANSITION) {
+      window.location.href = 'page-map.html';
+      return;
+    }
+
+    await generateRecipe(dish, allergiesList, '', recipeId, date, time);
+
+  } catch (error) {
+    console.error('Error:', error);
+    showError('Error: ' + error.message + ' — Please try again or check your connection.');
+    document.getElementById('recipeForm').style.display = 'block';
+    document.getElementById('spinner').classList.remove('show');
+  }
+});
+
+async function generateRecipe(dish, allergiesList, firstName, recipeId, date, time) {
+  const prompt = `You are Chef Jessica McKenzie. Create a FULL PROFESSIONAL VEGAN recipe for: ${dish}
+Avoid: ${allergiesList.join ? allergiesList.join(', ') : allergiesList || 'nothing'}
+
+RULES:
+- All recipes MUST be 100% vegan
+- Use FREE FROM THAT products where relevant: PANACEGG V2 (baked pastry/choux/custards - 5g+45g water = 1 egg), POTATO PROTEIN 300CW (mousse/meringues/marshmallows only - foaming), GERBET (macarons only - 12g+108g cold water per 40 shells)
+- NEVER use aquafaba
+- Generate 12-15 detailed steps minimum - this is a professional recipe
+- Each step must be specific with temperatures, timings, and technique details
+- Ingredients list must be complete with ALL items needed (10-15 ingredients minimum)
+- Use metric measurements (grams, ml)
+
+RESPOND ONLY WITH THIS EXACT JSON (no markdown, no extra text):
+{
+  "title": "Recipe Name",
+  "tagline": "One line describing the dish and technique",
+  "why": "One sentence: why this vegan technique works scientifically",
+  "about": "One sentence: about this dish",
+  "technique": "Key technique name",
+  "servings": "e.g. Makes 40 shells / Serves 6",
+  "ingredients": [
+    {"name": "Ingredient name", "qty": "250g"},
+    {"name": "Another ingredient", "qty": "2 tbsp"}
+  ],
+  "steps": [
+    "Step 1: Detailed method with temperature and timing",
+    "Step 2: ...",
+    "...at least 12 steps total..."
+  ],
+  "whyItWorks": "2-3 sentences explaining the food science behind the vegan substitutions",
+  "fftProduct": "PANACEGG V2 or POTATO PROTEIN 300CW or GERBET",
+  "tip": "One specific professional chef tip"
+}`;
+
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 25000);
+
+  const response = await fetch('https://fft-recipe.man-4bb.workers.dev', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ prompt }),
+    signal: controller.signal
+  });
+  clearTimeout(timeout);
+
+  if (!response.ok) throw new Error('Worker error: ' + response.status);
+
+  const text = await response.text();
+  const jsonMatch = text.match(/\{[\s\S]*\}/);
+  if (!jsonMatch) throw new Error('No JSON in response');
+
+  const recipe = JSON.parse(jsonMatch[0]);
+  recipe.customerName = '';
+
+  fetch('https://fft-recipe.man-4bb.workers.dev/sheet', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      type: 'recipe',
+      recipeId, date, time,
+      recipeName: recipe.title || dish,
+      cuisine: 'Vegan',
+      mealType: 'Baking/Pastry',
+      allergies: allergiesList.join ? allergiesList.join(', ') : allergiesList || 'None',
+      diet: 'Vegan',
+      fftProducts: recipe.fftProduct || '',
+      fullRecipe: JSON.stringify(recipe)
+    })
+  }).catch(() => {});
+
+  sessionStorage.setItem('recipeData', JSON.stringify(recipe));
+  window.location.href = 'page-2.html';
+}
+
+// ── DISH STARTER CHIPS — tap to fill the box ──────────────────────────────
+const dishIdeas = ['Vegan chocolate éclairs','Vegan macarons','Vegan cheesecake','Vegan tiramisu','Vegan mousse cake','Vegan burger','Vegan brownies','Vegan brioche'];
+function setupDishChips() {
+  const container = document.getElementById('dishChips');
+  const ta = document.getElementById('dish');
+  dishIdeas.forEach(idea => {
+    const chip = document.createElement('button');
+    chip.type = 'button';
+    chip.className = 'chip';
+    chip.textContent = idea;
+    chip.addEventListener('click', (e) => {
+      e.preventDefault();
+      ta.value = idea;
+      container.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
+      chip.classList.add('selected');
+      ta.focus();
+      ta.setSelectionRange(ta.value.length, ta.value.length);
+    });
+    container.appendChild(chip);
+  });
+  ta.addEventListener('input', () => {
+    container.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
+  });
+}
+setupDishChips();
+
+setupChips('allergies', allergies);
+</script>
+</body>
+</html>
